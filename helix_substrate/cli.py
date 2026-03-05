@@ -2,7 +2,8 @@
 helix-substrate CLI.
 
 Usage:
-    helix-substrate convert <model_id> --output <dir>
+    helix-substrate convert <model_id> --output <dir>       # HuggingFace models
+    helix-substrate convert-gguf <gguf_path> --output <dir> # GGUF models
     helix-substrate bench --rows 16384 --cols 16384
 """
 
@@ -63,6 +64,38 @@ def main():
         help="Suppress progress output"
     )
 
+    # Convert GGUF command
+    convert_gguf_parser = subparsers.add_parser(
+        "convert-gguf",
+        help="Convert GGUF model to CDNA format"
+    )
+    convert_gguf_parser.add_argument(
+        "gguf_path",
+        help="Path to GGUF file"
+    )
+    convert_gguf_parser.add_argument(
+        "--output", "-o",
+        required=True,
+        help="Output directory for CDNA files"
+    )
+    convert_gguf_parser.add_argument(
+        "--block-rows",
+        type=int,
+        default=16,
+        help="Block size for streaming (default: 16)"
+    )
+    convert_gguf_parser.add_argument(
+        "--codec",
+        choices=["brotli", "zstd"],
+        default="brotli",
+        help="Compression codec (default: brotli)"
+    )
+    convert_gguf_parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help="Suppress progress output"
+    )
+
     # Bench command
     bench_parser = subparsers.add_parser(
         "bench",
@@ -101,6 +134,18 @@ def main():
             skip_embeddings=args.skip_embeddings,
             skip_lm_head=args.skip_lm_head,
             token=args.token,
+            verbose=not args.quiet,
+        )
+
+    elif args.command == "convert-gguf":
+        from helix_substrate.convert_gguf import convert_gguf_model
+        from pathlib import Path
+
+        convert_gguf_model(
+            gguf_path=Path(args.gguf_path),
+            output_dir=Path(args.output),
+            block_rows=args.block_rows,
+            codec=args.codec,
             verbose=not args.quiet,
         )
 

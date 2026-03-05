@@ -8,7 +8,7 @@ Model weight compression and streaming decode library. Compress neural network w
 
 2. **Streaming Block Decode** — Compute `Y = X @ W` where W is stored in CDNA format. W is never fully loaded. Instead, blocks of rows are decompressed one at a time, multiplied against the corresponding slice of X, and accumulated.
 
-3. **Structural Entropy (Se) Routing** — Measure tensor complexity via `Se = H × U × D` (entropy × unstructuredness × rank depth). The Se score maps to a compute routing decision: simple tensors → CPU, parallel tensors → GPU, complex unstructured tensors → QPU.
+3. **Structural Entropy (Se) Routing** — Measure tensor complexity via `Se = H × U × D` (entropy × unstructuredness × rank depth). The Se score maps to a compute routing decision: simple tensors → CPU, complex tensors → GPU.
 
 4. **Receipts** — Every operation produces a tamper-evident receipt with SHA256 input/output hashes, timing, memory usage, and fidelity metrics. If you can't verify it, it didn't happen.
 
@@ -32,6 +32,28 @@ Run the benchmark yourself:
 python tools/bench_memory.py --rows 16384 --cols 16384 --block-rows 32
 ```
 
+## Supported Models
+
+### HuggingFace Models
+- Any model using safetensors format
+- Tested: TinyLlama-1.1B, Mistral-7B
+- Architecture: LLaMA-family (LLaMA, Mistral, TinyLlama, Qwen, etc.)
+
+### GGUF Models
+```bash
+pip install helix-substrate[gguf]
+helix-substrate convert-gguf ./model.gguf --output ./model-cdna
+```
+- Quantization types: Q8_0, Q4_K_M, Q5_K, F16, F32
+- Architecture: LLaMA-family only (uses LLaMA tensor naming convention)
+- **Not tested**: GPT-2, Falcon, MPT, or other architectures with different tensor names
+
+### What This Library Does NOT Do
+- **Full LLM inference**: This library handles weight storage and streaming matmul. For actual text generation, use llama.cpp, transformers, or similar.
+- **Training or fine-tuning**: Read-only weight access.
+- **Arbitrary architecture support**: Tensor naming assumes LLaMA-family conventions.
+- **KV cache management**: You supply the input tensors; we compute `Y = X @ W`.
+
 ## Install
 
 ```bash
@@ -53,7 +75,7 @@ Required: `numpy>=1.24`. Optional: `brotli`, `zstandard` (compression), `hugging
 helix-substrate convert mistralai/Mistral-7B-v0.1 --output ./mistral-cdna
 ```
 
-This downloads the model, quantizes each weight tensor to CDNA format, and saves to a directory. The model is now ready for streaming inference.
+This downloads the model, quantizes each weight tensor to CDNA format, and saves to a directory. Weight tensors can then be used for streaming matmul operations.
 
 ### Compress a tensor
 
@@ -118,12 +140,11 @@ Structural Entropy decomposes tensor complexity into three independent factors:
 | **U** (unstructuredness) | Neighbor coherence | No spatial correlation between adjacent rows |
 | **D** (depth) | Effective rank ratio | Many dimensions matter |
 
-`Se = H × U × D` produces a 0-1 score. The 2D routing policy uses `(Se, C_struct)` jointly:
+`Se = H × U × D` produces a 0-1 score. The routing policy uses Se to suggest compute targets:
 
-- **Zone 1**: Se < 0.30, structured → CPU
-- **Zone 2**: 0.30 ≤ Se < 0.70 → GPU
-- **Zone 3**: Se ≥ 0.70, unstructured → QPU
-- **Zone 4**: Se ≥ 0.70, structured → GPU
+- **Low Se** (< 0.30): Structured, predictable → CPU (simple ops)
+- **Medium Se** (0.30-0.70): Parallel-friendly → GPU
+- **High Se** (≥ 0.70): Dense, complex → GPU (batched)
 
 ## Inspiration
 

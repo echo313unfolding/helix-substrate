@@ -1,0 +1,62 @@
+=== helix-substrate Benchmark Receipt ===
+date: 2026-03-05T21:59:44Z
+package: helix-substrate==0.2.1
+python: Python 3.10.12
+
+=== Hardware ===
+CPU(s):                                  16
+Model name:                              Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Thread(s) per core:                      2
+Core(s) per socket:                      8
+memory: 62Gi
+
+=== Command ===
+python tools/bench_memory.py --rows 16384 --cols 16384 --block-rows 32
+
+=== Output ===
+Benchmark: 16384x16384 weight matrix, block_rows=32
+============================================================
+W shape: (16384, 16384), size: 1024.00 MB
+X shape: (8, 16384), size: 512.00 KB
+
+Standard matmul (dequantize full W, then multiply):
+  Peak memory: 1024.50 MB
+Streaming matmul (block by block):
+  Peak memory: 68.75 MB
+
+Cosine similarity: 1.000000
+Memory ratio (standard/streaming): 14.90x
+
+============================================================
+RECEIPT:
+  Matrix size: 16384x16384
+  Block size: 32
+  Standard peak: 1024.50 MB
+  Streaming peak: 68.75 MB
+  Measured ratio: 14.90x
+  Correctness: cosine=1.000000
+
+=== SHA256 of this receipt ===
+Benchmark: 16384x16384 weight matrix, block_rows=32
+============================================================
+W shape: (16384, 16384), size: 1024.00 MB
+X shape: (8, 16384), size: 512.00 KB
+
+Standard matmul (dequantize full W, then multiply):
+  Peak memory: 1024.50 MB
+Streaming matmul (block by block):
+  Peak memory: 68.75 MB
+
+Cosine similarity: 1.000000
+Memory ratio (standard/streaming): 14.90x
+
+============================================================
+RECEIPT:
+  Matrix size: 16384x16384
+  Block size: 32
+  Standard peak: 1024.50 MB
+  Streaming peak: 68.75 MB
+  Measured ratio: 14.90x
+  Correctness: cosine=1.000000
+
+=== SHA256 of this receipt ===

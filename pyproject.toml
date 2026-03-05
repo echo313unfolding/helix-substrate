@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "helix-substrate"
-version = "0.2.0"
+version = "0.2.1"
 description = "Model weight compression and streaming decode library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -50,6 +50,9 @@ hf = [
     "huggingface_hub>=0.20",
     "safetensors>=0.4",
 ]
+gguf = [
+    "gguf>=0.6",
+]
 dev = [
     "pytest>=7.0",
     "brotli>=1.0",
@@ -59,6 +62,7 @@ all = [
     "zstandard>=0.20",
     "huggingface_hub>=0.20",
     "safetensors>=0.4",
+    "gguf>=0.6",
 ]
 
 [project.scripts]
