@@ -38,14 +38,22 @@ python tools/bench_memory.py --rows 16384 --cols 16384 --block-rows 32
 pip install helix-substrate
 ```
 
-For compression support:
+For HuggingFace model conversion:
 ```bash
-pip install helix-substrate[brotli]
+pip install helix-substrate[hf,brotli]
 ```
 
-Required: `numpy>=1.24`. Optional: `brotli` (for CDNAv2 block compression), `zstandard` (alternative codec).
+Required: `numpy>=1.24`. Optional: `brotli`, `zstandard` (compression), `huggingface_hub`, `safetensors` (model conversion).
 
 ## Quick start
+
+### Convert a HuggingFace model
+
+```bash
+helix-substrate convert mistralai/Mistral-7B-v0.1 --output ./mistral-cdna
+```
+
+This downloads the model, quantizes each weight tensor to CDNA format, and saves to a directory. The model is now ready for streaming inference.
 
 ### Compress a tensor
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "helix-substrate"
-version = "0.1.0"
+version = "0.2.0"
 description = "Model weight compression and streaming decode library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -46,10 +46,23 @@ Documentation = "https://github.com/voidstr3m33/helix-substrate#readme"
 [project.optional-dependencies]
 brotli = ["brotli>=1.0"]
 zstd = ["zstandard>=0.20"]
+hf = [
+    "huggingface_hub>=0.20",
+    "safetensors>=0.4",
+]
 dev = [
     "pytest>=7.0",
     "brotli>=1.0",
 ]
+all = [
+    "brotli>=1.0",
+    "zstandard>=0.20",
+    "huggingface_hub>=0.20",
+    "safetensors>=0.4",
+]
+
+[project.scripts]
+helix-substrate = "helix_substrate.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["helix_substrate*"]
