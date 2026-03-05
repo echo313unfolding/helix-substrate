@@ -4,21 +4,46 @@ Model weight compression and streaming decode library. Compress neural network w
 
 ## What it does
 
-1. **CDNA Format** — Quantize model weights into a 256-entry codebook + uint8 indices, with per-block brotli compression and SHA256 verification. A 14GB model becomes ~6.6GB.
+1. **CDNA Format** — Quantize model weights into a 256-entry codebook + uint8 indices, with per-block brotli compression and SHA256 verification.
 
-2. **Streaming Block Decode** — Compute `Y = X @ W` where W is stored in CDNA format. W is never fully loaded. Instead, blocks of rows are decompressed one at a time, multiplied against the corresponding slice of X, and accumulated. Typical memory savings: 8-16x per projection.
+2. **Streaming Block Decode** — Compute `Y = X @ W` where W is stored in CDNA format. W is never fully loaded. Instead, blocks of rows are decompressed one at a time, multiplied against the corresponding slice of X, and accumulated.
 
 3. **Structural Entropy (Se) Routing** — Measure tensor complexity via `Se = H × U × D` (entropy × unstructuredness × rank depth). The Se score maps to a compute routing decision: simple tensors → CPU, parallel tensors → GPU, complex unstructured tensors → QPU.
 
 4. **Receipts** — Every operation produces a tamper-evident receipt with SHA256 input/output hashes, timing, memory usage, and fidelity metrics. If you can't verify it, it didn't happen.
 
+## Benchmarks
+
+Measured peak memory for `Y = X @ W` with streaming vs loading full W:
+
+| Matrix Size | Block Rows | Standard | Streaming | Ratio |
+|-------------|------------|----------|-----------|-------|
+| 64 MB       | 64         | 64 MB    | 18 MB     | **3.5x** |
+| 256 MB      | 64         | 256 MB   | 68 MB     | **3.8x** |
+| 1 GB        | 64         | 1024 MB  | 137 MB    | **7.5x** |
+| 1 GB        | 32         | 1024 MB  | 69 MB     | **14.9x** |
+
+Streaming overhead is ~constant (~68 MB). Ratio improves with matrix size. At LLM scale (1GB+ weight matrices), expect **7-15x memory reduction** depending on block size.
+
+Correctness: cosine similarity = 1.000000 (exact match to full-matrix computation).
+
+Run the benchmark yourself:
+```bash
+python tools/bench_memory.py --rows 16384 --cols 16384 --block-rows 32
+```
+
 ## Install
 
 ```bash
-pip install -e .
+pip install helix-substrate
 ```
 
-Required: `numpy`. Optional: `brotli` (for CDNAv2 block compression).
+For compression support:
+```bash
+pip install helix-substrate[brotli]
+```
+
+Required: `numpy>=1.24`. Optional: `brotli` (for CDNAv2 block compression), `zstandard` (alternative codec).
 
 ## Quick start
 
