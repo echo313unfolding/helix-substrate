@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "helix-substrate"
+version = "0.1.0"
+description = "Model weight compression and streaming decode library"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    { name = "voidstr3m33" }
+]
+keywords = [
+    "llm",
+    "compression",
+    "streaming",
+    "transformer",
+    "cdna",
+    "quantization",
+    "model-weights",
+    "neural-network",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Archiving :: Compression",
+]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/voidstr3m33/helix-substrate"
+Repository = "https://github.com/voidstr3m33/helix-substrate"
+Documentation = "https://github.com/voidstr3m33/helix-substrate#readme"
+
+[project.optional-dependencies]
+brotli = ["brotli>=1.0"]
+zstd = ["zstandard>=0.20"]
+dev = [
+    "pytest>=7.0",
+    "brotli>=1.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["helix_substrate*"]
