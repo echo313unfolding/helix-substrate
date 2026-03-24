@@ -1,0 +1,867 @@
+{
+  "work_order": "WO-MAMBA-HELIX-01",
+  "timestamp": "20260324T011719",
+  "model": "state-spaces/mamba-130m-hf",
+  "architecture": "MambaForCausalLM",
+  "model_config": {
+    "n_layers": 24,
+    "d_model": 768,
+    "d_inner": 1536,
+    "state_size": 16,
+    "vocab_size": 50280
+  },
+  "summary": {
+    "helix_modules": 96,
+    "linear_remaining": 1,
+    "compression_ratio": 5.61,
+    "compressed_mb": 87.27,
+    "dense_equivalent_mb": 489.3,
+    "sanity_pass": true,
+    "perplexity": 24.5961,
+    "corpus_source": "wikitext-2-test",
+    "tok_per_sec": 2.36,
+    "peak_rss_mb": 1674.5,
+    "errors": []
+  },
+  "phases": {
+    "phase1_load": {
+      "model_source": "/home/voidstr3m33/models/mamba-130m-hf",
+      "load_time_s": 2.669,
+      "original_linear_count": 97,
+      "total_params": 129135360
+    },
+    "phase2_swap": {
+      "cdna_dir": "/home/voidstr3m33/models/mamba-130m-hf/cdnav3",
+      "factors_loaded": 97,
+      "helix_modules": 96,
+      "linear_remaining": 1,
+      "compressed_mb": 87.27,
+      "dense_equivalent_mb": 489.3,
+      "compression_ratio": 5.61,
+      "swap_time_s": 0.25
+    },
+    "phase3_sanity": {
+      "test_tokens": 10,
+      "logits_shape": [
+        1,
+        10,
+        50280
+      ],
+      "has_nan": false,
+      "has_inf": false,
+      "all_finite": true,
+      "logits_min": -85.7891,
+      "logits_max": 55.1009,
+      "logits_mean": -16.651,
+      "verdict": "PASS",
+      "check_time_s": 0.561
+    },
+    "phase4_perplexity": {
+      "corpus_source": "wikitext-2-test",
+      "corpus_tokens": 2048,
+      "tokens_scored": 3069,
+      "perplexity": 24.5961,
+      "avg_nll": 3.202587,
+      "eval_time_s": 34.545,
+      "proof_layer": 3,
+      "proof_note": "Layer 3: real data (WikiText-2 test)"
+    },
+    "phase5_generation": {
+      "prompt": "The future of artificial intelligence",
+      "prompt_tokens": 5,
+      "new_tokens": 64,
+      "gen_wall_s": 27.097,
+      "tok_per_sec": 2.36,
+      "unique_output_tokens": 9,
+      "gen_has_nan": false,
+      "peak_rss_mb": 1674.5,
+      "output_preview": "The future of artificial intelligence is uncertain.\n\nThe future of artificial intelligence is uncertain.\n\nThe future of artificial intelligence is uncertain.\n\nThe future of artificial intelligence is uncertain.\n\nThe future of artificial intelligence is uncertain.\n\nThe future of artificial intelligen",
+      "gen_time_s": 27.108
+    },
+    "phase6_module_stats": {
+      "n_helix_modules": 96,
+      "avg_compression_ratio": 3.68,
+      "min_ratio": 2.26,
+      "max_ratio": 3.97,
+      "modules": [
+        {
+          "name": "backbone.layers.0.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.0.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.0.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 2.26,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.0.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.1.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.1.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.1.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.1.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.2.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.2.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.2.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.2.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.3.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.3.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.3.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.3.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.4.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.4.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.4.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.4.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.5.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.5.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.5.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.5.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.6.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.6.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.6.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.6.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.7.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.7.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.7.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.7.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.8.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.8.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.8.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.8.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.9.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.9.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.9.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.9.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.10.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.10.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.10.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.10.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.11.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.11.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.11.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.11.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.12.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.12.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.12.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.12.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.13.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.13.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.13.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.13.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.14.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.14.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.14.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.14.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.15.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.15.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.15.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.15.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.16.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.16.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.16.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.16.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.17.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.17.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.17.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.17.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.18.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.18.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.18.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.18.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.19.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.19.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.19.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.19.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.20.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.20.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.20.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.20.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.21.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.21.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.21.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 2.26,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.21.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.22.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.22.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 3.73,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.22.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 2.26,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.22.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.23.mixer.in_proj",
+          "in": 768,
+          "out": 3072,
+          "ratio": 3.97,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.23.mixer.x_proj",
+          "in": 1536,
+          "out": 80,
+          "ratio": 2.68,
+          "svd_rank": 8,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.23.mixer.dt_proj",
+          "in": 48,
+          "out": 1536,
+          "ratio": 3.71,
+          "svd_rank": 0,
+          "has_sidecar": true
+        },
+        {
+          "name": "backbone.layers.23.mixer.out_proj",
+          "in": 1536,
+          "out": 768,
+          "ratio": 3.94,
+          "svd_rank": 0,
+          "has_sidecar": true
+        }
+      ]
+    }
+  },
+  "cost": {
+    "wall_time_s": 65.137,
+    "cpu_time_s": 62.807,
+    "peak_memory_mb": 1674.5,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-24T01:16:13",
+    "timestamp_end": "2026-03-24T01:17:19"
+  }
+}

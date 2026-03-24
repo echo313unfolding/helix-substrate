@@ -1,0 +1,24 @@
+{
+  "work_order": "WO-QWEN7B-COMPRESS-01",
+  "question": "Does Qwen2.5-7B-Instruct compress through CDNA v3?",
+  "verdict": "PASS",
+  "manifest": {
+    "model": "Qwen2.5-7B-Instruct",
+    "n_blocks": 28,
+    "n_tensors": 196,
+    "n_newly_compressed": 196,
+    "total_dense_bytes": 26101153792,
+    "total_compressed_bytes": 6528143355,
+    "compression_ratio": 4.0,
+    "timestamp": "2026-03-23T23:58:50.895850+00:00"
+  },
+  "cost": {
+    "wall_time_s": 4090.765,
+    "cpu_time_s": 4079.167,
+    "peak_memory_mb": 16443.1,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-23T18:50:40",
+    "timestamp_end": "2026-03-23T19:58:50"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "helix_linear_integration_v1",
+  "work_order": "WO-HELIX-LINEAR-01",
+  "model": "TinyLlama-1.1B-Chat-v1.0",
+  "eval_tokens": 4096,
+  "baseline_ppl": 6.171684,
+  "helix_ppl": 6.219563,
+  "ppl_delta": 0.047879,
+  "ppl_delta_pct": 0.7758,
+  "tensors_swapped": 154,
+  "compression_ratio": 4.26,
+  "compressed_bytes": 971135200,
+  "dense_bytes": 4137680896,
+  "helix_modules": 154,
+  "linear_modules_remaining": 1,
+  "cost": {
+    "wall_time_s": 2107.102,
+    "cpu_time_s": 2067.418,
+    "peak_memory_mb": 13527.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-11T01:11:35.504233+00:00",
+    "timestamp_end": "2026-03-11T01:46:42.605830+00:00"
+  },
+  "verdict": "PASS"
+}

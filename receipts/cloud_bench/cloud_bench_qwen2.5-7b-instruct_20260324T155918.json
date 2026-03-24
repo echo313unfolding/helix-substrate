@@ -1,0 +1,116 @@
+{
+  "benchmark": "cloud_helix_linear",
+  "model_name": "qwen2.5-7b-instruct",
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4090",
+    "total_mb": 24210,
+    "capability": "8.9",
+    "driver": "12.6"
+  },
+  "system": {
+    "hostname": "0db1b6a9-9bb2-4c09-8b31-c1f771cdf46c",
+    "python": "3.10.12",
+    "torch": "2.10.0+cu126",
+    "cuda": "12.6"
+  },
+  "phase_a_load": {
+    "shell_time_s": 0.3,
+    "factor_load_time_s": 2.66,
+    "swap_time_s": 0.0,
+    "move_time_s": 1.09,
+    "helix_modules": 196,
+    "linear_modules": 1,
+    "vram_mb": 10389.7,
+    "compressed_mb": 6228.3,
+    "dense_equivalent_mb": 26971.0
+  },
+  "phase_b_ppl_compressed": {
+    "ppl": 7.7129,
+    "n_tokens": 8192,
+    "seq_len": 2048
+  },
+  "phase_c_speed": {
+    "decode_short": {
+      "prompt_tokens": 5,
+      "avg_gen_tokens": 128.0,
+      "avg_time_s": 6.374,
+      "tok_s": 20.1,
+      "n_runs": 5
+    },
+    "decode_long": {
+      "prompt_tokens": 5,
+      "avg_gen_tokens": 256.0,
+      "avg_time_s": 12.585,
+      "tok_s": 20.3,
+      "n_runs": 5
+    },
+    "prefill": {
+      "prompt_tokens": 302,
+      "avg_gen_tokens": 1.0,
+      "avg_time_s": 0.13,
+      "tok_s": 7.7,
+      "n_runs": 5
+    },
+    "vram_peak_mb": 13256.9
+  },
+  "phase_d_quality": [
+    {
+      "name": "sieve",
+      "n_tokens": 256,
+      "time_s": 12.27,
+      "tok_s": 20.9,
+      "output_preview": " The function should take an integer `n` as input and return a list of all prime numbers from 2 up to (and including) `n`. Additionally, include a check function that tests the correctness of your sieve function with several test cases.\n\nHere is the template you should follow:\n\n```python\nfrom typing import List\n\ndef sieve_of_eratosthenes(n: int) -> List[int]:\n    \"\"\"\n    Returns a list of all prime numbers from 2 up to and including n using the Sieve of Eratosthenes algorithm.\n    \n    Parameter"
+    },
+    {
+      "name": "binary_search_fix",
+      "n_tokens": 256,
+      "time_s": 12.39,
+      "tok_s": 20.7,
+      "output_preview": "\n\nThe issue with the provided binary search implementation is in the way the `low` and `high` indices are updated. Specifically, when `arr[mid] < target`, the code should update `low` to `mid + 1` instead of `mid`. Similarly, when `arr[mid] > target`, the code should update `high` to `mid - 1` instead of `mid`.\n\nHere's the corrected version:\n\n```python\ndef binary_search(arr, target):\n    low, high = 0, len(arr) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == tar"
+    },
+    {
+      "name": "explain_attention",
+      "n_tokens": 65,
+      "time_s": 3.27,
+      "tok_s": 19.9,
+      "output_preview": " Multi-head attention in transformers allows the model to weigh different aspects of the input sequence differently, improving its ability to capture complex relationships. It does this by creating multiple attention layers that each focus on different parts of the input, then combining their results. This mechanism enables the model to handle long-range dependencies and context more effectively."
+    },
+    {
+      "name": "sql_query",
+      "n_tokens": 128,
+      "time_s": 6.37,
+      "tok_s": 20.1,
+      "output_preview": " Additionally, include the total order value for each customer in the result set.\nAssuming we have two tables: \"customers\" and \"orders\". The \"customers\" table has columns \"id\", \"name\", and \"email\". The \"orders\" table has columns \"id\", \"customer_id\", and \"total_value\".\n\nHere is the SQL query to find the top 5 customers by total order value, including their name, email, and the total order value for each customer:\n\n```sql\nSELECT c.id, c.name, c.email, SUM(o.total_value) AS total_order_value\nFROM c"
+    },
+    {
+      "name": "refactor",
+      "n_tokens": 106,
+      "time_s": 5.17,
+      "tok_s": 20.5,
+      "output_preview": "\nYou can refactor the `get_squares` function using list comprehension as follows:\n\n```python\ndef get_squares(nums):\n    return [n**2 for n in nums if n > 0]\n```\n\nThis version of the function does the same thing but in a more concise and readable way. The list comprehension iterates over each element `n` in `nums`, checks if `n` is greater than 0, and if so, it appends `n**2` to the resulting list."
+    },
+    {
+      "name": "explain_compression",
+      "n_tokens": 99,
+      "time_s": 4.79,
+      "tok_s": 20.7,
+      "output_preview": " Vector quantization (VQ) in neural network compression involves replacing a set of vectors (e.g., weights or activations) with a smaller set of \"codebook\" vectors. This reduces the precision and storage requirements of the model. VQ can be static, using a pre-defined codebook, or dynamic, adapting the codebook during training. It's particularly useful for compressing deep learning models without significant loss in performance, making them more efficient for deployment on resource-constrained d"
+    }
+  ],
+  "phase_e_memory": {
+    "vram_allocated_mb": 11810.6,
+    "vram_reserved_mb": 14636.0,
+    "vram_peak_mb": 13256.9,
+    "host_rss_mb": 12210.5
+  },
+  "cost": {
+    "wall_time_s": 162.02,
+    "cpu_time_s": 169.122,
+    "peak_memory_mb": 12210.5,
+    "python_version": "3.10.12",
+    "hostname": "0db1b6a9-9bb2-4c09-8b31-c1f771cdf46c",
+    "timestamp_start": "2026-03-24T15:56:36.241656+00:00",
+    "timestamp_end": "2026-03-24T15:59:18.261681+00:00"
+  }
+}

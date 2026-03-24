@@ -1,0 +1,998 @@
+{
+  "work_order": "WO-MAMBA-COMPRESS-01",
+  "question": "Does Mamba-130m (SSM) compress through CDNA v3?",
+  "verdict": "PASS",
+  "manifest": {
+    "model": "Mamba-130m",
+    "architecture": "MambaForCausalLM",
+    "n_blocks": 24,
+    "n_tensors": 97,
+    "n_newly_compressed": 97,
+    "total_dense_bytes": 513073152,
+    "total_compressed_bytes": 130874016,
+    "compression_ratio": 3.92,
+    "note": "First SSM (non-transformer) through HelixLinear pipeline",
+    "timestamp": "2026-03-24T00:16:11.190147+00:00"
+  },
+  "per_tensor_stats": [
+    {
+      "name": "backbone.embeddings.weight",
+      "shape": [
+        50280,
+        768
+      ],
+      "kurtosis": 237.46,
+      "ratio": 3.84,
+      "cosine": 0.994536
+    },
+    {
+      "name": "backbone.layers.0.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.35,
+      "ratio": 3.99,
+      "cosine": 0.999767
+    },
+    {
+      "name": "backbone.layers.0.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 6.84,
+      "ratio": 2.77,
+      "cosine": 0.999363
+    },
+    {
+      "name": "backbone.layers.0.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 5.14,
+      "ratio": 2.32,
+      "cosine": 0.999487
+    },
+    {
+      "name": "backbone.layers.0.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 2.81,
+      "ratio": 3.99,
+      "cosine": 0.999449
+    },
+    {
+      "name": "backbone.layers.1.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.25,
+      "ratio": 3.99,
+      "cosine": 0.999822
+    },
+    {
+      "name": "backbone.layers.1.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 3.66,
+      "ratio": 3.92,
+      "cosine": 0.999647
+    },
+    {
+      "name": "backbone.layers.1.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.52,
+      "ratio": 3.88,
+      "cosine": 0.999726
+    },
+    {
+      "name": "backbone.layers.1.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.18,
+      "ratio": 3.99,
+      "cosine": 0.999706
+    },
+    {
+      "name": "backbone.layers.2.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.31,
+      "ratio": 3.99,
+      "cosine": 0.999792
+    },
+    {
+      "name": "backbone.layers.2.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 5.2,
+      "ratio": 2.77,
+      "cosine": 0.999562
+    },
+    {
+      "name": "backbone.layers.2.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.0,
+      "ratio": 3.88,
+      "cosine": 0.999752
+    },
+    {
+      "name": "backbone.layers.2.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.99,
+      "ratio": 3.99,
+      "cosine": 0.999754
+    },
+    {
+      "name": "backbone.layers.3.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.18,
+      "ratio": 3.99,
+      "cosine": 0.999842
+    },
+    {
+      "name": "backbone.layers.3.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 4.31,
+      "ratio": 3.92,
+      "cosine": 0.99961
+    },
+    {
+      "name": "backbone.layers.3.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.4,
+      "ratio": 3.88,
+      "cosine": 0.999674
+    },
+    {
+      "name": "backbone.layers.3.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.62,
+      "ratio": 3.99,
+      "cosine": 0.999801
+    },
+    {
+      "name": "backbone.layers.4.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.15,
+      "ratio": 3.99,
+      "cosine": 0.999846
+    },
+    {
+      "name": "backbone.layers.4.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.7,
+      "ratio": 3.92,
+      "cosine": 0.999679
+    },
+    {
+      "name": "backbone.layers.4.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.09,
+      "ratio": 3.88,
+      "cosine": 0.99982
+    },
+    {
+      "name": "backbone.layers.4.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.59,
+      "ratio": 3.99,
+      "cosine": 0.999799
+    },
+    {
+      "name": "backbone.layers.5.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.14,
+      "ratio": 3.99,
+      "cosine": 0.999834
+    },
+    {
+      "name": "backbone.layers.5.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.41,
+      "ratio": 3.92,
+      "cosine": 0.99972
+    },
+    {
+      "name": "backbone.layers.5.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.81,
+      "ratio": 3.88,
+      "cosine": 0.999708
+    },
+    {
+      "name": "backbone.layers.5.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.69,
+      "ratio": 3.99,
+      "cosine": 0.999785
+    },
+    {
+      "name": "backbone.layers.6.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.15,
+      "ratio": 3.99,
+      "cosine": 0.999852
+    },
+    {
+      "name": "backbone.layers.6.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.3,
+      "ratio": 3.92,
+      "cosine": 0.999698
+    },
+    {
+      "name": "backbone.layers.6.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 0.96,
+      "ratio": 3.88,
+      "cosine": 0.999811
+    },
+    {
+      "name": "backbone.layers.6.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.58,
+      "ratio": 3.99,
+      "cosine": 0.999802
+    },
+    {
+      "name": "backbone.layers.7.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.29,
+      "ratio": 3.99,
+      "cosine": 0.999792
+    },
+    {
+      "name": "backbone.layers.7.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 3.3,
+      "ratio": 3.92,
+      "cosine": 0.999673
+    },
+    {
+      "name": "backbone.layers.7.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.08,
+      "ratio": 3.88,
+      "cosine": 0.999814
+    },
+    {
+      "name": "backbone.layers.7.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.06,
+      "ratio": 3.99,
+      "cosine": 0.999697
+    },
+    {
+      "name": "backbone.layers.8.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.19,
+      "ratio": 3.99,
+      "cosine": 0.99983
+    },
+    {
+      "name": "backbone.layers.8.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.75,
+      "ratio": 3.92,
+      "cosine": 0.999657
+    },
+    {
+      "name": "backbone.layers.8.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.24,
+      "ratio": 3.88,
+      "cosine": 0.999711
+    },
+    {
+      "name": "backbone.layers.8.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.68,
+      "ratio": 3.99,
+      "cosine": 0.999802
+    },
+    {
+      "name": "backbone.layers.9.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.2,
+      "ratio": 3.99,
+      "cosine": 0.999846
+    },
+    {
+      "name": "backbone.layers.9.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.44,
+      "ratio": 3.92,
+      "cosine": 0.999674
+    },
+    {
+      "name": "backbone.layers.9.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 0.68,
+      "ratio": 3.88,
+      "cosine": 0.999835
+    },
+    {
+      "name": "backbone.layers.9.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.73,
+      "ratio": 3.99,
+      "cosine": 0.99979
+    },
+    {
+      "name": "backbone.layers.10.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.24,
+      "ratio": 3.99,
+      "cosine": 0.999797
+    },
+    {
+      "name": "backbone.layers.10.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 3.04,
+      "ratio": 3.92,
+      "cosine": 0.99962
+    },
+    {
+      "name": "backbone.layers.10.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 0.88,
+      "ratio": 3.88,
+      "cosine": 0.999797
+    },
+    {
+      "name": "backbone.layers.10.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.68,
+      "ratio": 3.99,
+      "cosine": 0.999773
+    },
+    {
+      "name": "backbone.layers.11.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.32,
+      "ratio": 3.99,
+      "cosine": 0.999823
+    },
+    {
+      "name": "backbone.layers.11.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 3.1,
+      "ratio": 3.91,
+      "cosine": 0.999636
+    },
+    {
+      "name": "backbone.layers.11.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.14,
+      "ratio": 3.88,
+      "cosine": 0.999826
+    },
+    {
+      "name": "backbone.layers.11.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.79,
+      "ratio": 3.99,
+      "cosine": 0.99981
+    },
+    {
+      "name": "backbone.layers.12.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.77,
+      "ratio": 3.99,
+      "cosine": 0.999762
+    },
+    {
+      "name": "backbone.layers.12.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 9.69,
+      "ratio": 2.77,
+      "cosine": 0.9993
+    },
+    {
+      "name": "backbone.layers.12.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.97,
+      "ratio": 3.88,
+      "cosine": 0.999727
+    },
+    {
+      "name": "backbone.layers.12.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.14,
+      "ratio": 3.99,
+      "cosine": 0.999701
+    },
+    {
+      "name": "backbone.layers.13.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.55,
+      "ratio": 3.99,
+      "cosine": 0.999687
+    },
+    {
+      "name": "backbone.layers.13.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 2.81,
+      "ratio": 3.91,
+      "cosine": 0.999617
+    },
+    {
+      "name": "backbone.layers.13.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.17,
+      "ratio": 3.88,
+      "cosine": 0.999808
+    },
+    {
+      "name": "backbone.layers.13.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.17,
+      "ratio": 3.99,
+      "cosine": 0.999759
+    },
+    {
+      "name": "backbone.layers.14.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.51,
+      "ratio": 3.99,
+      "cosine": 0.999722
+    },
+    {
+      "name": "backbone.layers.14.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 4.96,
+      "ratio": 3.91,
+      "cosine": 0.999523
+    },
+    {
+      "name": "backbone.layers.14.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 0.78,
+      "ratio": 3.88,
+      "cosine": 0.999846
+    },
+    {
+      "name": "backbone.layers.14.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.81,
+      "ratio": 3.99,
+      "cosine": 0.999757
+    },
+    {
+      "name": "backbone.layers.15.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.68,
+      "ratio": 3.99,
+      "cosine": 0.999732
+    },
+    {
+      "name": "backbone.layers.15.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 15.46,
+      "ratio": 2.77,
+      "cosine": 0.999052
+    },
+    {
+      "name": "backbone.layers.15.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 3.21,
+      "ratio": 3.88,
+      "cosine": 0.999616
+    },
+    {
+      "name": "backbone.layers.15.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.6,
+      "ratio": 3.99,
+      "cosine": 0.99968
+    },
+    {
+      "name": "backbone.layers.16.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.81,
+      "ratio": 3.99,
+      "cosine": 0.99972
+    },
+    {
+      "name": "backbone.layers.16.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 19.58,
+      "ratio": 2.77,
+      "cosine": 0.998833
+    },
+    {
+      "name": "backbone.layers.16.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.64,
+      "ratio": 3.88,
+      "cosine": 0.999653
+    },
+    {
+      "name": "backbone.layers.16.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.31,
+      "ratio": 3.99,
+      "cosine": 0.999745
+    },
+    {
+      "name": "backbone.layers.17.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.77,
+      "ratio": 3.99,
+      "cosine": 0.999779
+    },
+    {
+      "name": "backbone.layers.17.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 18.21,
+      "ratio": 2.77,
+      "cosine": 0.998655
+    },
+    {
+      "name": "backbone.layers.17.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 2.92,
+      "ratio": 3.88,
+      "cosine": 0.999701
+    },
+    {
+      "name": "backbone.layers.17.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.87,
+      "ratio": 3.99,
+      "cosine": 0.999743
+    },
+    {
+      "name": "backbone.layers.18.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.48,
+      "ratio": 3.99,
+      "cosine": 0.999789
+    },
+    {
+      "name": "backbone.layers.18.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 6.76,
+      "ratio": 2.77,
+      "cosine": 0.999401
+    },
+    {
+      "name": "backbone.layers.18.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.45,
+      "ratio": 3.88,
+      "cosine": 0.999788
+    },
+    {
+      "name": "backbone.layers.18.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.13,
+      "ratio": 3.99,
+      "cosine": 0.999692
+    },
+    {
+      "name": "backbone.layers.19.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.44,
+      "ratio": 3.99,
+      "cosine": 0.999762
+    },
+    {
+      "name": "backbone.layers.19.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 18.28,
+      "ratio": 2.77,
+      "cosine": 0.998969
+    },
+    {
+      "name": "backbone.layers.19.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.18,
+      "ratio": 3.88,
+      "cosine": 0.999835
+    },
+    {
+      "name": "backbone.layers.19.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 0.7,
+      "ratio": 3.99,
+      "cosine": 0.999786
+    },
+    {
+      "name": "backbone.layers.20.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.45,
+      "ratio": 3.99,
+      "cosine": 0.999773
+    },
+    {
+      "name": "backbone.layers.20.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 24.0,
+      "ratio": 2.77,
+      "cosine": 0.998573
+    },
+    {
+      "name": "backbone.layers.20.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 1.43,
+      "ratio": 3.88,
+      "cosine": 0.99982
+    },
+    {
+      "name": "backbone.layers.20.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.23,
+      "ratio": 3.99,
+      "cosine": 0.999718
+    },
+    {
+      "name": "backbone.layers.21.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.43,
+      "ratio": 3.99,
+      "cosine": 0.999775
+    },
+    {
+      "name": "backbone.layers.21.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 3.59,
+      "ratio": 3.91,
+      "cosine": 0.99965
+    },
+    {
+      "name": "backbone.layers.21.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 5.2,
+      "ratio": 2.32,
+      "cosine": 0.999372
+    },
+    {
+      "name": "backbone.layers.21.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 2.54,
+      "ratio": 3.99,
+      "cosine": 0.999765
+    },
+    {
+      "name": "backbone.layers.22.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.33,
+      "ratio": 3.99,
+      "cosine": 0.999782
+    },
+    {
+      "name": "backbone.layers.22.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 1.91,
+      "ratio": 3.91,
+      "cosine": 0.999744
+    },
+    {
+      "name": "backbone.layers.22.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 6.84,
+      "ratio": 2.32,
+      "cosine": 0.999316
+    },
+    {
+      "name": "backbone.layers.22.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 1.01,
+      "ratio": 3.99,
+      "cosine": 0.999794
+    },
+    {
+      "name": "backbone.layers.23.mixer.in_proj.weight",
+      "shape": [
+        3072,
+        768
+      ],
+      "kurtosis": 0.24,
+      "ratio": 3.99,
+      "cosine": 0.999848
+    },
+    {
+      "name": "backbone.layers.23.mixer.x_proj.weight",
+      "shape": [
+        80,
+        1536
+      ],
+      "kurtosis": 5.23,
+      "ratio": 2.77,
+      "cosine": 0.999656
+    },
+    {
+      "name": "backbone.layers.23.mixer.dt_proj.weight",
+      "shape": [
+        1536,
+        48
+      ],
+      "kurtosis": 4.7,
+      "ratio": 3.89,
+      "cosine": 0.999472
+    },
+    {
+      "name": "backbone.layers.23.mixer.out_proj.weight",
+      "shape": [
+        768,
+        1536
+      ],
+      "kurtosis": 2.41,
+      "ratio": 3.99,
+      "cosine": 0.999709
+    }
+  ],
+  "cost": {
+    "wall_time_s": 225.541,
+    "cpu_time_s": 223.855,
+    "peak_memory_mb": 4041.6,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-23T20:12:25",
+    "timestamp_end": "2026-03-23T20:16:11"
+  }
+}

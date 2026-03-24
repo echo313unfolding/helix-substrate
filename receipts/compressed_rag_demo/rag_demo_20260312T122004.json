@@ -1,0 +1,102 @@
+{
+  "experiment": "compressed_rag_demo",
+  "timestamp": "2026-03-12T16:18:58.020154+00:00",
+  "model": "all-MiniLM-L6-v2",
+  "n_documents": 46,
+  "n_queries": 8,
+  "n_layers_compressed": 37,
+  "compression_ratio": 3.94,
+  "dense_linear_mb": 43.1,
+  "compressed_linear_mb": 10.9,
+  "avg_embedding_cosine": 0.998279,
+  "min_embedding_cosine": 0.996275,
+  "top1_match_rate": 0.875,
+  "avg_top5_overlap": 4.75,
+  "index_time_dense_s": 0.339,
+  "index_time_compressed_s": 1.531,
+  "compress_time_s": 57.7,
+  "queries": [
+    {
+      "query": "What was the VRAM peak in the GPU viability test?",
+      "dense_top1": "gpu_viability_20260311T010918.json",
+      "compressed_top1": "gpu_viability_20260311T010918.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.537149,
+      "compressed_score": 0.530296
+    },
+    {
+      "query": "Which model had the best compression ratio?",
+      "dense_top1": "tensor_dna_prototype_2026-03-08T18-06-46.json",
+      "compressed_top1": "benchmark_20260310T204711.json",
+      "top1_match": false,
+      "top5_overlap": 5,
+      "dense_score": 0.32447,
+      "compressed_score": 0.313379
+    },
+    {
+      "query": "What is the perplexity of the compressed TinyLlama?",
+      "dense_top1": "full_model_20260310T193242.json",
+      "compressed_top1": "full_model_20260310T193242.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.404514,
+      "compressed_score": 0.413493
+    },
+    {
+      "query": "How many tensors were compressed for Qwen?",
+      "dense_top1": "tensor_dna_prototype_2026-03-08T18-06-46.json",
+      "compressed_top1": "tensor_dna_prototype_2026-03-08T18-06-46.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.436801,
+      "compressed_score": 0.434397
+    },
+    {
+      "query": "CLIP vision encoder compression results",
+      "dense_top1": "non_llm_proof_20260312T103756.json",
+      "compressed_top1": "non_llm_proof_20260312T103756.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.339817,
+      "compressed_score": 0.329216
+    },
+    {
+      "query": "sentence transformer embedding cosine similarity",
+      "dense_top1": "non_llm_proof_20260312T103756.json",
+      "compressed_top1": "non_llm_proof_20260312T103756.json",
+      "top1_match": true,
+      "top5_overlap": 3,
+      "dense_score": 0.396602,
+      "compressed_score": 0.385159
+    },
+    {
+      "query": "ResNet prediction accuracy after compression",
+      "dense_top1": "tensor_dna_prototype_2026-03-08T18-06-46.json",
+      "compressed_top1": "tensor_dna_prototype_2026-03-08T18-06-46.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.313763,
+      "compressed_score": 0.302185
+    },
+    {
+      "query": "Triton kernel memory usage",
+      "dense_top1": "integration_test_20260310T141911.json",
+      "compressed_top1": "integration_test_20260310T141911.json",
+      "top1_match": true,
+      "top5_overlap": 5,
+      "dense_score": 0.338582,
+      "compressed_score": 0.334908
+    }
+  ],
+  "cost": {
+    "wall_time_s": 66.911,
+    "cpu_time_s": 63.033,
+    "peak_memory_mb": 2703.1,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-12T16:18:58.020154+00:00",
+    "timestamp_end": "2026-03-12T16:20:04.931630+00:00"
+  },
+  "verdict": "PROVEN"
+}

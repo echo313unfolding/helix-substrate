@@ -1,16 +1,22 @@
 """
 Structural Entropy (Se) Estimator for Tensor Routing
 
-Computes Se = H x U x D for any tensor, producing a normalized 0-1 score
-that captures how "complex" a tensor is from a compute-routing perspective.
-
-Formula:
+LEGACY FORMULA (retained for backward compatibility):
     Se = H x U x D (all normalized 0-1)
 
 Where:
-    H = (1 - energy_at_10pct)     -- Entropy: spread-out spectrum = high H
-    U = (1 - neighbor_coherence)  -- Unstructuredness: no local adjacency = high U
-    D = sqrt(rank_ratio)          -- Depth: high effective rank = high D
+    H = (1 - energy_at_10pct)     -- Height: spectral spread
+    U = (1 - neighbor_coherence)  -- Unity: local coherence (conditional helper)
+    D = sqrt(rank_ratio)          -- Depth: effective dimensional reach
+
+REVISED MODEL (WO-SE-REVISION-01, 2026-03-21):
+    The evidence-backed model uses four components: H, D, W, U.
+    W = hist_entropy / log2(bins) -- Width: amplitude distribution (NEW)
+    U is demoted from core axis to conditional locality helper.
+    See: receipts/skeptic_packet/se_final_form.md
+
+    This module retains H x U x D for backward compatibility.
+    The revised model is not yet implemented here.
 
 2D Routing Policy:
     Zone 1: Se < 0.30, C_struct >= 0.30 -> CPU (simple + organized)

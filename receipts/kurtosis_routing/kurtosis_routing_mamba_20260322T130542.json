@@ -1,0 +1,2294 @@
+{
+  "work_order": "WO-KURTOSIS-ROUTING-MAMBA-01",
+  "description": "Cross-architecture kurtosis validation on Mamba-130m (SSM)",
+  "model": "/home/voidstr3m33/models/mamba-130m-hf",
+  "architecture": "MambaForCausalLM",
+  "n_layers": 24,
+  "n_tensors": 145,
+  "kurtosis_stats": {
+    "mean": 4.93,
+    "median": 1.17,
+    "max": 237.46,
+    "above_50": 2,
+    "above_5": 30
+  },
+  "by_tensor_type": {
+    "EMBED": {
+      "count": 1,
+      "mean": 237.46,
+      "median": 237.46,
+      "max": 237.46,
+      "min": 237.46,
+      "above_5": 1,
+      "above_50": 1
+    },
+    "PROJ:in_proj": {
+      "count": 24,
+      "mean": 0.38,
+      "median": 0.32,
+      "max": 0.81,
+      "min": 0.14,
+      "above_5": 0,
+      "above_50": 0
+    },
+    "PROJ:out_proj": {
+      "count": 24,
+      "mean": 1.14,
+      "median": 1.0,
+      "max": 2.81,
+      "min": 0.58,
+      "above_5": 0,
+      "above_50": 0
+    },
+    "SSM:A_log": {
+      "count": 24,
+      "mean": -0.25,
+      "median": -0.32,
+      "max": 0.7,
+      "min": -1.05,
+      "above_5": 0,
+      "above_50": 0
+    },
+    "SSM:conv1d": {
+      "count": 24,
+      "mean": 9.14,
+      "median": 5.4,
+      "max": 79.85,
+      "min": 3.73,
+      "above_5": 16,
+      "above_50": 1
+    },
+    "SSM:dt_proj": {
+      "count": 24,
+      "mean": 2.31,
+      "median": 1.89,
+      "max": 6.84,
+      "min": 0.68,
+      "above_5": 3,
+      "above_50": 0
+    },
+    "SSM:x_proj": {
+      "count": 24,
+      "mean": 7.19,
+      "median": 3.99,
+      "max": 24.0,
+      "min": 1.91,
+      "above_5": 10,
+      "above_50": 0
+    }
+  },
+  "ssm_specific_high_kurtosis": 29,
+  "projection_high_kurtosis": 0,
+  "correlation_kurtosis_vs_error": {
+    "rho": 0.635,
+    "p_value": 4.180847027319906e-05
+  },
+  "per_tensor_results": [
+    {
+      "name": "backbone.embeddings.weight",
+      "block": -1,
+      "type": "EMBED",
+      "kurtosis": 237.46,
+      "shape": [
+        50280,
+        768
+      ],
+      "numel": 38615040,
+      "category": "HIGH",
+      "error_vq_only": 0.003631,
+      "error_vq_svd": 8.106e-05,
+      "improvement": 0.00354993,
+      "improvement_pct": 97.8
+    },
+    {
+      "name": "backbone.layers.0.mixer.conv1d.weight",
+      "block": 0,
+      "type": "SSM:conv1d",
+      "kurtosis": 79.85,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "HIGH",
+      "error_vq_only": 0.03187448,
+      "error_vq_svd": 6e-08,
+      "improvement": 0.03187442,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.20.mixer.x_proj.weight",
+      "block": 20,
+      "type": "SSM:x_proj",
+      "kurtosis": 24.0,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00445718,
+      "error_vq_svd": 0.00058997,
+      "improvement": 0.00386721,
+      "improvement_pct": 86.8
+    },
+    {
+      "name": "backbone.layers.16.mixer.x_proj.weight",
+      "block": 16,
+      "type": "SSM:x_proj",
+      "kurtosis": 19.58,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00206387,
+      "error_vq_svd": 0.00041884,
+      "improvement": 0.00164503,
+      "improvement_pct": 79.7
+    },
+    {
+      "name": "backbone.layers.19.mixer.x_proj.weight",
+      "block": 19,
+      "type": "SSM:x_proj",
+      "kurtosis": 18.28,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00226444,
+      "error_vq_svd": 0.00077653,
+      "improvement": 0.00148791,
+      "improvement_pct": 65.7
+    },
+    {
+      "name": "backbone.layers.17.mixer.x_proj.weight",
+      "block": 17,
+      "type": "SSM:x_proj",
+      "kurtosis": 18.21,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00166184,
+      "error_vq_svd": 0.00054437,
+      "improvement": 0.00111747,
+      "improvement_pct": 67.2
+    },
+    {
+      "name": "backbone.layers.15.mixer.x_proj.weight",
+      "block": 15,
+      "type": "SSM:x_proj",
+      "kurtosis": 15.46,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00106853,
+      "error_vq_svd": 0.00053775,
+      "improvement": 0.00053078,
+      "improvement_pct": 49.7
+    },
+    {
+      "name": "backbone.layers.17.mixer.conv1d.weight",
+      "block": 17,
+      "type": "SSM:conv1d",
+      "kurtosis": 10.68,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00280052,
+      "error_vq_svd": 1.2e-07,
+      "improvement": 0.00280041,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.22.mixer.conv1d.weight",
+      "block": 22,
+      "type": "SSM:conv1d",
+      "kurtosis": 10.13,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00390577,
+      "error_vq_svd": 6e-08,
+      "improvement": 0.00390571,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.21.mixer.conv1d.weight",
+      "block": 21,
+      "type": "SSM:conv1d",
+      "kurtosis": 9.79,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00167197,
+      "error_vq_svd": -1.2e-07,
+      "improvement": 0.00167209,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.12.mixer.x_proj.weight",
+      "block": 12,
+      "type": "SSM:x_proj",
+      "kurtosis": 9.69,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00131804,
+      "error_vq_svd": 0.00034571,
+      "improvement": 0.00097233,
+      "improvement_pct": 73.8
+    },
+    {
+      "name": "backbone.layers.1.mixer.conv1d.weight",
+      "block": 1,
+      "type": "SSM:conv1d",
+      "kurtosis": 9.25,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00445282,
+      "error_vq_svd": 0.0,
+      "improvement": 0.00445282,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.23.mixer.conv1d.weight",
+      "block": 23,
+      "type": "SSM:conv1d",
+      "kurtosis": 8.42,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00322849,
+      "error_vq_svd": -1.2e-07,
+      "improvement": 0.0032286,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.2.mixer.conv1d.weight",
+      "block": 2,
+      "type": "SSM:conv1d",
+      "kurtosis": 8.01,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00466979,
+      "error_vq_svd": 6e-08,
+      "improvement": 0.00466973,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.22.mixer.dt_proj.weight",
+      "block": 22,
+      "type": "SSM:dt_proj",
+      "kurtosis": 6.84,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728,
+      "category": "BORDER",
+      "error_vq_only": 0.00043714,
+      "error_vq_svd": 4.81e-05,
+      "improvement": 0.00038904,
+      "improvement_pct": 89.0
+    },
+    {
+      "name": "backbone.layers.0.mixer.x_proj.weight",
+      "block": 0,
+      "type": "SSM:x_proj",
+      "kurtosis": 6.84,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00057018,
+      "error_vq_svd": 0.00010687,
+      "improvement": 0.00046331,
+      "improvement_pct": 81.3
+    },
+    {
+      "name": "backbone.layers.18.mixer.x_proj.weight",
+      "block": 18,
+      "type": "SSM:x_proj",
+      "kurtosis": 6.76,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00195634,
+      "error_vq_svd": 0.00029248,
+      "improvement": 0.00166386,
+      "improvement_pct": 85.0
+    },
+    {
+      "name": "backbone.layers.12.mixer.conv1d.weight",
+      "block": 12,
+      "type": "SSM:conv1d",
+      "kurtosis": 6.15,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00075257,
+      "error_vq_svd": 0.0,
+      "improvement": 0.00075257,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.19.mixer.conv1d.weight",
+      "block": 19,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.74,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00379926,
+      "error_vq_svd": 1.2e-07,
+      "improvement": 0.00379914,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.18.mixer.conv1d.weight",
+      "block": 18,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.64,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00183702,
+      "error_vq_svd": 6e-08,
+      "improvement": 0.00183696,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.15.mixer.conv1d.weight",
+      "block": 15,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.62,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00273079,
+      "error_vq_svd": 0.0,
+      "improvement": 0.00273079,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.7.mixer.conv1d.weight",
+      "block": 7,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.52,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00091636,
+      "error_vq_svd": -1.2e-07,
+      "improvement": 0.00091648,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.20.mixer.conv1d.weight",
+      "block": 20,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.28,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00171435,
+      "error_vq_svd": 0.0,
+      "improvement": 0.00171435,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.3.mixer.conv1d.weight",
+      "block": 3,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.25,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.002249,
+      "error_vq_svd": 0.0,
+      "improvement": 0.002249,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.23.mixer.x_proj.weight",
+      "block": 23,
+      "type": "SSM:x_proj",
+      "kurtosis": 5.23,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00243241,
+      "error_vq_svd": 4.387e-05,
+      "improvement": 0.00238854,
+      "improvement_pct": 98.2
+    },
+    {
+      "name": "backbone.layers.21.mixer.dt_proj.weight",
+      "block": 21,
+      "type": "SSM:dt_proj",
+      "kurtosis": 5.2,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728,
+      "category": "BORDER",
+      "error_vq_only": 0.00029302,
+      "error_vq_svd": 7.474e-05,
+      "improvement": 0.00021827,
+      "improvement_pct": 74.5
+    },
+    {
+      "name": "backbone.layers.2.mixer.x_proj.weight",
+      "block": 2,
+      "type": "SSM:x_proj",
+      "kurtosis": 5.2,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "BORDER",
+      "error_vq_only": 0.00115252,
+      "error_vq_svd": 0.00011128,
+      "improvement": 0.00104123,
+      "improvement_pct": 90.3
+    },
+    {
+      "name": "backbone.layers.16.mixer.conv1d.weight",
+      "block": 16,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.18,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00097728,
+      "error_vq_svd": -1.2e-07,
+      "improvement": 0.0009774,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.0.mixer.dt_proj.weight",
+      "block": 0,
+      "type": "SSM:dt_proj",
+      "kurtosis": 5.14,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728,
+      "category": "BORDER",
+      "error_vq_only": 0.00061864,
+      "error_vq_svd": 8.804e-05,
+      "improvement": 0.0005306,
+      "improvement_pct": 85.8
+    },
+    {
+      "name": "backbone.layers.4.mixer.conv1d.weight",
+      "block": 4,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.02,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144,
+      "category": "BORDER",
+      "error_vq_only": 0.00197154,
+      "error_vq_svd": 0.0,
+      "improvement": 0.00197154,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "backbone.layers.22.mixer.x_proj.weight",
+      "block": 22,
+      "type": "SSM:x_proj",
+      "kurtosis": 1.91,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880,
+      "category": "CONTROL",
+      "error_vq_only": 0.00063264,
+      "error_vq_svd": 5.144e-05,
+      "improvement": 0.0005812,
+      "improvement_pct": 91.9
+    },
+    {
+      "name": "backbone.layers.9.mixer.dt_proj.weight",
+      "block": 9,
+      "type": "SSM:dt_proj",
+      "kurtosis": 0.68,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728,
+      "category": "CONTROL",
+      "error_vq_only": 8.231e-05,
+      "error_vq_svd": 2.98e-05,
+      "improvement": 5.251e-05,
+      "improvement_pct": 63.8
+    },
+    {
+      "name": "backbone.layers.6.mixer.out_proj.weight",
+      "block": 6,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.58,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648,
+      "category": "CONTROL",
+      "error_vq_only": 0.00086737,
+      "error_vq_svd": 6.682e-05,
+      "improvement": 0.00080055,
+      "improvement_pct": 92.3
+    },
+    {
+      "name": "backbone.layers.5.mixer.in_proj.weight",
+      "block": 5,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.14,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296,
+      "category": "CONTROL",
+      "error_vq_only": 0.00011355,
+      "error_vq_svd": 6.437e-05,
+      "improvement": 4.917e-05,
+      "improvement_pct": 43.3
+    },
+    {
+      "name": "backbone.layers.23.mixer.A_log",
+      "block": 23,
+      "type": "SSM:A_log",
+      "kurtosis": -1.05,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576,
+      "category": "CONTROL",
+      "error_vq_only": 5.907e-05,
+      "error_vq_svd": 2.44e-06,
+      "improvement": 5.662e-05,
+      "improvement_pct": 95.9
+    }
+  ],
+  "all_tensor_profiles": [
+    {
+      "name": "backbone.embeddings.weight",
+      "block": -1,
+      "type": "EMBED",
+      "kurtosis": 237.45896945443116,
+      "shape": [
+        50280,
+        768
+      ],
+      "numel": 38615040
+    },
+    {
+      "name": "backbone.layers.0.mixer.A_log",
+      "block": 0,
+      "type": "SSM:A_log",
+      "kurtosis": -0.07241329613290404,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.0.mixer.conv1d.weight",
+      "block": 0,
+      "type": "SSM:conv1d",
+      "kurtosis": 79.85466333668668,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.0.mixer.dt_proj.weight",
+      "block": 0,
+      "type": "SSM:dt_proj",
+      "kurtosis": 5.137168457552695,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.0.mixer.in_proj.weight",
+      "block": 0,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.34819937583473193,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.0.mixer.out_proj.weight",
+      "block": 0,
+      "type": "PROJ:out_proj",
+      "kurtosis": 2.8100488584426886,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.0.mixer.x_proj.weight",
+      "block": 0,
+      "type": "SSM:x_proj",
+      "kurtosis": 6.835205425234154,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.1.mixer.A_log",
+      "block": 1,
+      "type": "SSM:A_log",
+      "kurtosis": -0.3152161593733007,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.1.mixer.conv1d.weight",
+      "block": 1,
+      "type": "SSM:conv1d",
+      "kurtosis": 9.246342313985224,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.1.mixer.dt_proj.weight",
+      "block": 1,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.5201400884411846,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.1.mixer.in_proj.weight",
+      "block": 1,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.253852069811888,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.1.mixer.out_proj.weight",
+      "block": 1,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.1830387443904264,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.1.mixer.x_proj.weight",
+      "block": 1,
+      "type": "SSM:x_proj",
+      "kurtosis": 3.656407681829,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.10.mixer.A_log",
+      "block": 10,
+      "type": "SSM:A_log",
+      "kurtosis": 0.6930303733745884,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.10.mixer.conv1d.weight",
+      "block": 10,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.6129467729940785,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.10.mixer.dt_proj.weight",
+      "block": 10,
+      "type": "SSM:dt_proj",
+      "kurtosis": 0.8772297567510643,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.10.mixer.in_proj.weight",
+      "block": 10,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.24045549471996308,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.10.mixer.out_proj.weight",
+      "block": 10,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.6774355060546209,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.10.mixer.x_proj.weight",
+      "block": 10,
+      "type": "SSM:x_proj",
+      "kurtosis": 3.0406025416568694,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.11.mixer.A_log",
+      "block": 11,
+      "type": "SSM:A_log",
+      "kurtosis": 0.025772328988220128,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.11.mixer.conv1d.weight",
+      "block": 11,
+      "type": "SSM:conv1d",
+      "kurtosis": 3.731024829598117,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.11.mixer.dt_proj.weight",
+      "block": 11,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.1374257039319788,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.11.mixer.in_proj.weight",
+      "block": 11,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.3189098732895146,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.11.mixer.out_proj.weight",
+      "block": 11,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.7884763199274074,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.11.mixer.x_proj.weight",
+      "block": 11,
+      "type": "SSM:x_proj",
+      "kurtosis": 3.1006513526093684,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.12.mixer.A_log",
+      "block": 12,
+      "type": "SSM:A_log",
+      "kurtosis": -0.8493964829939955,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.12.mixer.conv1d.weight",
+      "block": 12,
+      "type": "SSM:conv1d",
+      "kurtosis": 6.145121169698065,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.12.mixer.dt_proj.weight",
+      "block": 12,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.974911057865011,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.12.mixer.in_proj.weight",
+      "block": 12,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.7696659345397565,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.12.mixer.out_proj.weight",
+      "block": 12,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.143336639616316,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.12.mixer.x_proj.weight",
+      "block": 12,
+      "type": "SSM:x_proj",
+      "kurtosis": 9.68838282824187,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.13.mixer.A_log",
+      "block": 13,
+      "type": "SSM:A_log",
+      "kurtosis": 0.4284701689760233,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.13.mixer.conv1d.weight",
+      "block": 13,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.565885240825652,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.13.mixer.dt_proj.weight",
+      "block": 13,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.1685669491830595,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.13.mixer.in_proj.weight",
+      "block": 13,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.5511996360801916,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.13.mixer.out_proj.weight",
+      "block": 13,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.1681359522703785,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.13.mixer.x_proj.weight",
+      "block": 13,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.8107002439900493,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.14.mixer.A_log",
+      "block": 14,
+      "type": "SSM:A_log",
+      "kurtosis": 0.1670093940096149,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.14.mixer.conv1d.weight",
+      "block": 14,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.232024756839706,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.14.mixer.dt_proj.weight",
+      "block": 14,
+      "type": "SSM:dt_proj",
+      "kurtosis": 0.7806905145252827,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.14.mixer.in_proj.weight",
+      "block": 14,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.514633904906026,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.14.mixer.out_proj.weight",
+      "block": 14,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.8105198738018315,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.14.mixer.x_proj.weight",
+      "block": 14,
+      "type": "SSM:x_proj",
+      "kurtosis": 4.959779225786405,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.15.mixer.A_log",
+      "block": 15,
+      "type": "SSM:A_log",
+      "kurtosis": -1.0161553417601543,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.15.mixer.conv1d.weight",
+      "block": 15,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.618848983925643,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.15.mixer.dt_proj.weight",
+      "block": 15,
+      "type": "SSM:dt_proj",
+      "kurtosis": 3.205976618655064,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.15.mixer.in_proj.weight",
+      "block": 15,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.6806789915743745,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.15.mixer.out_proj.weight",
+      "block": 15,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.6001910696190071,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.15.mixer.x_proj.weight",
+      "block": 15,
+      "type": "SSM:x_proj",
+      "kurtosis": 15.459885655202367,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.16.mixer.A_log",
+      "block": 16,
+      "type": "SSM:A_log",
+      "kurtosis": 0.698604394098822,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.16.mixer.conv1d.weight",
+      "block": 16,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.184648756417982,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.16.mixer.dt_proj.weight",
+      "block": 16,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.643335369175756,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.16.mixer.in_proj.weight",
+      "block": 16,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.8107302195025405,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.16.mixer.out_proj.weight",
+      "block": 16,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.309161464199704,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.16.mixer.x_proj.weight",
+      "block": 16,
+      "type": "SSM:x_proj",
+      "kurtosis": 19.58073937203747,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.17.mixer.A_log",
+      "block": 17,
+      "type": "SSM:A_log",
+      "kurtosis": -0.021805097695891007,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.17.mixer.conv1d.weight",
+      "block": 17,
+      "type": "SSM:conv1d",
+      "kurtosis": 10.675862583194917,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.17.mixer.dt_proj.weight",
+      "block": 17,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.9179140278270044,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.17.mixer.in_proj.weight",
+      "block": 17,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.7686119449993423,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.17.mixer.out_proj.weight",
+      "block": 17,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.8713674117594654,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.17.mixer.x_proj.weight",
+      "block": 17,
+      "type": "SSM:x_proj",
+      "kurtosis": 18.20820372589352,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.18.mixer.A_log",
+      "block": 18,
+      "type": "SSM:A_log",
+      "kurtosis": 0.05619650250415331,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.18.mixer.conv1d.weight",
+      "block": 18,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.644723615547878,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.18.mixer.dt_proj.weight",
+      "block": 18,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.4525796463513974,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.18.mixer.in_proj.weight",
+      "block": 18,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.48392922370980207,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.18.mixer.out_proj.weight",
+      "block": 18,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.1331216769135448,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.18.mixer.x_proj.weight",
+      "block": 18,
+      "type": "SSM:x_proj",
+      "kurtosis": 6.755263516961659,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.19.mixer.A_log",
+      "block": 19,
+      "type": "SSM:A_log",
+      "kurtosis": -0.6717468364060122,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.19.mixer.conv1d.weight",
+      "block": 19,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.743345015038763,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.19.mixer.dt_proj.weight",
+      "block": 19,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.1791807882739915,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.19.mixer.in_proj.weight",
+      "block": 19,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.43895566210576353,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.19.mixer.out_proj.weight",
+      "block": 19,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.6974706322191415,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.19.mixer.x_proj.weight",
+      "block": 19,
+      "type": "SSM:x_proj",
+      "kurtosis": 18.283928842836296,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.2.mixer.A_log",
+      "block": 2,
+      "type": "SSM:A_log",
+      "kurtosis": -0.3184825679271448,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.2.mixer.conv1d.weight",
+      "block": 2,
+      "type": "SSM:conv1d",
+      "kurtosis": 8.007555984395456,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.2.mixer.dt_proj.weight",
+      "block": 2,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.0033904814210333,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.2.mixer.in_proj.weight",
+      "block": 2,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.3063178809185376,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.2.mixer.out_proj.weight",
+      "block": 2,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.9863622158377048,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.2.mixer.x_proj.weight",
+      "block": 2,
+      "type": "SSM:x_proj",
+      "kurtosis": 5.199213655299136,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.20.mixer.A_log",
+      "block": 20,
+      "type": "SSM:A_log",
+      "kurtosis": -0.3832666472944948,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.20.mixer.conv1d.weight",
+      "block": 20,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.276867211894389,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.20.mixer.dt_proj.weight",
+      "block": 20,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.433847801287114,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.20.mixer.in_proj.weight",
+      "block": 20,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.44763969854012986,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.20.mixer.out_proj.weight",
+      "block": 20,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.2288649669376746,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.20.mixer.x_proj.weight",
+      "block": 20,
+      "type": "SSM:x_proj",
+      "kurtosis": 24.00434420206361,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.21.mixer.A_log",
+      "block": 21,
+      "type": "SSM:A_log",
+      "kurtosis": -0.379868921127021,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.21.mixer.conv1d.weight",
+      "block": 21,
+      "type": "SSM:conv1d",
+      "kurtosis": 9.792122234634085,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.21.mixer.dt_proj.weight",
+      "block": 21,
+      "type": "SSM:dt_proj",
+      "kurtosis": 5.20208808459865,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.21.mixer.in_proj.weight",
+      "block": 21,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.4258421187901349,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.21.mixer.out_proj.weight",
+      "block": 21,
+      "type": "PROJ:out_proj",
+      "kurtosis": 2.537518728175537,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.21.mixer.x_proj.weight",
+      "block": 21,
+      "type": "SSM:x_proj",
+      "kurtosis": 3.586134870840433,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.22.mixer.A_log",
+      "block": 22,
+      "type": "SSM:A_log",
+      "kurtosis": -0.7856869614886581,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.22.mixer.conv1d.weight",
+      "block": 22,
+      "type": "SSM:conv1d",
+      "kurtosis": 10.126799631781056,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.22.mixer.dt_proj.weight",
+      "block": 22,
+      "type": "SSM:dt_proj",
+      "kurtosis": 6.836076385210495,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.22.mixer.in_proj.weight",
+      "block": 22,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.32503774464333857,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.22.mixer.out_proj.weight",
+      "block": 22,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.009613236202327,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.22.mixer.x_proj.weight",
+      "block": 22,
+      "type": "SSM:x_proj",
+      "kurtosis": 1.914589568651449,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.23.mixer.A_log",
+      "block": 23,
+      "type": "SSM:A_log",
+      "kurtosis": -1.0458806816397994,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.23.mixer.conv1d.weight",
+      "block": 23,
+      "type": "SSM:conv1d",
+      "kurtosis": 8.423189584117578,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.23.mixer.dt_proj.weight",
+      "block": 23,
+      "type": "SSM:dt_proj",
+      "kurtosis": 4.69731942589761,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.23.mixer.in_proj.weight",
+      "block": 23,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.23547342788547798,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.23.mixer.out_proj.weight",
+      "block": 23,
+      "type": "PROJ:out_proj",
+      "kurtosis": 2.411182742922354,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.23.mixer.x_proj.weight",
+      "block": 23,
+      "type": "SSM:x_proj",
+      "kurtosis": 5.231766450327791,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.3.mixer.A_log",
+      "block": 3,
+      "type": "SSM:A_log",
+      "kurtosis": -0.4057139971742596,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.3.mixer.conv1d.weight",
+      "block": 3,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.252089195344631,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.3.mixer.dt_proj.weight",
+      "block": 3,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.401303271375834,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.3.mixer.in_proj.weight",
+      "block": 3,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.18219787478417748,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.3.mixer.out_proj.weight",
+      "block": 3,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.6187264950282985,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.3.mixer.x_proj.weight",
+      "block": 3,
+      "type": "SSM:x_proj",
+      "kurtosis": 4.314646836146331,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.4.mixer.A_log",
+      "block": 4,
+      "type": "SSM:A_log",
+      "kurtosis": -0.5985108367216356,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.4.mixer.conv1d.weight",
+      "block": 4,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.023826815561117,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.4.mixer.dt_proj.weight",
+      "block": 4,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.0910302957866982,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.4.mixer.in_proj.weight",
+      "block": 4,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.14563795753121456,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.4.mixer.out_proj.weight",
+      "block": 4,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.5905731505134089,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.4.mixer.x_proj.weight",
+      "block": 4,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.704064281264152,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.5.mixer.A_log",
+      "block": 5,
+      "type": "SSM:A_log",
+      "kurtosis": -0.599001995102252,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.5.mixer.conv1d.weight",
+      "block": 5,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.2995311399720535,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.5.mixer.dt_proj.weight",
+      "block": 5,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.8144624478543552,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.5.mixer.in_proj.weight",
+      "block": 5,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.14285868183383332,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.5.mixer.out_proj.weight",
+      "block": 5,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.6853583350253594,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.5.mixer.x_proj.weight",
+      "block": 5,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.4147246624969805,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.6.mixer.A_log",
+      "block": 6,
+      "type": "SSM:A_log",
+      "kurtosis": -0.648071837010046,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.6.mixer.conv1d.weight",
+      "block": 6,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.341181573597038,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.6.mixer.dt_proj.weight",
+      "block": 6,
+      "type": "SSM:dt_proj",
+      "kurtosis": 0.9589287463264342,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.6.mixer.in_proj.weight",
+      "block": 6,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.15261144832383122,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.6.mixer.out_proj.weight",
+      "block": 6,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.5828824339865952,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.6.mixer.x_proj.weight",
+      "block": 6,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.295544988817147,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.7.mixer.A_log",
+      "block": 7,
+      "type": "SSM:A_log",
+      "kurtosis": 0.028268297292896705,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.7.mixer.conv1d.weight",
+      "block": 7,
+      "type": "SSM:conv1d",
+      "kurtosis": 5.517100163591708,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.7.mixer.dt_proj.weight",
+      "block": 7,
+      "type": "SSM:dt_proj",
+      "kurtosis": 1.083873006824387,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.7.mixer.in_proj.weight",
+      "block": 7,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.2872449980652858,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.7.mixer.out_proj.weight",
+      "block": 7,
+      "type": "PROJ:out_proj",
+      "kurtosis": 1.0562061724326242,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.7.mixer.x_proj.weight",
+      "block": 7,
+      "type": "SSM:x_proj",
+      "kurtosis": 3.30240862982121,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.8.mixer.A_log",
+      "block": 8,
+      "type": "SSM:A_log",
+      "kurtosis": -0.15561721247361326,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.8.mixer.conv1d.weight",
+      "block": 8,
+      "type": "SSM:conv1d",
+      "kurtosis": 3.8552258522495952,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.8.mixer.dt_proj.weight",
+      "block": 8,
+      "type": "SSM:dt_proj",
+      "kurtosis": 2.243077707163075,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.8.mixer.in_proj.weight",
+      "block": 8,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.18973179389473493,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.8.mixer.out_proj.weight",
+      "block": 8,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.6805881598491528,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.8.mixer.x_proj.weight",
+      "block": 8,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.745976990575275,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    },
+    {
+      "name": "backbone.layers.9.mixer.A_log",
+      "block": 9,
+      "type": "SSM:A_log",
+      "kurtosis": 0.25161361266377114,
+      "shape": [
+        1536,
+        16
+      ],
+      "numel": 24576
+    },
+    {
+      "name": "backbone.layers.9.mixer.conv1d.weight",
+      "block": 9,
+      "type": "SSM:conv1d",
+      "kurtosis": 4.110939432659399,
+      "shape": [
+        1536,
+        1,
+        4
+      ],
+      "numel": 6144
+    },
+    {
+      "name": "backbone.layers.9.mixer.dt_proj.weight",
+      "block": 9,
+      "type": "SSM:dt_proj",
+      "kurtosis": 0.6818196564078431,
+      "shape": [
+        1536,
+        48
+      ],
+      "numel": 73728
+    },
+    {
+      "name": "backbone.layers.9.mixer.in_proj.weight",
+      "block": 9,
+      "type": "PROJ:in_proj",
+      "kurtosis": 0.20423828257034948,
+      "shape": [
+        3072,
+        768
+      ],
+      "numel": 2359296
+    },
+    {
+      "name": "backbone.layers.9.mixer.out_proj.weight",
+      "block": 9,
+      "type": "PROJ:out_proj",
+      "kurtosis": 0.7273610037192038,
+      "shape": [
+        768,
+        1536
+      ],
+      "numel": 1179648
+    },
+    {
+      "name": "backbone.layers.9.mixer.x_proj.weight",
+      "block": 9,
+      "type": "SSM:x_proj",
+      "kurtosis": 2.4431862374090727,
+      "shape": [
+        80,
+        1536
+      ],
+      "numel": 122880
+    }
+  ],
+  "cost": {
+    "wall_time_s": 81.779,
+    "cpu_time_s": 81.763,
+    "peak_memory_mb": 2909.9,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-22T13:04:20",
+    "timestamp_end": "2026-03-22T13:05:42"
+  }
+}

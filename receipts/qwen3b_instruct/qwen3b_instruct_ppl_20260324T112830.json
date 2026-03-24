@@ -1,0 +1,36 @@
+{
+  "work_order": "WO-QWEN3B-INSTRUCT-PPL-01",
+  "question": "Does Qwen2.5-3B-Instruct maintain PPL within 2% after CDNA v3 compression?",
+  "verdict": "PASS",
+  "model": "Qwen2.5-3B-Instruct",
+  "eval_dataset": "wikitext-2-raw-v1 (validation)",
+  "eval_tokens": 2048,
+  "baseline": {
+    "ppl": 5.4952,
+    "nll": 1.70388
+  },
+  "compressed": {
+    "ppl": 5.5331,
+    "nll": 1.710754,
+    "tensors_swapped": 252
+  },
+  "delta": {
+    "ppl": 0.0379,
+    "pct": 0.69
+  },
+  "cosine_fidelity": {
+    "min": 0.993716,
+    "mean": 0.999218,
+    "max": 0.999822,
+    "n_tensors": 252
+  },
+  "cost": {
+    "wall_time_s": 386.418,
+    "cpu_time_s": 372.594,
+    "peak_memory_mb": 16035.2,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-24T11:22:04",
+    "timestamp_end": "2026-03-24T11:28:30"
+  }
+}

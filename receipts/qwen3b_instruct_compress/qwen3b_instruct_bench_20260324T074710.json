@@ -1,0 +1,119 @@
+{
+  "benchmark": "qwen3b_instruct_helix_linear",
+  "model": "Qwen2.5-3B-Instruct",
+  "architecture": "Qwen2ForCausalLM",
+  "n_layers": 36,
+  "hidden_size": 2048,
+  "num_attention_heads": 16,
+  "num_kv_heads": 2,
+  "vocab_size": 151936,
+  "phases": {
+    "A_verify": {
+      "helix_modules": 252,
+      "expected_helix_modules": 252,
+      "helix_count_ok": true,
+      "linear_remaining": 1,
+      "forward_pass_finite": true,
+      "forward_pass_nan": false,
+      "logits_shape": [
+        1,
+        4,
+        151936
+      ],
+      "logits_min": -10.675084114074707,
+      "logits_max": 19.8216495513916,
+      "logits_mean": 0.3851286470890045,
+      "pass": true
+    },
+    "B_perplexity": {
+      "dataset": "wikitext-2-raw-v1",
+      "split": "test",
+      "perplexity": 9.0706,
+      "cached": true,
+      "pass": true
+    },
+    "C_speed": {
+      "prefill_tokens": 10,
+      "prefill_median_ms": 275.6,
+      "prefill_tok_s": 36.3,
+      "prefill_runs": 3,
+      "decode_prompt_tokens": 9,
+      "decode_new_tokens": 64,
+      "decode_time_ms": 17404.9,
+      "decode_tok_s": 3.7,
+      "max_new_tokens": 64,
+      "pass": true
+    },
+    "D_quality": {
+      "prompts": [
+        {
+          "name": "cooling_systems",
+          "prompt": "What are the main components of a data center cooling system?",
+          "response": "A data center cooling system is crucial for maintaining optimal operating temperatures to ensure the reliability and performance of servers and other IT equipment. The main components of a data center cooling system typically include:\n\n1. **Air Conditioners (Chillers)**: These devices cool the air that circulates through the data center. They can be either air-cooled or water-cooled. Air-cooled chillers use fans to blow air over a heat exchanger, while water-cooled chillers use a cooling tower o",
+          "new_tokens": 128,
+          "gen_time_s": 35.45,
+          "tok_s": 3.6,
+          "nonempty": true,
+          "coherent": true,
+          "no_nan": true
+        },
+        {
+          "name": "tier_classification",
+          "prompt": "Explain the difference between Tier III and Tier IV data center classifications.",
+          "response": "Tier classification is a system used to evaluate the robustness and reliability of data centers based on their ability to maintain operations during power outages, equipment failures, and other disruptions. The International Electrotechnical Commission (IEC) developed this system, which is now widely adopted in the industry.\n\nThe IEC defines six tiers, with Tier I being the least robust and Tier VI being the most robust. Each tier has specific requirements that must be met to achieve certificati",
+          "new_tokens": 128,
+          "gen_time_s": 35.45,
+          "tok_s": 3.6,
+          "nonempty": true,
+          "coherent": true,
+          "no_nan": true
+        },
+        {
+          "name": "location_factors",
+          "prompt": "What factors determine the optimal location for a new data center facility?",
+          "response": "The optimal location for a new data center facility is influenced by a variety of critical factors that ensure reliability, efficiency, and cost-effectiveness. Here are some key considerations:\n\n1. **Geographical Stability**: Data centers need to be located in areas with minimal natural disasters such as earthquakes, floods, or hurricanes. Additionally, they should be situated away from active fault lines.\n\n2. **Power Supply Reliability**: Access to a stable and reliable power supply is crucial.",
+          "new_tokens": 128,
+          "gen_time_s": 35.37,
+          "tok_s": 3.6,
+          "nonempty": true,
+          "coherent": true,
+          "no_nan": true
+        }
+      ],
+      "all_nonempty": true,
+      "all_coherent": true,
+      "all_no_nan": true,
+      "pass": true
+    },
+    "E_vram": {
+      "gpu_name": "Quadro T2000",
+      "gpu_total_mb": 3899,
+      "vram_allocated_mb": 1213,
+      "vram_reserved_mb": 1220,
+      "vram_peak_mb": 1230,
+      "headroom_mb": 2669,
+      "pass": true
+    }
+  },
+  "warnings": [],
+  "load_time_s": 7.3,
+  "swap_summary": {
+    "helix_modules": 252,
+    "linear_modules": 1,
+    "total_linear": 253,
+    "compressed_bytes": 2783865792,
+    "dense_equivalent_bytes": 12342788096,
+    "overall_ratio": 4.43
+  },
+  "cost": {
+    "wall_time_s": 133.564,
+    "cpu_time_s": 133.53,
+    "peak_memory_mb": 15179.2,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-24T07:44:57",
+    "timestamp_end": "2026-03-24T07:47:10"
+  },
+  "all_pass": true,
+  "device": "cuda:0"
+}

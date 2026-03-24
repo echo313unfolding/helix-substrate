@@ -5,6 +5,7 @@ Core components:
     - CDNA format: k-means quantized model weight compression
     - Streaming decode: block-by-block Y = X @ W without loading full weights
     - Se routing: structural entropy for tensor-level compute routing
+      (legacy H×U×D formula; revised four-component model in se_final_form.md)
     - Receipts: tamper-evident verification of all operations
 """
 
@@ -21,6 +22,9 @@ from helix_substrate.receipt import (
     save_execution_receipt,
     load_execution_receipt,
 )
+from helix_substrate.tensor_policy import classify_tensor, TensorPolicy, TensorClass, MORPHO_FFT_POLICY
+from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.cdnav3_reader import CDNAv3Reader
 
 __all__ = [
     "encode_tensor_to_cdna",
@@ -34,4 +38,10 @@ __all__ = [
     "validate_execution_receipt",
     "save_execution_receipt",
     "load_execution_receipt",
+    "classify_tensor",
+    "TensorPolicy",
+    "TensorClass",
+    "CDNAv3Writer",
+    "CDNAv3Reader",
+    "MORPHO_FFT_POLICY",
 ]

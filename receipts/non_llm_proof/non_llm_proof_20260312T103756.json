@@ -1,0 +1,61 @@
+{
+  "experiment": "non_llm_helix_linear_proof",
+  "timestamp": "2026-03-12T14:30:19.333559+00:00",
+  "results": {
+    "sentence_transformer": {
+      "model": "all-MiniLM-L6-v2",
+      "type": "sentence_embedding",
+      "n_linear": 37,
+      "n_compressed": 37,
+      "compression_ratio": 3.94,
+      "dense_mb": 43.1,
+      "compressed_mb": 10.9,
+      "avg_cosine": 0.998944,
+      "min_cosine": 0.998886,
+      "rank_preservation": 1.0,
+      "compress_time_s": 57.3,
+      "note": "Rerun after .cpu() fix — original run hit CUDA-to-numpy error"
+    },
+    "clip_vit": {
+      "model": "clip-vit-base-patch32",
+      "type": "vision_language",
+      "n_linear": 144,
+      "n_compressed": 146,
+      "compression_ratio": 3.98,
+      "dense_mb": 493.4,
+      "compressed_mb": 123.9,
+      "avg_image_cosine": 0.997285,
+      "avg_text_cosine": 0.999721,
+      "logits_cosine": 0.999878,
+      "ranking_preserved": 1.0,
+      "compress_time_s": 386.2
+    },
+    "resnet18": {
+      "model": "ResNet-18",
+      "type": "cnn_classifier",
+      "n_linear": 1,
+      "n_compressed": 1,
+      "compression_ratio": 3.97,
+      "dense_mb": 2.0,
+      "compressed_mb": 0.5,
+      "output_cosine": 0.999852,
+      "prediction_match": 1.0,
+      "compress_time_s": 3.1
+    }
+  },
+  "cost": {
+    "wall_time_s": 457.053,
+    "cpu_time_s": 396.05,
+    "peak_memory_mb": 5221.4,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-12T14:30:19.333559+00:00",
+    "timestamp_end": "2026-03-12T14:37:56.386832+00:00",
+    "sentence_transformer_rerun_wall_s": 63.9
+  },
+  "verdict": {
+    "sentence_transformer": "STRONG",
+    "clip_vit": "STRONG",
+    "resnet18": "PROVEN"
+  }
+}

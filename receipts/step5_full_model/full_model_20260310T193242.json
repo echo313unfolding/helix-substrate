@@ -1,0 +1,2074 @@
+{
+  "schema": "step5_full_model_perplexity:v1",
+  "model": "/home/voidstr3m33/models/tinyllama_fp32/model.safetensors",
+  "eval_dataset": "wikitext-2-raw-v1/validation",
+  "eval_tokens": 4096,
+  "n_chunks": 2,
+  "baseline_perplexity": 6.1717,
+  "baseline_nll": 1.819972,
+  "compressed_perplexity": 6.2256,
+  "compressed_nll": 1.828665,
+  "delta_ppl": 0.0539,
+  "delta_pct": 0.8731,
+  "total_original_bytes": 4400193536,
+  "total_compressed_bytes": 1102056216,
+  "compression_ratio": 3.99,
+  "savings_bytes": 3298137320,
+  "savings_pct": 74.95,
+  "n_tensors_compressed": 156,
+  "n_tensors_exact": 45,
+  "n_svd_upgraded": 7,
+  "norm_bytes": 368640,
+  "logit_kl": {
+    "mean": 0.009498435072600842,
+    "max": 2.61221981048584,
+    "median": 0.004534650128334761,
+    "std": 0.05961029976606369,
+    "p95": 0.025821242481470108,
+    "p99": 0.055627722293138504,
+    "n_tokens": 4096
+  },
+  "verdict": "GOOD \u2014 minor compounding, still safe",
+  "step4_sum_of_deltas": 0.0459,
+  "compounding_factor": 1.17,
+  "tensor_stats": [
+    {
+      "hf_key": "model.layers.0.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 142.19,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4329436,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.995865
+    },
+    {
+      "hf_key": "model.layers.0.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 298.77,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 602114,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.997248
+    },
+    {
+      "hf_key": "model.layers.0.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.89,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 602161,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999837
+    },
+    {
+      "hf_key": "model.layers.0.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 52.27,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4329283,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.997877
+    },
+    {
+      "hf_key": "model.layers.0.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 1.57,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11784098,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999549
+    },
+    {
+      "hf_key": "model.layers.0.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.24,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11784488,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999736
+    },
+    {
+      "hf_key": "model.layers.0.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.78,
+      "svd_rank": 8,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11784171,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.9996
+    },
+    {
+      "hf_key": "model.layers.1.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 4.97,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198049,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999102
+    },
+    {
+      "hf_key": "model.layers.1.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 7.0,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527956,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999246
+    },
+    {
+      "hf_key": "model.layers.1.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.77,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528085,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999805
+    },
+    {
+      "hf_key": "model.layers.1.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 4.5,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197845,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999363
+    },
+    {
+      "hf_key": "model.layers.1.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.52,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538133,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99978
+    },
+    {
+      "hf_key": "model.layers.1.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.16,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538256,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99978
+    },
+    {
+      "hf_key": "model.layers.1.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.2,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538115,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99956
+    },
+    {
+      "hf_key": "model.layers.2.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.87,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198004,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.99949
+    },
+    {
+      "hf_key": "model.layers.2.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 3.0,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527973,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999585
+    },
+    {
+      "hf_key": "model.layers.2.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.41,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528065,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999848
+    },
+    {
+      "hf_key": "model.layers.2.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 15.46,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197743,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.998761
+    },
+    {
+      "hf_key": "model.layers.2.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 11.81,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11537714,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999488
+    },
+    {
+      "hf_key": "model.layers.2.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.29,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538176,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999706
+    },
+    {
+      "hf_key": "model.layers.2.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.56,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538119,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999643
+    },
+    {
+      "hf_key": "model.layers.3.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198098,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.99971
+    },
+    {
+      "hf_key": "model.layers.3.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.53,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527995,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.99974
+    },
+    {
+      "hf_key": "model.layers.3.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528032,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999864
+    },
+    {
+      "hf_key": "model.layers.3.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.89,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197820,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999515
+    },
+    {
+      "hf_key": "model.layers.3.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.22,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538143,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999815
+    },
+    {
+      "hf_key": "model.layers.3.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.17,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538239,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999874
+    },
+    {
+      "hf_key": "model.layers.3.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.76,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538142,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999654
+    },
+    {
+      "hf_key": "model.layers.4.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.2,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198066,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999607
+    },
+    {
+      "hf_key": "model.layers.4.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.73,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527990,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999711
+    },
+    {
+      "hf_key": "model.layers.4.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.37,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528034,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999846
+    },
+    {
+      "hf_key": "model.layers.4.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.9,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197894,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.99969
+    },
+    {
+      "hf_key": "model.layers.4.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538050,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999876
+    },
+    {
+      "hf_key": "model.layers.4.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.12,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538278,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99977
+    },
+    {
+      "hf_key": "model.layers.4.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.37,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538129,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999801
+    },
+    {
+      "hf_key": "model.layers.5.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.96,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198082,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999724
+    },
+    {
+      "hf_key": "model.layers.5.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.24,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528005,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999755
+    },
+    {
+      "hf_key": "model.layers.5.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.23,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528034,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999859
+    },
+    {
+      "hf_key": "model.layers.5.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.79,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197828,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999623
+    },
+    {
+      "hf_key": "model.layers.5.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.63,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538122,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999715
+    },
+    {
+      "hf_key": "model.layers.5.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.21,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538228,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999812
+    },
+    {
+      "hf_key": "model.layers.5.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.61,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538183,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999685
+    },
+    {
+      "hf_key": "model.layers.6.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.75,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197997,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999649
+    },
+    {
+      "hf_key": "model.layers.6.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.87,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527917,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999671
+    },
+    {
+      "hf_key": "model.layers.6.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.68,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528033,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999835
+    },
+    {
+      "hf_key": "model.layers.6.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.48,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197776,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999486
+    },
+    {
+      "hf_key": "model.layers.6.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.55,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538133,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999676
+    },
+    {
+      "hf_key": "model.layers.6.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538278,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999789
+    },
+    {
+      "hf_key": "model.layers.6.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.02,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538134,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999641
+    },
+    {
+      "hf_key": "model.layers.7.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 4.59,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197846,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999047
+    },
+    {
+      "hf_key": "model.layers.7.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 2.26,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527929,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999674
+    },
+    {
+      "hf_key": "model.layers.7.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.85,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527991,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999789
+    },
+    {
+      "hf_key": "model.layers.7.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.67,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197853,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999476
+    },
+    {
+      "hf_key": "model.layers.7.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.89,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538078,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999619
+    },
+    {
+      "hf_key": "model.layers.7.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.37,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538227,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999768
+    },
+    {
+      "hf_key": "model.layers.7.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 3.17,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538193,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999588
+    },
+    {
+      "hf_key": "model.layers.8.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.9,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197994,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999518
+    },
+    {
+      "hf_key": "model.layers.8.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.87,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527981,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999711
+    },
+    {
+      "hf_key": "model.layers.8.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.6,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528061,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999835
+    },
+    {
+      "hf_key": "model.layers.8.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.87,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197867,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.99961
+    },
+    {
+      "hf_key": "model.layers.8.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.54,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538151,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999671
+    },
+    {
+      "hf_key": "model.layers.8.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538209,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999728
+    },
+    {
+      "hf_key": "model.layers.8.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.13,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538165,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999699
+    },
+    {
+      "hf_key": "model.layers.9.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.39,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197962,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999624
+    },
+    {
+      "hf_key": "model.layers.9.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.1,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527978,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999778
+    },
+    {
+      "hf_key": "model.layers.9.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.27,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528054,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999865
+    },
+    {
+      "hf_key": "model.layers.9.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.48,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197954,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999743
+    },
+    {
+      "hf_key": "model.layers.9.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.63,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538133,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999636
+    },
+    {
+      "hf_key": "model.layers.9.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.21,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538257,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999842
+    },
+    {
+      "hf_key": "model.layers.9.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.61,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538143,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999799
+    },
+    {
+      "hf_key": "model.layers.10.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.66,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197935,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999559
+    },
+    {
+      "hf_key": "model.layers.10.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.08,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528006,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999798
+    },
+    {
+      "hf_key": "model.layers.10.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.3,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528061,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999866
+    },
+    {
+      "hf_key": "model.layers.10.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.89,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197874,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999715
+    },
+    {
+      "hf_key": "model.layers.10.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.53,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538155,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999642
+    },
+    {
+      "hf_key": "model.layers.10.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.18,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538297,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999711
+    },
+    {
+      "hf_key": "model.layers.10.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.74,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11537978,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999597
+    },
+    {
+      "hf_key": "model.layers.11.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.93,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198038,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999354
+    },
+    {
+      "hf_key": "model.layers.11.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.56,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527976,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999728
+    },
+    {
+      "hf_key": "model.layers.11.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.55,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528041,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999832
+    },
+    {
+      "hf_key": "model.layers.11.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.09,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197966,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999665
+    },
+    {
+      "hf_key": "model.layers.11.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.7,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538095,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999631
+    },
+    {
+      "hf_key": "model.layers.11.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.16,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538277,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999857
+    },
+    {
+      "hf_key": "model.layers.11.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.47,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538036,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999731
+    },
+    {
+      "hf_key": "model.layers.12.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.44,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198048,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999651
+    },
+    {
+      "hf_key": "model.layers.12.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.55,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527912,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999722
+    },
+    {
+      "hf_key": "model.layers.12.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.34,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528073,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999855
+    },
+    {
+      "hf_key": "model.layers.12.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.06,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197844,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999627
+    },
+    {
+      "hf_key": "model.layers.12.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 1.05,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538094,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999541
+    },
+    {
+      "hf_key": "model.layers.12.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.28,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538275,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999797
+    },
+    {
+      "hf_key": "model.layers.12.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.03,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538055,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999694
+    },
+    {
+      "hf_key": "model.layers.13.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.35,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198100,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999651
+    },
+    {
+      "hf_key": "model.layers.13.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.61,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527921,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999709
+    },
+    {
+      "hf_key": "model.layers.13.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.32,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528057,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999851
+    },
+    {
+      "hf_key": "model.layers.13.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.89,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197976,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999703
+    },
+    {
+      "hf_key": "model.layers.13.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 1.31,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538112,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999513
+    },
+    {
+      "hf_key": "model.layers.13.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.3,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538263,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999661
+    },
+    {
+      "hf_key": "model.layers.13.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.97,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538127,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999757
+    },
+    {
+      "hf_key": "model.layers.14.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.27,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198041,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999518
+    },
+    {
+      "hf_key": "model.layers.14.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.99,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527939,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999679
+    },
+    {
+      "hf_key": "model.layers.14.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.59,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528069,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999827
+    },
+    {
+      "hf_key": "model.layers.14.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.98,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197803,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999419
+    },
+    {
+      "hf_key": "model.layers.14.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 1.29,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538114,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999498
+    },
+    {
+      "hf_key": "model.layers.14.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.4,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538306,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999765
+    },
+    {
+      "hf_key": "model.layers.14.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.9,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538113,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999653
+    },
+    {
+      "hf_key": "model.layers.15.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 3.04,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198008,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999228
+    },
+    {
+      "hf_key": "model.layers.15.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 2.21,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527965,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999663
+    },
+    {
+      "hf_key": "model.layers.15.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.35,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528054,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999744
+    },
+    {
+      "hf_key": "model.layers.15.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.24,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198047,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999568
+    },
+    {
+      "hf_key": "model.layers.15.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.84,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538131,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999621
+    },
+    {
+      "hf_key": "model.layers.15.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.31,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538341,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999731
+    },
+    {
+      "hf_key": "model.layers.15.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.89,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538123,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99968
+    },
+    {
+      "hf_key": "model.layers.16.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.58,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198103,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999337
+    },
+    {
+      "hf_key": "model.layers.16.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.33,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527987,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999759
+    },
+    {
+      "hf_key": "model.layers.16.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.41,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528038,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999849
+    },
+    {
+      "hf_key": "model.layers.16.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.68,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197945,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999716
+    },
+    {
+      "hf_key": "model.layers.16.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.86,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538180,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999681
+    },
+    {
+      "hf_key": "model.layers.16.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.27,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538334,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999839
+    },
+    {
+      "hf_key": "model.layers.16.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 1.01,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538152,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999648
+    },
+    {
+      "hf_key": "model.layers.17.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.82,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198101,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999633
+    },
+    {
+      "hf_key": "model.layers.17.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.63,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528016,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999719
+    },
+    {
+      "hf_key": "model.layers.17.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.06,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527995,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999756
+    },
+    {
+      "hf_key": "model.layers.17.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.1,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197828,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999563
+    },
+    {
+      "hf_key": "model.layers.17.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.67,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538169,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.99962
+    },
+    {
+      "hf_key": "model.layers.17.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.23,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538293,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999696
+    },
+    {
+      "hf_key": "model.layers.17.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.62,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538173,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999683
+    },
+    {
+      "hf_key": "model.layers.18.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.87,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198131,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999637
+    },
+    {
+      "hf_key": "model.layers.18.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 2.05,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528021,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999677
+    },
+    {
+      "hf_key": "model.layers.18.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 3.39,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528016,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999541
+    },
+    {
+      "hf_key": "model.layers.18.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.95,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197904,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999714
+    },
+    {
+      "hf_key": "model.layers.18.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.64,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538115,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999693
+    },
+    {
+      "hf_key": "model.layers.18.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.11,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538323,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999963
+    },
+    {
+      "hf_key": "model.layers.18.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.41,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538250,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999838
+    },
+    {
+      "hf_key": "model.layers.19.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.21,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198084,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999457
+    },
+    {
+      "hf_key": "model.layers.19.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.9,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527991,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999698
+    },
+    {
+      "hf_key": "model.layers.19.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 2.31,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528006,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999641
+    },
+    {
+      "hf_key": "model.layers.19.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.19,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198049,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.99969
+    },
+    {
+      "hf_key": "model.layers.19.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.53,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538173,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999658
+    },
+    {
+      "hf_key": "model.layers.19.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.09,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538319,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999789
+    },
+    {
+      "hf_key": "model.layers.19.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.42,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538280,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999747
+    },
+    {
+      "hf_key": "model.layers.20.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.93,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198008,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999505
+    },
+    {
+      "hf_key": "model.layers.20.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.58,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528000,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999719
+    },
+    {
+      "hf_key": "model.layers.20.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.37,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528021,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999843
+    },
+    {
+      "hf_key": "model.layers.20.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 0.82,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197991,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999767
+    },
+    {
+      "hf_key": "model.layers.20.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.95,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538229,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999747
+    },
+    {
+      "hf_key": "model.layers.20.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 0.11,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538297,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999863
+    },
+    {
+      "hf_key": "model.layers.20.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 0.71,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538186,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999867
+    },
+    {
+      "hf_key": "model.layers.21.self_attn.q_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 2.82,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4198047,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999469
+    },
+    {
+      "hf_key": "model.layers.21.self_attn.k_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 1.75,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 527992,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999698
+    },
+    {
+      "hf_key": "model.layers.21.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "kurtosis": 0.25,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 528079,
+      "original_bytes": 2097152,
+      "weight_cosine": 0.999861
+    },
+    {
+      "hf_key": "model.layers.21.self_attn.o_proj.weight",
+      "shape": [
+        2048,
+        2048
+      ],
+      "kurtosis": 1.83,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 4197744,
+      "original_bytes": 16777216,
+      "weight_cosine": 0.999459
+    },
+    {
+      "hf_key": "model.layers.21.mlp.gate_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 2.14,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11537872,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999296
+    },
+    {
+      "hf_key": "model.layers.21.mlp.up_proj.weight",
+      "shape": [
+        5632,
+        2048
+      ],
+      "kurtosis": 4.86,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11537756,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999021
+    },
+    {
+      "hf_key": "model.layers.21.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        5632
+      ],
+      "kurtosis": 3.09,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 11538128,
+      "original_bytes": 46137344,
+      "weight_cosine": 0.999561
+    },
+    {
+      "hf_key": "model.embed_tokens.weight",
+      "shape": [
+        32000,
+        2048
+      ],
+      "kurtosis": 0.23,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 65537152,
+      "original_bytes": 262144000,
+      "weight_cosine": 0.999677
+    },
+    {
+      "hf_key": "lm_head.weight",
+      "shape": [
+        32000,
+        2048
+      ],
+      "kurtosis": 1.67,
+      "svd_rank": 0,
+      "storage_mode": "codebook",
+      "compressed_bytes": 65539782,
+      "original_bytes": 262144000,
+      "weight_cosine": 0.998619
+    }
+  ],
+  "cost": {
+    "wall_time_s": 2372.244,
+    "cpu_time_s": 2366.706,
+    "peak_memory_mb": 17524.5,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-10T22:53:10.363687+00:00",
+    "timestamp_end": "2026-03-10T23:32:42.607342+00:00"
+  },
+  "receipt_sha256": "7d6f027b1d1ea7a55e30be0189d1fac3f16d38852547804f779043cf11daf7a5"
+}

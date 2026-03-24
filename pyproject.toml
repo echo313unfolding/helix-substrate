@@ -39,9 +39,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/voidstr3m33/helix-substrate"
-Repository = "https://github.com/voidstr3m33/helix-substrate"
-Documentation = "https://github.com/voidstr3m33/helix-substrate#readme"
+Homepage = "https://github.com/echo313unfolding/helix-substrate"
+Repository = "https://github.com/echo313unfolding/helix-substrate"
+Documentation = "https://github.com/echo313unfolding/helix-substrate#readme"
 
 [project.optional-dependencies]
 brotli = ["brotli>=1.0"]

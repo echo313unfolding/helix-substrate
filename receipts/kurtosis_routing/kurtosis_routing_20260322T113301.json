@@ -1,0 +1,143 @@
+{
+  "work_order": "WO-KURTOSIS-ROUTING-01",
+  "description": "Kurtosis-based routing vs position-based routing on TinyLlama",
+  "model": "/home/voidstr3m33/models/tinyllama_fp32",
+  "n_tensors": 154,
+  "old_svd_count": 14,
+  "new_svd_count": 6,
+  "routing_changes": 17,
+  "tensors_gained_svd": 3,
+  "tensors_lost_svd": 4,
+  "tensors_kept_svd": 3,
+  "per_tensor_results": [
+    {
+      "name": "model.layers.2.self_attn.o_proj.weight",
+      "block": 2,
+      "proj": "o_proj",
+      "kurtosis": 15.46,
+      "old_route": "VQ_ONLY",
+      "new_route": "SVD_BORDERLINE",
+      "error_vq_only": 0.00590158,
+      "error_vq_svd": 0.00078452,
+      "improvement": 0.00511706,
+      "improvement_pct": 86.7
+    },
+    {
+      "name": "model.layers.2.mlp.gate_proj.weight",
+      "block": 2,
+      "proj": "gate_proj",
+      "kurtosis": 11.81,
+      "old_route": "VQ_ONLY",
+      "new_route": "SVD_BORDERLINE",
+      "error_vq_only": 0.0029515,
+      "error_vq_svd": -3.6e-07,
+      "improvement": 0.00295186,
+      "improvement_pct": 100.0
+    },
+    {
+      "name": "model.layers.1.self_attn.k_proj.weight",
+      "block": 1,
+      "proj": "k_proj",
+      "kurtosis": 7.0,
+      "old_route": "VQ_ONLY",
+      "new_route": "SVD_BORDERLINE",
+      "error_vq_only": 0.00097555,
+      "error_vq_svd": 0.00029695,
+      "improvement": 0.0006786,
+      "improvement_pct": 69.6
+    },
+    {
+      "name": "model.layers.0.mlp.down_proj.weight",
+      "block": 0,
+      "proj": "down_proj",
+      "kurtosis": 1.78,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "VQ_ONLY",
+      "error_vq_only": 0.00127023,
+      "error_vq_svd": 0.00034142,
+      "improvement": 0.00092882,
+      "improvement_pct": 73.1
+    },
+    {
+      "name": "model.layers.0.mlp.gate_proj.weight",
+      "block": 0,
+      "proj": "gate_proj",
+      "kurtosis": 1.57,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "VQ_ONLY",
+      "error_vq_only": 0.00067949,
+      "error_vq_svd": 3.844e-05,
+      "improvement": 0.00064105,
+      "improvement_pct": 94.3
+    },
+    {
+      "name": "model.layers.0.self_attn.v_proj.weight",
+      "block": 0,
+      "proj": "v_proj",
+      "kurtosis": 0.89,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "VQ_ONLY",
+      "error_vq_only": 8.219e-05,
+      "error_vq_svd": 5.984e-05,
+      "improvement": 2.235e-05,
+      "improvement_pct": 27.2
+    },
+    {
+      "name": "model.layers.0.mlp.up_proj.weight",
+      "block": 0,
+      "proj": "up_proj",
+      "kurtosis": 0.24,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "VQ_ONLY",
+      "error_vq_only": 0.00016898,
+      "error_vq_svd": 0.00010687,
+      "improvement": 6.211e-05,
+      "improvement_pct": 36.8
+    },
+    {
+      "name": "model.layers.0.self_attn.k_proj.weight",
+      "block": 0,
+      "proj": "k_proj",
+      "kurtosis": 298.77,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "SVD_HIGH",
+      "error_vq_only": 0.02137148,
+      "error_vq_svd": 0.00259119,
+      "improvement": 0.01878029,
+      "improvement_pct": 87.9
+    },
+    {
+      "name": "model.layers.0.self_attn.q_proj.weight",
+      "block": 0,
+      "proj": "q_proj",
+      "kurtosis": 142.19,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "SVD_HIGH",
+      "error_vq_only": 0.01653236,
+      "error_vq_svd": 0.00228012,
+      "improvement": 0.01425225,
+      "improvement_pct": 86.2
+    },
+    {
+      "name": "model.layers.0.self_attn.o_proj.weight",
+      "block": 0,
+      "proj": "o_proj",
+      "kurtosis": 52.27,
+      "old_route": "SVD_BLOCK0",
+      "new_route": "SVD_HIGH",
+      "error_vq_only": 0.0122999,
+      "error_vq_svd": 0.00163728,
+      "improvement": 0.01066262,
+      "improvement_pct": 86.7
+    }
+  ],
+  "cost": {
+    "wall_time_s": 152.245,
+    "cpu_time_s": 150.551,
+    "peak_memory_mb": 5139.6,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-22T11:30:29",
+    "timestamp_end": "2026-03-22T11:33:01"
+  }
+}

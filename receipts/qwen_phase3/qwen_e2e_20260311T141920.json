@@ -1,0 +1,71 @@
+{
+  "schema": "qwen_e2e_proof_v1",
+  "work_order": "WO-QWEN-COMPRESS-01",
+  "phase": 3,
+  "model": "Qwen2.5-Coder-1.5B-Instruct",
+  "model_params": 1543714304,
+  "n_blocks": 28,
+  "eval_tokens": 2048,
+  "phase_a": {
+    "baseline_ppl": 7.85903,
+    "helix_ppl": 7.994602,
+    "ppl_delta": 0.135572,
+    "ppl_delta_pct": 1.7251,
+    "baseline_time_s": 77.6,
+    "helix_time_s": 84.8,
+    "compression_time_s": 1172.1,
+    "tensors_swapped": 196,
+    "compression_ratio": 4.7,
+    "compressed_bytes": 1312976556,
+    "dense_bytes": 6174277632,
+    "helix_modules": 196,
+    "linear_modules_remaining": 1,
+    "cosine_summary": {
+      "avg": 0.99951,
+      "min": 0.998467,
+      "max": 0.999887,
+      "below_999": 4,
+      "below_998": 0
+    }
+  },
+  "phase_b": {
+    "fit": false,
+    "error": "CUDA out of memory. Tried to allocate 192.00 MiB. GPU 0 has a total capacity of 3.81 GiB of which 66.50 MiB is free. Process 1498 has 1.30 GiB memory in use. Including non-PyTorch memory, this process has 2.44 GiB memory in use. Of the allocated memory 2.34 GiB is allocated by PyTorch, and 26.17 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  },
+  "phase_c": [
+    {
+      "name": "python_function",
+      "tokens_generated": 128,
+      "generation_time_s": 698.37,
+      "tok_s": 0.2,
+      "output_preview": "```python\nimport re\n\ndef is_valid_ipv4(ip):\n    # Regular expression to match a valid IPv4 address\n    pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9])$'\n    \n    # Check if the IP matches the pattern\n    return bool(re.match(pattern, ip))\n\n# Example usage\nip_address = \"192.1",
+      "device": "cpu"
+    },
+    {
+      "name": "bug_fix",
+      "tokens_generated": 128,
+      "generation_time_s": 697.82,
+      "tok_s": 0.2,
+      "output_preview": "The problem with the given code is that it does not handle the case when one of the lists is exhausted before the other. This can lead to an infinite loop or incorrect results. To fix this, we need to add a check at the end of the while loop to append any remaining elements from either list.\n\nHere's the corrected code:\n\n```python\ndef merge_sorted(a, b):\n    result = []\n    i = j = 0\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            result.append(a[i])\n            i += 1\n ",
+      "device": "cpu"
+    },
+    {
+      "name": "controller_tool",
+      "tokens_generated": 128,
+      "generation_time_s": 692.65,
+      "tok_s": 0.2,
+      "output_preview": "Here is a simple Python script that uses the given tools to accomplish this task:\n\n```python\n# Importing the required functions\nfrom search_docs import search_docs\nfrom run_test import run_test\n\n# Search for 'authentication'\nsearch_docs('authentication')\n\n# Run the auth test file\nrun_test('auth_test.py')\n```\n\nThis script first searches for the term 'authentication' using the `search_docs` function, and then runs the `auth_test.py` file using the `run_test` function.\n\nPlease note that you need to",
+      "device": "cpu"
+    }
+  ],
+  "cost": {
+    "wall_time_s": 3437.941,
+    "cpu_time_s": 3431.942,
+    "peak_memory_mb": 14983.2,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-11T17:22:02.548556+00:00",
+    "timestamp_end": "2026-03-11T18:19:20.489495+00:00"
+  },
+  "verdict": "PARTIAL \u2014 PPL ok, GPU failed"
+}

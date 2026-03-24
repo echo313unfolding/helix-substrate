@@ -1,0 +1,20 @@
+{
+  "schema": "gpu_viability_v1",
+  "work_order": "WO-GPU-VIABILITY-01",
+  "model": "TinyLlama-1.1B-Chat-v1.0",
+  "eval_tokens": 4096,
+  "gpu": "Quadro T2000",
+  "gpu_vram_mb": 3899,
+  "helix": {
+    "status": "OOM"
+  },
+  "cost": {
+    "wall_time_s": 1706.65,
+    "cpu_time_s": 1701.625,
+    "peak_memory_mb": 12761.0,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-11T04:40:51.781327+00:00",
+    "timestamp_end": "2026-03-11T05:09:18.431828+00:00"
+  }
+}
