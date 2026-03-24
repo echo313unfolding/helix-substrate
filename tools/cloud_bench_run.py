@@ -149,16 +149,16 @@ def load_model_compressed(model_dir: Path, device="cuda"):
     }
 
 
-def load_model_dense(model_dir: Path, device="cuda"):
+def load_model_dense(model_dir: Path, device="cuda", dtype=torch.bfloat16):
     """Load dense HF model for baseline comparison."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    print("  Loading dense baseline...")
+    print(f"  Loading dense baseline ({dtype})...")
     t0 = time.time()
     tokenizer = AutoTokenizer.from_pretrained(str(model_dir), trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
         str(model_dir),
-        torch_dtype=torch.float32,
+        torch_dtype=dtype,
         trust_remote_code=True,
     )
     model = model.to(device).eval()
@@ -166,7 +166,7 @@ def load_model_dense(model_dir: Path, device="cuda"):
 
     vram_mb = torch.cuda.memory_allocated() / 1024 / 1024 if torch.cuda.is_available() else 0
     print(f"  Dense loaded: {vram_mb:.0f} MB VRAM, {load_time:.1f}s")
-    return model, tokenizer, {"vram_mb": round(vram_mb, 1), "load_time_s": round(load_time, 2)}
+    return model, tokenizer, {"vram_mb": round(vram_mb, 1), "load_time_s": round(load_time, 2), "dtype": str(dtype)}
 
 
 # ── Phase B: Perplexity ──

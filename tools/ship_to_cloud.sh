@@ -167,8 +167,7 @@ cd "\$WORK/helix-substrate"
 python3 tools/cloud_bench_run.py \
     --model-dir "\$FULL_DIR" \
     --model-name "\$MODEL_NAME" \
-    --output-dir "\$WORK/receipts" \
-    --skip-dense
+    --output-dir "\$WORK/receipts"
 
 echo ""
 echo "=== DONE ==="
