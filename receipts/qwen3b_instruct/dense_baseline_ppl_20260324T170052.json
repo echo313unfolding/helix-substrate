@@ -1,0 +1,31 @@
+{
+  "work_order": "WO-QWEN3B-DENSE-BASELINE-01",
+  "description": "Dense FP32 baseline PPL for Qwen2.5-3B-Instruct on WikiText-2 validation",
+  "model": "Qwen2.5-3B-Instruct",
+  "model_path": "/home/voidstr3m33/models/qwen2.5-3b-instruct",
+  "dtype": "float32",
+  "device": "cpu",
+  "n_params": 3085938688,
+  "model_size_mb": 11771.9,
+  "eval_dataset": "wikitext-2-raw-v1 (validation)",
+  "dense_ppl": 6.6007,
+  "dense_nll": 1.887171,
+  "n_tokens": 8192,
+  "seq_len": 2048,
+  "load_time_s": 6.39,
+  "compressed_ppl_reference": 5.5331,
+  "compressed_ppl_n_tokens": 2048,
+  "note": "compressed_ppl_reference was measured at 2048 tokens, NOT 8192. Apples-to-apples comparison requires re-running compressed at 8192 tokens. The 2048-token dense baseline from chunk 1 was 5.4911, consistent with earlier receipt (5.4952). At 2048 tokens: delta = +0.69%.",
+  "dense_ppl_2048tok_chunk1": 5.4911,
+  "ppl_delta_pct_2048tok": 0.69,
+  "ppl_delta_pct_8192tok": "NOT_COMPARABLE — compressed PPL at 8192 tokens not yet measured",
+  "cost": {
+    "wall_time_s": 616.913,
+    "cpu_time_s": 609.687,
+    "peak_memory_mb": 16018.7,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-24T20:50:35",
+    "timestamp_end": "2026-03-24T21:00:52"
+  }
+}
