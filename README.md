@@ -1,4 +1,14 @@
-# helix-substrate
+<p align="center">
+  <img src="assets/helix-banner.svg" alt="helix-substrate" width="800"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/echo313unfolding/helix-substrate/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"/></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+"/></a>
+  <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg" alt="PyTorch 2.0+"/></a>
+</p>
+
+---
 
 Run larger open models on smaller hardware with bounded quality loss.
 
