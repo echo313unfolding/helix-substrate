@@ -1,0 +1,31 @@
+{
+  "work_order": "compress-tinyllama_fp32",
+  "question": "Does tinyllama_fp32 compress through CDNA v3?",
+  "verdict": "PASS",
+  "manifest": {
+    "model": "tinyllama_fp32",
+    "model_type": "llama",
+    "architectures": [
+      "LlamaForCausalLM"
+    ],
+    "n_layers": 22,
+    "n_tensors_compressed": 156,
+    "n_tensors_cached": 154,
+    "n_tensors_exact": 45,
+    "n_svd_routed": 0,
+    "total_dense_bytes": 4399824896,
+    "total_compressed_bytes": 1102837368,
+    "compression_ratio": 3.99,
+    "compressor": "compress.py (universal)",
+    "timestamp": "2026-03-25T18:37:27.254949+00:00"
+  },
+  "cost": {
+    "wall_time_s": 69.008,
+    "cpu_time_s": 68.951,
+    "peak_memory_mb": 4312.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T14:36:18",
+    "timestamp_end": "2026-03-25T14:37:27"
+  }
+}

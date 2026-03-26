@@ -1,0 +1,71 @@
+{
+  "work_order": "WO-ADAPTIVE-PPL-01",
+  "question": "Does adaptive k pass 2% PPL on the model that failed flat k=64?",
+  "verdict": "FAIL",
+  "model": "Qwen2.5-Coder-1.5B-Instruct",
+  "n_blocks": 28,
+  "n_tensors_loaded": 196,
+  "n_tensors_missing": 0,
+  "eval_dataset": "wikitext-2-raw-v1 (validation)",
+  "eval_tokens": 4096,
+  "baseline": {
+    "ppl": 8.58276,
+    "nll": 2.149756
+  },
+  "adaptive": {
+    "ppl": 8.859843,
+    "nll": 2.181529,
+    "delta_pct": 3.2284,
+    "mean_cosine": 0.998587,
+    "min_cosine": 0.998002,
+    "n_tokens": 4094,
+    "k_distribution": {
+      "128": 57,
+      "64": 136,
+      "256": 3
+    },
+    "worst_5_tensors": [
+      {
+        "tensor": "model.layers.18.self_attn.o_proj.weight",
+        "cosine": 0.998002,
+        "chosen_k": 64
+      },
+      {
+        "tensor": "model.layers.13.self_attn.o_proj.weight",
+        "cosine": 0.998013,
+        "chosen_k": 64
+      },
+      {
+        "tensor": "model.layers.7.self_attn.o_proj.weight",
+        "cosine": 0.998022,
+        "chosen_k": 64
+      },
+      {
+        "tensor": "model.layers.15.self_attn.o_proj.weight",
+        "cosine": 0.998032,
+        "chosen_k": 64
+      },
+      {
+        "tensor": "model.layers.6.self_attn.o_proj.weight",
+        "cosine": 0.998043,
+        "chosen_k": 64
+      }
+    ]
+  },
+  "comparison": {
+    "flat_k64_delta_pct": 2.78,
+    "flat_k64_verdict": "FAIL",
+    "adaptive_delta_pct": 3.2284,
+    "adaptive_verdict": "FAIL"
+  },
+  "blended_info_theoretic_ratio": 5.09,
+  "cost": {
+    "wall_time_s": 642.627,
+    "cpu_time_s": 324.982,
+    "peak_memory_mb": 20158.7,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T20:33:13",
+    "timestamp_end": "2026-03-25T20:43:56"
+  }
+}

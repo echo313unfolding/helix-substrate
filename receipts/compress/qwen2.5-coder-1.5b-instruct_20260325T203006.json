@@ -1,0 +1,40 @@
+{
+  "work_order": "compress-qwen2.5-coder-1.5b-instruct-adaptive",
+  "question": "Does qwen2.5-coder-1.5b-instruct compress through CDNA v3 with adaptive k (target cos>=0.998)?",
+  "verdict": "PASS",
+  "manifest": {
+    "model": "qwen2.5-coder-1.5b-instruct",
+    "model_type": "qwen2",
+    "architectures": [
+      "Qwen2ForCausalLM"
+    ],
+    "n_layers": 28,
+    "mode": "adaptive",
+    "k": "adaptive",
+    "quality_target": 0.998,
+    "k_distribution": {
+      "128": 58,
+      "64": 136,
+      "256": 3
+    },
+    "n_tensors_compressed": 197,
+    "n_tensors_cached": 0,
+    "n_tensors_exact": 57,
+    "n_svd_routed": 0,
+    "n_escalated": 61,
+    "total_dense_bytes": 6174277632,
+    "total_compressed_bytes": 1544123856,
+    "compression_ratio": 4.0,
+    "compressor": "compress.py (universal, adaptive)",
+    "timestamp": "2026-03-26T00:30:06.479028+00:00"
+  },
+  "cost": {
+    "wall_time_s": 769.816,
+    "cpu_time_s": 767.598,
+    "peak_memory_mb": 5858.1,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T20:17:16",
+    "timestamp_end": "2026-03-25T20:30:06"
+  }
+}

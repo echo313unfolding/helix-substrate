@@ -284,7 +284,22 @@ def detect_tied_weights(names: list[str], source: WeightSource) -> set[str]:
 # ---------------------------------------------------------------------------
 
 def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
-                   k_override: int = None):
+                   k_override: int = None, adaptive: bool = False,
+                   quality_target: float = 0.998):
+    """
+    Compress a model to CDNA v3 format.
+
+    Modes:
+      --k N:        Fixed codebook size (output: cdnav3_k{N}/)
+      --adaptive:   Per-tensor quality-driven k selection (output: cdnav3_adaptive/)
+                    Starts at k=64, escalates to 128→256→256+SVD until
+                    cosine >= quality_target. Logs final k per tensor.
+      (default):    k=256, standard mode (output: cdnav3/)
+    """
+    import re
+    from dataclasses import replace as dc_replace
+    import shutil
+
     t_start = time.time()
     cpu_start = time.process_time()
     start_iso = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -299,14 +314,24 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     model_type = config.get("model_type", "unknown")
     tied = config.get("tie_word_embeddings", False)
 
+    # Adaptive k escalation ladder
+    K_LADDER = [64, 128, 256]
+
     print("=" * 70)
     print(f"  CDNA v3 Universal Compressor")
     print("=" * 70)
-    print(f"  Model:      {model_name}")
+    print(f"  Model:       {model_name}")
     print(f"  Type:        {model_type}")
     print(f"  Directory:   {model_dir}")
     print(f"  Layers:      {n_layers or '(not in config)'}")
     print(f"  Tied embeds: {tied}")
+    if adaptive:
+        print(f"  Mode:        ADAPTIVE (quality target: {quality_target})")
+        print(f"  k ladder:    {K_LADDER} → +SVD if needed")
+    elif k_override:
+        print(f"  Mode:        FIXED k={k_override} (info-theoretic {32.0 / np.log2(k_override):.1f}x)")
+    else:
+        print(f"  Mode:        STANDARD k=256")
 
     # Open weight source
     source = WeightSource(model_dir)
@@ -341,35 +366,35 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
 
     if dry_run:
         print(f"\n  [DRY RUN] Would compress {n_compress} tensors. Exiting.")
-        # Print the plan
         for name, shape, action in plan:
             tc = classify_tensor(name, shape=shape)
             print(f"    {action:8s}  {tc.value:15s}  {str(shape):>20s}  {name}")
         return
 
     # ── Phase 2: Encode ──
-    if k_override and k_override != 256:
+    if adaptive:
+        cdna_dir = model_dir / "cdnav3_adaptive"
+    elif k_override and k_override != 256:
         cdna_dir = model_dir / f"cdnav3_k{k_override}"
     else:
         cdna_dir = model_dir / "cdnav3"
     cdna_dir.mkdir(parents=True, exist_ok=True)
     writer = CDNAv3Writer(cdna_dir)
 
-    if k_override:
-        print(f"\n  k override: {k_override} (info-theoretic {32.0 / np.log2(k_override):.1f}x)")
     print(f"\n  Output: {cdna_dir}")
     print(f"  Encoding {n_compress} tensors...\n")
 
     stats_all = []
+    k_distribution = {}  # k_value → count (adaptive mode tracking)
     n_done = 0
     n_cached = 0
     total_dense = 0
     total_compressed = 0
     n_svd = 0
+    n_escalated = 0  # tensors that needed k > 64 in adaptive mode
 
     for name, shape, action in plan:
         if action == "exact":
-            # Store 1D tensors (norms) as-is
             safe_name = name.replace("/", "_").replace(".", "_")
             exact_path = cdna_dir / f"{safe_name}.npy"
             if not exact_path.exists() or force:
@@ -386,12 +411,14 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         if tensor_dir.exists() and (tensor_dir / "codebook.npy").exists() and not force:
             n_cached += 1
             n_done += 1
-            # Read existing stats for manifest
             stats_path = tensor_dir / "stats.json"
             if stats_path.exists():
                 s = json.loads(stats_path.read_text())
                 total_dense += s.get("original_bytes", 0)
                 total_compressed += s.get("compressed_bytes", 0)
+                # Track k for cached tensors too
+                cached_k = s.get("chosen_k", k_override or 256)
+                k_distribution[cached_k] = k_distribution.get(cached_k, 0) + 1
             continue
 
         # Load tensor
@@ -409,24 +436,79 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         kurt = kurtosis_1d(tensor_np.ravel())
 
         # Parse block index from name (for last-block rule)
-        import re
         block_match = re.search(r'layers?\.(\d+)', name)
         block_idx = int(block_match.group(1)) if block_match else None
 
-        policy = get_policy(
+        base_policy = get_policy(
             name, orig_shape,
             block_idx=block_idx,
             kurtosis=kurt,
             n_blocks=n_layers,
         )
 
-        # Override k if requested (preserves kurtosis routing, SVD, sidecar)
-        if k_override:
-            from dataclasses import replace
-            policy = replace(policy, n_clusters=k_override)
+        if adaptive:
+            # ── Adaptive k escalation ──
+            # Try each k in the ladder. Accept the first that meets quality_target.
+            # If none meet it, try k=256 + SVD as final fallback.
+            #
+            # IMPORTANT: Preserve SVD from kurtosis routing (base_policy).
+            # Stripping SVD from kurtosis-routed tensors causes PPL
+            # regression even when per-tensor cosine looks fine — proven
+            # by adaptive_ppl runs at 0.998 and 0.999 thresholds both
+            # FAILing at +3.2% despite high cosine.
+            chosen_k = None
+            stats = None
+            base_svd_rank = base_policy.svd_residual_rank
 
-        # Encode
-        stats = writer.write_tensor(tensor_np, name, policy=policy)
+            for try_k in K_LADDER:
+                policy = dc_replace(base_policy, n_clusters=try_k)
+
+                # Clean previous attempt's output
+                if tensor_dir.exists():
+                    shutil.rmtree(tensor_dir)
+
+                stats = writer.write_tensor(tensor_np, name, policy=policy)
+
+                # Check quality — use best metric available
+                cos = stats.get("cosine_with_svd",
+                      stats.get("cosine_with_sidecar",
+                      stats.get("cosine_no_sidecar", 0)))
+
+                if cos >= quality_target:
+                    chosen_k = try_k
+                    if base_svd_rank > 0:
+                        chosen_k = f"{try_k}+SVD"
+                    break
+
+            # Final fallback: k=256 + SVD (force SVD even if base didn't have it)
+            if chosen_k is None:
+                policy = dc_replace(base_policy, n_clusters=256, svd_residual_rank=max(8, base_svd_rank))
+                if tensor_dir.exists():
+                    shutil.rmtree(tensor_dir)
+                stats = writer.write_tensor(tensor_np, name, policy=policy)
+                chosen_k = "256+SVD"
+
+            # Record chosen k in stats.json for resume tracking
+            stats["chosen_k"] = chosen_k
+            stats_json_path = tensor_dir / "stats.json"
+            if stats_json_path.exists():
+                s = json.loads(stats_json_path.read_text())
+                s["chosen_k"] = chosen_k
+                stats_json_path.write_text(json.dumps(s, indent=2))
+
+            k_distribution[chosen_k] = k_distribution.get(chosen_k, 0) + 1
+            if chosen_k != K_LADDER[0]:
+                n_escalated += 1
+
+        else:
+            # ── Fixed k mode ──
+            policy = base_policy
+            if k_override:
+                policy = dc_replace(policy, n_clusters=k_override)
+
+            stats = writer.write_tensor(tensor_np, name, policy=policy)
+            chosen_k = k_override or 256
+
         stats_all.append(stats)
 
         n_done += 1
@@ -438,11 +520,14 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         del tensor_np
 
         # Progress
-        if n_done % 10 == 0 or n_done == n_compress:
-            ratio_so_far = total_dense / max(1, total_compressed)
+        cos_val = stats.get("cosine_with_svd", stats.get("cosine_with_sidecar", 0))
+        ratio_so_far = total_dense / max(1, total_compressed)
+        k_label = f"k={chosen_k}" if not adaptive else f"k={chosen_k:>7s}" if isinstance(chosen_k, str) else f"k={chosen_k:>3d}    "
+        if n_done % 5 == 0 or n_done == n_compress or (adaptive and chosen_k != K_LADDER[0]):
             print(f"    {n_done:4d}/{n_compress}  "
-                  f"cos={stats.get('cosine_with_sidecar', 0):.4f}  "
+                  f"cos={cos_val:.4f}  "
                   f"kurt={kurt:6.1f}  "
+                  f"{k_label}  "
                   f"ratio={ratio_so_far:.2f}x  "
                   f"{tc.value:15s}  {name}",
                   flush=True)
@@ -457,8 +542,15 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     print(f"\n{'=' * 70}")
     print(f"  Complete: {n_done} tensors ({n_cached} cached)")
     print(f"  SVD sidecars: {n_svd} tensors (kurtosis-routed)")
+    if adaptive:
+        print(f"  Adaptive k distribution:")
+        for k_val in sorted(k_distribution.keys(), key=lambda x: str(x)):
+            count = k_distribution[k_val]
+            pct = 100 * count / max(1, n_done)
+            print(f"    k={k_val}: {count} tensors ({pct:.0f}%)")
+        print(f"  Escalated: {n_escalated}/{n_done} tensors needed k > {K_LADDER[0]}")
     if total_dense > 0:
-        print(f"  Dense: {total_dense / 1e9:.3f} GB → Compressed: {total_compressed / 1e9:.3f} GB ({ratio}x)")
+        print(f"  Dense: {total_dense / 1e9:.3f} GB -> Compressed: {total_compressed / 1e9:.3f} GB ({ratio}x)")
     print(f"  Time: {wall:.0f}s wall, {cpu:.0f}s CPU")
     print(f"{'=' * 70}")
 
@@ -467,15 +559,19 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         "model_type": model_type,
         "architectures": config.get("architectures", []),
         "n_layers": n_layers,
-        "k": k_override or 256,
+        "mode": "adaptive" if adaptive else "fixed",
+        "k": "adaptive" if adaptive else (k_override or 256),
+        "quality_target": quality_target if adaptive else None,
+        "k_distribution": {str(k): v for k, v in k_distribution.items()} if adaptive else None,
         "n_tensors_compressed": n_done,
         "n_tensors_cached": n_cached,
         "n_tensors_exact": n_exact,
         "n_svd_routed": n_svd,
+        "n_escalated": n_escalated if adaptive else 0,
         "total_dense_bytes": int(total_dense),
         "total_compressed_bytes": int(total_compressed),
         "compression_ratio": ratio,
-        "compressor": "compress.py (universal)",
+        "compressor": "compress.py (universal, adaptive)" if adaptive else "compress.py (universal)",
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -485,8 +581,10 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
 
     # Receipt
     receipt = {
-        "work_order": f"compress-{model_name}",
-        "question": f"Does {model_name} compress through CDNA v3?",
+        "work_order": f"compress-{model_name}" + ("-adaptive" if adaptive else ""),
+        "question": f"Does {model_name} compress through CDNA v3"
+                    + (f" with adaptive k (target cos>={quality_target})?" if adaptive
+                       else "?"),
         "verdict": "PASS" if n_done > 0 else "EMPTY",
         "manifest": manifest,
         "cost": {
@@ -520,19 +618,31 @@ def main():
         description="Universal CDNA v3 compressor. Point at any model directory.",
         epilog="Examples:\n"
                "  python3 tools/compress.py ~/models/tinyllama_fp32\n"
-               "  python3 tools/compress.py ~/models/qwen2.5-7b-instruct --dry-run\n",
+               "  python3 tools/compress.py ~/models/qwen2.5-7b-instruct --adaptive\n"
+               "  python3 tools/compress.py ~/models/qwen2.5-7b-instruct --k 64\n"
+               "  python3 tools/compress.py ~/models/anything --adaptive --quality-target 0.999\n",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("model_dir", type=Path, help="Path to model directory (must contain config.json + weights)")
     parser.add_argument("--dry-run", action="store_true", help="Show compression plan without encoding")
     parser.add_argument("--force", action="store_true", help="Re-compress even if cached")
     parser.add_argument("--k", type=int, default=None,
-                        help="Override codebook size (e.g. --k 64 for 6-bit). "
-                             "Preserves kurtosis routing and SVD. Output: cdnav3_k{K}/")
+                        help="Fixed codebook size (e.g. --k 64 for 6-bit). "
+                             "Mutually exclusive with --adaptive. Output: cdnav3_k{K}/")
+    parser.add_argument("--adaptive", action="store_true",
+                        help="Adaptive k selection per tensor. Starts at k=64, escalates "
+                             "to 128/256/256+SVD until cosine >= quality-target. "
+                             "Output: cdnav3_adaptive/")
+    parser.add_argument("--quality-target", type=float, default=0.998,
+                        help="Cosine similarity threshold for adaptive mode (default: 0.998)")
     args = parser.parse_args()
 
+    if args.adaptive and args.k:
+        parser.error("--adaptive and --k are mutually exclusive")
+
     compress_model(args.model_dir, dry_run=args.dry_run, force=args.force,
-                   k_override=args.k)
+                   k_override=args.k, adaptive=args.adaptive,
+                   quality_target=args.quality_target)
 
 
 if __name__ == "__main__":
