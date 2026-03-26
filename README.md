@@ -144,7 +144,7 @@ All receipts in `receipts/tensor_infra/`.
 
 ## Companion projects
 
-### [helix-online-kv](https://github.com/voidstr3m33/helix-online-kv)
+### [helix-online-kv](https://github.com/echo313unfolding/helix-online-kv)
 
 Online KV cache compression using the same VQ codec. Fits codebooks on the first 128 tokens, then VQ-assigns all subsequent KV entries in real time.
 
@@ -154,7 +154,7 @@ Online KV cache compression using the same VQ codec. Fits codebooks on the first
 
 **Compressed-domain attention (CDC-03):** Product quantization scores rank all tokens cheaply, select top 128 by approximate score, exact attention on subset only. Proven at cosine 0.9997 on layers 1-21 with 12.5% token coverage. Projected 29x compute savings at 4K context, 900x at 128K.
 
-### [echo_runtime](https://github.com/voidstr3m33/echo-runtime)
+### [echo_runtime](https://github.com/echo313unfolding/echo_runtime)
 
 Unified inference runtime wiring HelixLinear + CompressedKVCache + CDC-03 attention into one forward pass. One config file, one command.
 
@@ -245,6 +245,6 @@ If you use helix-substrate in research, please cite:
   author = {Josh (voidstr3m33)},
   title = {helix-substrate: Calibration-free neural network compression},
   year = {2026},
-  url = {https://github.com/voidstr3m33/helix-substrate}
+  url = {https://github.com/echo313unfolding/helix-substrate}
 }
 ```
