@@ -285,7 +285,8 @@ def detect_tied_weights(names: list[str], source: WeightSource) -> set[str]:
 
 def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                    k_override: int = None, adaptive: bool = False,
-                   quality_target: float = 0.998):
+                   quality_target: float = 0.998,
+                   scale_file: Path = None, policy_file: Path = None):
     """
     Compress a model to CDNA v3 format.
 
@@ -325,6 +326,25 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     print(f"  Directory:   {model_dir}")
     print(f"  Layers:      {n_layers or '(not in config)'}")
     print(f"  Tied embeds: {tied}")
+    # Load activation scale factors if provided
+    act_scales = {}
+    if scale_file is not None:
+        scale_file = Path(scale_file).expanduser().resolve()
+        assert scale_file.exists(), f"Scale file not found: {scale_file}"
+        loaded = np.load(scale_file)
+        act_scales = {k: loaded[k] for k in loaded.files}
+        print(f"  Scaling:     AWQ-style channel scaling ({len(act_scales)} tensors)")
+        print(f"  Scale file:  {scale_file}")
+
+    # Load per-tensor dynamic policy if provided
+    dynamic_policies = {}
+    if policy_file is not None:
+        policy_file = Path(policy_file).expanduser().resolve()
+        assert policy_file.exists(), f"Policy file not found: {policy_file}"
+        dynamic_policies = json.loads(policy_file.read_text())
+        print(f"  Policy:      Dynamic per-tensor ({len(dynamic_policies)} tensors)")
+        print(f"  Policy file: {policy_file}")
+
     if adaptive:
         print(f"  Mode:        ADAPTIVE (quality target: {quality_target})")
         print(f"  k ladder:    {K_LADDER} → +SVD if needed")
@@ -431,6 +451,32 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         elif tensor_np.ndim > 2:
             tensor_np = tensor_np.reshape(-1, tensor_np.shape[-1])
 
+        # AWQ-style channel scaling: scale columns by activation magnitude
+        # before k-means. Codebook fits the scaled distribution, giving more
+        # resolution to important channels. Scale factors stored alongside
+        # codebook; inference pre-scales input x by 1/scale.
+        channel_scales = None
+        if name in act_scales:
+            channel_scales = act_scales[name]
+            # Ensure shape matches tensor columns
+            if channel_scales.shape[0] == tensor_np.shape[1]:
+                tensor_np = tensor_np * channel_scales[np.newaxis, :]
+            else:
+                print(f"    WARNING: scale shape mismatch for {name}: "
+                      f"{channel_scales.shape} vs cols={tensor_np.shape[1]}, skipping scaling")
+                channel_scales = None
+
+        # Dynamic policy channel scaling (overrides --scale-file for this tensor)
+        dp_entry = dynamic_policies.get(name)
+        if dp_entry is not None and channel_scales is None and "act_scales" in dp_entry:
+            cal_scales = np.array(dp_entry["act_scales"], dtype=np.float32)
+            if cal_scales.shape[0] == tensor_np.shape[1]:
+                channel_scales = cal_scales
+                tensor_np = tensor_np * channel_scales[np.newaxis, :]
+            else:
+                print(f"    WARNING: policy act_scales shape mismatch for {name}: "
+                      f"{cal_scales.shape} vs cols={tensor_np.shape[1]}")
+
         # Classify + route
         tc = classify_tensor(name, shape=orig_shape)
         kurt = kurtosis_1d(tensor_np.ravel())
@@ -445,6 +491,21 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             kurtosis=kurt,
             n_blocks=n_layers,
         )
+
+        # Dynamic policy overrides (per-tensor k, SVD, sidecar from --policy-file)
+        if dp_entry is not None:
+            dp_pol = dp_entry.get("policy", {})
+            overrides = {}
+            if "k" in dp_pol:
+                overrides["n_clusters"] = dp_pol["k"]
+            if dp_pol.get("svd", False):
+                overrides["svd_residual_rank"] = dp_pol.get("svd_rank", 8)
+            elif "svd" in dp_pol and not dp_pol["svd"]:
+                overrides["svd_residual_rank"] = 0
+            if "sidecar_top_k" in dp_pol:
+                overrides["max_corrections"] = dp_pol["sidecar_top_k"]
+            if overrides:
+                base_policy = dc_replace(base_policy, **overrides)
 
         if adaptive:
             # ── Adaptive k escalation ──
@@ -500,14 +561,39 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             if chosen_k != K_LADDER[0]:
                 n_escalated += 1
 
+            # Save channel scale factors (adaptive path)
+            if channel_scales is not None:
+                scale_path = tensor_dir / "channel_scales.npy"
+                np.save(scale_path, channel_scales.astype(np.float32))
+
         else:
             # ── Fixed k mode ──
             policy = base_policy
-            if k_override:
+            if k_override and dp_entry is None:
                 policy = dc_replace(policy, n_clusters=k_override)
 
             stats = writer.write_tensor(tensor_np, name, policy=policy)
+
+            # Hessian sidecar post-processing (replaces percentile sidecar)
+            if (dp_entry is not None
+                    and dp_entry.get("policy", {}).get("sidecar_mode") == "hessian"
+                    and "hessian_diag" in dp_entry):
+                _replace_sidecar_hessian(
+                    tensor_dir, tensor_np,
+                    np.array(dp_entry["hessian_diag"], dtype=np.float32),
+                    top_k=dp_entry.get("policy", {}).get("sidecar_top_k"),
+                )
+                # Reload stats after sidecar replacement
+                stats_path = tensor_dir / "stats.json"
+                if stats_path.exists():
+                    stats = json.loads(stats_path.read_text())
+
             chosen_k = k_override or 256
+
+        # Save channel scale factors alongside the tensor artifacts
+        if channel_scales is not None:
+            scale_path = tensor_dir / "channel_scales.npy"
+            np.save(scale_path, channel_scales.astype(np.float32))
 
         stats_all.append(stats)
 
@@ -610,6 +696,45 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
 
 
 # ---------------------------------------------------------------------------
+# Hessian sidecar post-processing
+# ---------------------------------------------------------------------------
+
+def _replace_sidecar_hessian(tensor_dir: Path, original: np.ndarray,
+                              hessian_diag: np.ndarray, top_k: int = None):
+    """Replace percentile sidecar with hessian-sensitivity-weighted sidecar."""
+    from helix_substrate.generate_sidecars_v3 import find_outliers_hessian, write_sidecar_npz
+
+    codebook = np.load(tensor_dir / "codebook.npy")
+    indices = np.fromfile(tensor_dir / "indices.bin", dtype=np.uint8)
+    quantized = codebook[indices].reshape(original.shape)
+
+    positions, values = find_outliers_hessian(original, quantized, hessian_diag, top_k=top_k)
+
+    if len(positions) > 0:
+        sidecar_path = tensor_dir / "sidecar.npz"
+        write_sidecar_npz(positions, values, sidecar_path)
+
+        # Update stats.json
+        stats_path = tensor_dir / "stats.json"
+        if stats_path.exists():
+            s = json.loads(stats_path.read_text())
+            s["num_outliers"] = len(positions)
+            s["sidecar_bytes"] = int(sidecar_path.stat().st_size)
+            s["sidecar_mode"] = "hessian"
+            # Recompute cosine_with_sidecar
+            patched = codebook[indices].copy()
+            patched[positions] = values
+            flat_orig = original.ravel().astype(np.float32)
+            patched = patched.astype(np.float32)
+            dot = np.dot(flat_orig, patched)
+            norm_a = np.linalg.norm(flat_orig)
+            norm_b = np.linalg.norm(patched)
+            cos = float(dot / max(norm_a * norm_b, 1e-12))
+            s["cosine_with_sidecar"] = round(cos, 6)
+            stats_path.write_text(json.dumps(s, indent=2))
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -635,6 +760,12 @@ def main():
                              "Output: cdnav3_adaptive/")
     parser.add_argument("--quality-target", type=float, default=0.998,
                         help="Cosine similarity threshold for adaptive mode (default: 0.998)")
+    parser.add_argument("--scale-file", type=Path, default=None,
+                        help="Path to act_scales.npz from calibrate.py. "
+                             "Enables AWQ-style channel scaling before k-means.")
+    parser.add_argument("--policy-file", type=Path, default=None,
+                        help="Path to dynamic_policy.json from calibrate_dynamic.py. "
+                             "Per-tensor compression recipes (k, SVD, sidecar mode).")
     args = parser.parse_args()
 
     if args.adaptive and args.k:
@@ -642,7 +773,9 @@ def main():
 
     compress_model(args.model_dir, dry_run=args.dry_run, force=args.force,
                    k_override=args.k, adaptive=args.adaptive,
-                   quality_target=args.quality_target)
+                   quality_target=args.quality_target,
+                   scale_file=args.scale_file,
+                   policy_file=args.policy_file)
 
 
 if __name__ == "__main__":

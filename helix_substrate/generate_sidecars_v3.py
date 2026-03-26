@@ -86,6 +86,50 @@ def find_outliers_contribution(
     return positions, values
 
 
+def find_outliers_hessian(
+    original: np.ndarray,
+    quantized: np.ndarray,
+    hessian_diag: np.ndarray,
+    top_k: Optional[int] = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Find outliers using Hessian-sensitivity-weighted error.
+
+    Score = hessian_diag[col] * |weight_error[row, col]|
+
+    High-sensitivity columns (large Hessian diagonal = steep loss landscape)
+    with large quantization error get priority for sidecar correction.
+
+    Args:
+        original: Original 2D weight tensor
+        quantized: Quantized 2D weight tensor (same shape)
+        hessian_diag: Per-column Hessian diagonal [in_features]
+        top_k: Number of outliers to select (default: 0.1% of elements)
+
+    Returns:
+        (positions, values) sorted by position
+    """
+    original = original.astype(np.float32)
+    quantized = quantized.astype(np.float32)
+
+    weight_error = np.abs(original - quantized)
+    hess = hessian_diag.astype(np.float32)
+
+    # Broadcast: sensitivity_error[row, col] = hessian_diag[col] * |error[row, col]|
+    sensitivity_error = weight_error * hess[np.newaxis, :]
+
+    if top_k is None:
+        top_k = max(1, int(original.size * 0.001))  # 0.1% default
+
+    flat_se = sensitivity_error.ravel()
+    top_indices = np.argpartition(flat_se, -top_k)[-top_k:]
+    top_indices = top_indices[np.argsort(flat_se[top_indices])[::-1]]
+
+    positions = np.sort(top_indices).astype(np.int64)
+    values = original.ravel()[positions].astype(np.float32)
+    return positions, values
+
+
 def write_sidecar_npz(
     positions: np.ndarray,
     values: np.ndarray,
