@@ -1,3 +1,22 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:1a6b3c&height=200&section=header&text=helix-substrate&fontSize=42&fontColor=58a6ff&animation=fadeIn&fontAlignY=35&desc=Calibration-free%20neural%20network%20compression&descSize=16&descColor=8b949e&descAlignY=55">
+  <source media="(prefers-color-scheme: light)" srcset="https://capsule-render.vercel.app/api?type=waving&color=0:f0f6fc,100:2ea043&height=200&section=header&text=helix-substrate&fontSize=42&fontColor=1f2328&animation=fadeIn&fontAlignY=35&desc=Calibration-free%20neural%20network%20compression&descSize=16&descColor=656d76&descAlignY=55">
+  <img alt="helix-substrate" src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:1a6b3c&height=200&section=header&text=helix-substrate&fontSize=42&fontColor=58a6ff&animation=fadeIn&fontAlignY=35&desc=Calibration-free%20neural%20network%20compression&descSize=16&descColor=8b949e&descAlignY=55">
+</picture>
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://python.org)
+[![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0%2B-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![License](https://img.shields.io/badge/license-Echo%20Labs-green)](LICENSE)
+[![4x Compression](https://img.shields.io/badge/compression-4x-brightgreen)]()
+[![<1% PPL Loss](https://img.shields.io/badge/quality-%3C1%25%20PPL-blue)]()
+
+**Point it at a model, get 4x smaller weights with <1% quality loss.**
+**No training data. No fine-tuning. Transformers, SSMs, CNNs, vision — same command.**
+
+</div>
+
 # helix-substrate
 
 Calibration-free neural network compression. Point it at a model, get 4x smaller weights with <1% quality loss. No training data needed. Works on transformers, SSMs, CNNs, vision encoders, and embedding models without code changes.
@@ -248,3 +267,7 @@ If you use helix-substrate in research, please cite:
   url = {https://github.com/echo313unfolding/helix-substrate}
 }
 ```
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,100:1a6b3c&height=100&section=footer" width="100%">
+</div>
