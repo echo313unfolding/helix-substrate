@@ -200,9 +200,9 @@ Input Tensor (2D float32)
 
 **4x is the universal number. 5.3x is model-dependent.** k=64 passes on TinyLlama (+1.44%) but fails on Qwen-1.5B (+2.78%). We do not claim universal 5.3x compression.
 
-**Our kernels are early-stage.** GPTQ/AWQ have mature, highly optimized inference kernels (Marlin, exllama2). Our Triton kernels work but don't match their speed yet. Our advantage is on quality, universality, and the compressed runtime stack -- not raw throughput.
+**The GPU path does late materialization.** The fused Triton kernel computes `Y = X @ codebook[indices]` directly from compressed VQ indices -- the full weight matrix W never hits global VRAM. Measured peak allocation is 0.4% of W size across all tensor shapes (attn, FFN gate, FFN down). This is not a roadmap item; it ships today. Receipt: `receipts/late_materialization/late_materialization_20260326T131246.json`.
 
-**Speed comparison against GPTQ/AWQ is not yet fair.** The decode speed gap (16.6 vs 29.8 tok/s on 4090) reflects the naive reconstruction path. The fused Triton kernel and packed index formats are on the roadmap.
+**Speed comparison against GPTQ/AWQ is not yet fair.** The decode speed gap (16.6 vs 29.8 tok/s on 4090) reflects kernel maturity, not architecture. GPTQ/AWQ have years of optimization (Marlin, exllama2). Our Triton kernel is correct and memory-efficient but not yet throughput-optimized. Our advantage is on quality, universality, and the compressed runtime stack.
 
 ## Prior art and references
 
