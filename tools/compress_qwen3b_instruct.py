@@ -29,8 +29,14 @@ from helix_substrate.cdnav3_writer import CDNAv3Writer
 from helix_substrate.tensor_policy import get_policy
 
 MODEL_DIR = Path.home() / "models" / "qwen2.5-3b-instruct"
-N_BLOCKS = 36
 TENSOR_TYPES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# Auto-detect layer count from config.json
+_config = json.load(open(MODEL_DIR / "config.json"))
+N_BLOCKS = _config.get("num_hidden_layers") or _config.get("n_layer")
+if N_BLOCKS is None:
+    raise ValueError(f"Cannot detect layer count from {MODEL_DIR / 'config.json'}")
+print(f"  Auto-detected: {N_BLOCKS} blocks (from config.json)")
 
 HF_PATTERNS = {
     "q_proj": "model.layers.{i}.self_attn.q_proj.weight",

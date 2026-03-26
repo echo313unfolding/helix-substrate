@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Compress Qwen2.5-7B-Instruct to CDNA v3 / HelixLinear format.
+Compress Qwen2.5-14B-Instruct to CDNA v3 / HelixLinear format.
 
-Handles multi-shard safetensors (model-00001-of-00004.safetensors etc.)
-Same pipeline as precompress_models.py but adapted for sharded models.
+Handles multi-shard safetensors. Same pipeline as compress_qwen7b.py
+but with 14B architecture params (48 blocks, 7 tensor types = 336 tensors).
 
 Output:
-  ~/models/qwen2.5-7b-instruct/cdnav3/   (28 blocks × 7 tensors = 196 HelixLinear)
+  ~/models/qwen2.5-14b-instruct/cdnav3/
 
 Usage:
-  python3 tools/compress_qwen7b.py
+  python3 tools/compress_qwen14b_instruct.py
 """
 
 import json
@@ -28,10 +28,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from helix_substrate.cdnav3_writer import CDNAv3Writer
 from helix_substrate.tensor_policy import get_policy
 
-MODEL_DIR = Path.home() / "models" / "qwen2.5-7b-instruct"
+MODEL_DIR = Path.home() / "models" / "qwen2.5-14b-instruct"
 TENSOR_TYPES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 
-# Auto-detect layer count from config.json
+# Auto-detect layer count from config.json (fixes N_BLOCKS=40 bug — model has 48 layers)
 _config = json.load(open(MODEL_DIR / "config.json"))
 N_BLOCKS = _config.get("num_hidden_layers") or _config.get("n_layer")
 if N_BLOCKS is None:
@@ -69,7 +69,6 @@ def get_tensor_from_shards(tensor_name: str, weight_map: dict, model_dir: Path, 
 
     shard_path = model_dir / shard_file
 
-    # Cache open shard handles to avoid re-opening
     if shard_file not in shard_cache:
         shard_cache[shard_file] = safe_open(str(shard_path), framework="pt")
 
@@ -82,15 +81,13 @@ def main():
     start_iso = time.strftime("%Y-%m-%dT%H:%M:%S")
 
     print("=" * 70)
-    print("  Compress Qwen2.5-7B-Instruct → CDNA v3")
+    print("  Compress Qwen2.5-14B-Instruct → CDNA v3")
     print("=" * 70)
 
-    # Check model exists
     if not MODEL_DIR.exists():
         print(f"  ERROR: {MODEL_DIR} not found")
         sys.exit(1)
 
-    # Check for single-file or sharded safetensors
     single_sf = MODEL_DIR / "model.safetensors"
     weight_map = load_shard_index(MODEL_DIR)
 
@@ -101,7 +98,6 @@ def main():
         shard_files = sorted(set(weight_map.values()))
         mode = "sharded"
         print(f"  Source: {len(shard_files)} shards")
-        # Verify all shards exist
         for sf in shard_files:
             if not (MODEL_DIR / sf).exists():
                 print(f"  ERROR: Missing shard {sf}")
@@ -131,7 +127,6 @@ def main():
         for tensor_type in TENSOR_TYPES:
             hf_name = HF_PATTERNS[tensor_type].format(i=block_idx)
 
-            # Check if already compressed
             safe_name = hf_name.replace("/", "_").replace(".", "_")
             tensor_dir = cdna_dir / f"{safe_name}.cdnav3"
             if tensor_dir.exists() and (tensor_dir / "codebook.npy").exists():
@@ -139,7 +134,6 @@ def main():
                 n_tensors += 1
                 continue
 
-            # Load tensor
             if mode == "single":
                 from safetensors import safe_open
                 if not hasattr(main, '_sf_handle'):
@@ -158,17 +152,15 @@ def main():
             total_dense += np.prod(shape) * 4
             total_compressed += stats.get("compressed_bytes", 0)
 
-            # Free memory
             del tensor_np
 
         block_elapsed = time.time() - block_t0
         if block_tensors > 0:
             print(f"  Block {block_idx:2d}/{N_BLOCKS} — "
                   f"{block_tensors} tensors, {block_elapsed:.1f}s", flush=True)
-        elif (block_idx + 1) % 7 == 0:
+        elif (block_idx + 1) % 10 == 0:
             print(f"  Block {block_idx:2d}/{N_BLOCKS} — (cached)", flush=True)
 
-    # Close shard handles
     shard_cache.clear()
 
     wall = time.time() - t_start
@@ -182,9 +174,8 @@ def main():
     print(f"  Time: {wall:.0f}s wall, {cpu:.0f}s CPU")
     print(f"{'=' * 70}")
 
-    # Write manifest
     manifest = {
-        "model": "Qwen2.5-7B-Instruct",
+        "model": "Qwen2.5-14B-Instruct",
         "n_blocks": N_BLOCKS,
         "n_tensors": n_tensors,
         "n_newly_compressed": n_tensors - n_skipped,
@@ -197,10 +188,9 @@ def main():
     manifest_path = cdna_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2))
 
-    # Write receipt
     receipt = {
-        "work_order": "WO-QWEN7B-COMPRESS-01",
-        "question": "Does Qwen2.5-7B-Instruct compress through CDNA v3?",
+        "work_order": "WO-QWEN14B-COMPRESS-01",
+        "question": "Does Qwen2.5-14B-Instruct compress through CDNA v3?",
         "verdict": "PASS" if n_tensors == N_BLOCKS * len(TENSOR_TYPES) else "PARTIAL",
         "manifest": manifest,
         "cost": {
@@ -214,10 +204,10 @@ def main():
         },
     }
 
-    receipts_dir = Path(__file__).parent.parent / "receipts" / "qwen7b_compress"
+    receipts_dir = Path(__file__).parent.parent / "receipts" / "qwen14b_compress"
     receipts_dir.mkdir(parents=True, exist_ok=True)
     ts = time.strftime("%Y%m%dT%H%M%S")
-    receipt_path = receipts_dir / f"qwen7b_compress_{ts}.json"
+    receipt_path = receipts_dir / f"qwen14b_compress_{ts}.json"
     receipt_path.write_text(json.dumps(receipt, indent=2))
     print(f"\n  Receipt: {receipt_path}")
 

@@ -113,6 +113,10 @@ class HelixLinear(nn.Module):
         self._kurtosis_gate = None
         # Sidecar phase: "fused" | "scatter" | None (auto). Frozen at request start.
         self._sidecar_phase: Optional[str] = None
+        # CUDA graph mode: when True, forward() avoids GPU→CPU syncs (.item()).
+        # Kurtosis gate returns cached decision; evaluation happens out-of-band
+        # via pre_step_kurtosis(). Toggle with set_cuda_graph_mode().
+        self._cuda_graph_mode: bool = False
 
         # VQ components (read-only buffers, not parameters)
         self.register_buffer("codebook", codebook.contiguous())  # [256]
@@ -198,9 +202,12 @@ class HelixLinear(nn.Module):
         # Amortized: kurtosis computed every check_interval calls (~0.016ms/call
         # at interval=8), cached decision reused between checks (zero cost).
         # Zero overhead when _kurtosis_gate is None (Class 1 / non-SVD modules).
+        # In CUDA graph mode, step() returns cached decision (no GPU→CPU sync).
         if self._kurtosis_gate is not None and self.has_svd:
             with torch.no_grad():
-                enable_svd = self._kurtosis_gate.step(x)
+                enable_svd = self._kurtosis_gate.step(
+                    x, cuda_graph_safe=self._cuda_graph_mode
+                )
                 self._cell_skip_svd = not enable_svd
 
         if self._fused_available and x.is_cuda:
@@ -262,6 +269,38 @@ class HelixLinear(nn.Module):
         self._kurtosis_gate = None
         self._cell_skip_svd = False
 
+    def set_cuda_graph_mode(self, enabled: bool) -> None:
+        """Toggle CUDA graph compatibility mode.
+
+        When enabled:
+        - forward() avoids GPU→CPU syncs (.item() in kurtosis gate)
+        - Kurtosis gate returns cached decision from last pre_step_kurtosis() call
+        - Safe for torch.cuda.CUDAGraph.capture() / replay()
+
+        When disabled:
+        - Normal behavior: kurtosis computed inline with GPU→CPU sync
+        - Required for accurate gate tracking on varying inputs
+
+        Switch freely between modes at any time.
+        """
+        self._cuda_graph_mode = enabled
+
+    def pre_step_kurtosis(self, x: torch.Tensor) -> Optional[bool]:
+        """Evaluate kurtosis gate OUTSIDE a CUDA graph capture region.
+
+        Call this before graph replay to update the gate decision.
+        During graph replay, forward() uses the cached decision.
+
+        Returns:
+            True if SVD is enabled, False if skipped, None if no gate attached.
+        """
+        if self._kurtosis_gate is None or not self.has_svd:
+            return None
+        with torch.no_grad():
+            enable_svd = self._kurtosis_gate.pre_step(x)
+            self._cell_skip_svd = not enable_svd
+            return enable_svd
+
     def dispatch_metadata(self) -> dict:
         """Return instrumentation dict for receipt embedding.
 
@@ -277,6 +316,7 @@ class HelixLinear(nn.Module):
             "cell_skip_svd": self._cell_skip_svd,
             "svd_active": self.has_svd and not self._cell_skip_svd,
             "kurtosis_gate": self._kurtosis_gate.summary() if self._kurtosis_gate else None,
+            "cuda_graph_mode": self._cuda_graph_mode,
         }
 
     def _forward_fused(self, x: torch.Tensor) -> torch.Tensor:
@@ -610,6 +650,55 @@ def swap_to_helix(
             replaced += 1
 
     return model
+
+
+def set_cuda_graph_mode(model: nn.Module, enabled: bool) -> int:
+    """Toggle CUDA graph mode across all HelixLinear modules.
+
+    When enabled, forward() avoids GPU→CPU syncs (safe for graph capture/replay).
+    When disabled, normal kurtosis evaluation with inline .item() calls.
+
+    Call pre_step_kurtosis_all() before graph replay to update gate decisions.
+
+    Args:
+        model: Model containing HelixLinear modules.
+        enabled: True to enable graph-safe mode, False for normal mode.
+
+    Returns:
+        Number of HelixLinear modules updated.
+    """
+    count = 0
+    for module in model.modules():
+        if isinstance(module, HelixLinear):
+            module.set_cuda_graph_mode(enabled)
+            count += 1
+    return count
+
+
+def pre_step_kurtosis_all(model: nn.Module, inputs: Optional[Dict[str, torch.Tensor]] = None) -> int:
+    """Evaluate kurtosis gates for all gated modules OUTSIDE graph capture.
+
+    Call this before CUDA graph replay to update cached gate decisions.
+    In graph mode, forward() uses these cached decisions with zero sync.
+
+    Args:
+        model: Model containing HelixLinear modules.
+        inputs: Optional {tensor_name: activation_tensor} for per-module input.
+                If None, gates keep their current cached decision.
+
+    Returns:
+        Number of gates evaluated.
+    """
+    count = 0
+    if inputs is None:
+        return count
+    for name, module in model.named_modules():
+        if isinstance(module, HelixLinear) and module._kurtosis_gate is not None:
+            tensor_key = module.tensor_name
+            if tensor_key in inputs:
+                module.pre_step_kurtosis(inputs[tensor_key])
+                count += 1
+    return count
 
 
 def freeze_sidecar_phase(model: nn.Module, phase: Optional[str]) -> int:

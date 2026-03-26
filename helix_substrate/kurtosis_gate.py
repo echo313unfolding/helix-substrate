@@ -21,8 +21,15 @@ from typing import List, Dict, Any, Optional
 import torch
 
 
-def compute_kurtosis(x: torch.Tensor) -> float:
-    """Excess kurtosis of a tensor. One pass, no SVD, cheap."""
+def compute_kurtosis(x: torch.Tensor, *, no_sync: bool = False) -> float:
+    """Excess kurtosis of a tensor. One pass, no SVD, cheap.
+
+    Args:
+        x: Input tensor.
+        no_sync: If True, skip .item() (CUDA graph safe). Returns 0.0 and
+                 stores the raw GPU tensor in _last_kurtosis_tensor for
+                 deferred host readback.
+    """
     flat = x.detach().float().reshape(-1)
     if flat.numel() < 4:
         return 0.0
@@ -30,7 +37,12 @@ def compute_kurtosis(x: torch.Tensor) -> float:
     s = flat.std()
     if s < 1e-8:
         return 0.0
-    return ((flat - m) / s).pow(4).mean().item() - 3.0
+    k = ((flat - m) / s).pow(4).mean() - 3.0
+    if no_sync:
+        # Store for deferred readback outside graph capture
+        compute_kurtosis._last_gpu_tensor = k
+        return 0.0
+    return k.item()
 
 
 @dataclass
@@ -70,7 +82,7 @@ class KurtosisGate:
     _trace_max: int = 100
     _trace: List[Dict[str, Any]] = field(default_factory=list)
 
-    def step(self, x: torch.Tensor) -> bool:
+    def step(self, x: torch.Tensor, *, cuda_graph_safe: bool = False) -> bool:
         """
         Amortized gate step. Call on every forward().
 
@@ -80,11 +92,22 @@ class KurtosisGate:
 
         Args:
             x: Input activation tensor.
+            cuda_graph_safe: If True, skip .item() sync — return cached
+                decision without GPU→CPU transfer. Kurtosis must be
+                evaluated out-of-band via pre_step() before graph replay.
 
         Returns:
             True if SVD should be enabled for this forward pass.
         """
         self._total_forwards += 1
+
+        if cuda_graph_safe:
+            # CUDA graph mode: never do GPU→CPU sync in the captured region.
+            # Return cached decision. pre_step() handles kurtosis updates.
+            if self._enable_svd:
+                self._total_svd_enables += 1
+            return self._enable_svd
+
         if not self._initialized or self._total_forwards % self.check_interval == 0:
             kurt = compute_kurtosis(x)
             return self.update(kurt)
@@ -92,6 +115,22 @@ class KurtosisGate:
         if self._enable_svd:
             self._total_svd_enables += 1
         return self._enable_svd
+
+    def pre_step(self, x: torch.Tensor) -> bool:
+        """Evaluate kurtosis OUTSIDE a CUDA graph capture region.
+
+        Call this before torch.cuda.CUDAGraph.replay() to update the gate
+        decision. Then during graph replay, step(cuda_graph_safe=True)
+        returns the cached decision with zero GPU→CPU sync.
+
+        Args:
+            x: Input activation tensor (may be from previous iteration).
+
+        Returns:
+            True if SVD should be enabled.
+        """
+        kurt = compute_kurtosis(x)
+        return self.update(kurt)
 
     def update(self, raw_kurtosis: float) -> bool:
         """

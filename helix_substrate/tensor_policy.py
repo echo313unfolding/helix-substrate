@@ -85,8 +85,14 @@ _HF_PATTERNS = [
     (re.compile(r"layers\.(\d+)\.mixer\.out_proj\.weight"), TensorClass.FFN),
     (re.compile(r"layers\.(\d+)\.mixer\.x_proj\.weight"), TensorClass.UNKNOWN),
     (re.compile(r"layers\.(\d+)\.mixer\.dt_proj\.weight"), TensorClass.UNKNOWN),
-    # Mamba embedding
-    (re.compile(r"backbone\.embeddings\.weight$"), TensorClass.EMBEDDING),
+    # Mamba-2 additional mixer layers
+    (re.compile(r"layers\.(\d+)\.mixer\.B_proj\.weight"), TensorClass.FFN),
+    (re.compile(r"layers\.(\d+)\.mixer\.C_proj\.weight"), TensorClass.FFN),
+    (re.compile(r"layers\.(\d+)\.mixer\.A_log"), TensorClass.UNKNOWN),
+    (re.compile(r"layers\.(\d+)\.mixer\.D$"), TensorClass.UNKNOWN),
+    (re.compile(r"layers\.(\d+)\.mixer\.norm\.weight"), TensorClass.NORM),
+    # Mamba embedding (Mamba-1: "embeddings", Mamba-2: "embedding")
+    (re.compile(r"backbone\.embeddings?\.weight$"), TensorClass.EMBEDDING),
 ]
 
 

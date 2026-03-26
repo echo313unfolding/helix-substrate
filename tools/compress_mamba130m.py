@@ -37,8 +37,14 @@ from helix_substrate.cdnav3_writer import CDNAv3Writer
 from helix_substrate.tensor_policy import get_policy
 
 MODEL_DIR = Path.home() / "models" / "mamba-130m-hf"
-N_BLOCKS = 24
 TENSOR_TYPES = ["in_proj", "x_proj", "dt_proj", "out_proj"]
+
+# Auto-detect layer count from config.json
+_config = json.load(open(MODEL_DIR / "config.json"))
+N_BLOCKS = _config.get("num_hidden_layers") or _config.get("n_layer")
+if N_BLOCKS is None:
+    raise ValueError(f"Cannot detect layer count from {MODEL_DIR / 'config.json'}")
+print(f"  Auto-detected: {N_BLOCKS} blocks (from config.json)")
 
 # Mamba uses backbone.layers.N.mixer.{proj}.weight
 HF_PATTERNS = {
