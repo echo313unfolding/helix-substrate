@@ -45,8 +45,8 @@ def main():
         HelixLinear, load_cdna_factors, swap_to_helix, swap_summary
     )
 
-    model_path = "/home/voidstr3m33/models/tinyllama_fp32/"
-    cdna_path = "/home/voidstr3m33/models/tinyllama_fp32/cdnav3/"
+    model_path = str(Path.home() / "models" / "tinyllama_fp32")
+    cdna_path = str(Path.home() / "models" / "tinyllama_fp32" / "cdnav3")
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     config = AutoConfig.from_pretrained(model_path)
@@ -180,7 +180,7 @@ def main():
     step1_receipt = args.step1_receipt
     if step1_receipt is None:
         # Auto-detect latest Step 1 receipt
-        receipt_dir = Path("/home/voidstr3m33/helix-substrate/receipts/vpsi/")
+        receipt_dir = Path(__file__).resolve().parent.parent / "receipts" / "vpsi"
         step1_files = sorted(receipt_dir.glob("step1_*.json"))
         if step1_files:
             step1_receipt = str(step1_files[-1])
@@ -226,7 +226,7 @@ def main():
         "cost": cost,
     }
 
-    receipt_dir = Path("/home/voidstr3m33/helix-substrate/receipts/vpsi/")
+    receipt_dir = Path(__file__).resolve().parent.parent / "receipts" / "vpsi"
     receipt_dir.mkdir(parents=True, exist_ok=True)
     ts = time.strftime('%Y%m%dT%H%M%S')
     receipt_path = receipt_dir / ("step2_sensitivity_%s.json" % ts)

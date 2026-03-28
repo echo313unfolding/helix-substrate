@@ -1,0 +1,464 @@
+{
+  "work_order": "WO-RVQ-BENCHMARK-01",
+  "question": "Does ResidualVQ beat flat VQ and work on both transformers and SSMs?",
+  "library": "vector-quantize-pytorch==1.28.0 (Lucidrain)",
+  "models": {
+    "qwen_3b": [
+      {
+        "name": "model.layers.11.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "elements": 4194304,
+        "flat_k256": {
+          "cosine": 0.999296,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 7.75
+        },
+        "rvq_2x16": {
+          "cosine": 0.176884,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 3.38
+        },
+        "rvq_2x256": {
+          "cosine": 0.52212,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 1.83
+        },
+        "rvq_4x16": {
+          "cosine": 0.231527,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 2.52
+        }
+      },
+      {
+        "name": "model.layers.18.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "elements": 4194304,
+        "flat_k256": {
+          "cosine": 0.999594,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 7.57
+        },
+        "rvq_2x16": {
+          "cosine": 0.189294,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 1.24
+        },
+        "rvq_2x256": {
+          "cosine": 0.559825,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 1.89
+        },
+        "rvq_4x16": {
+          "cosine": 0.258451,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 2.53
+        }
+      },
+      {
+        "name": "model.layers.24.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "elements": 524288,
+        "flat_k256": {
+          "cosine": 0.999797,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 1.64
+        },
+        "rvq_2x16": {
+          "cosine": 0.351429,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.48
+        },
+        "rvq_2x256": {
+          "cosine": 1.0,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.53
+        },
+        "rvq_4x16": {
+          "cosine": 0.481058,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.02
+        }
+      },
+      {
+        "name": "model.layers.28.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "elements": 524288,
+        "flat_k256": {
+          "cosine": 0.999475,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 1.64
+        },
+        "rvq_2x16": {
+          "cosine": 0.382377,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.51
+        },
+        "rvq_2x256": {
+          "cosine": 1.0,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.53
+        },
+        "rvq_4x16": {
+          "cosine": 0.502502,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.03
+        }
+      },
+      {
+        "name": "model.layers.34.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "elements": 4194304,
+        "flat_k256": {
+          "cosine": 0.999442,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 7.62
+        },
+        "rvq_2x16": {
+          "cosine": 0.183298,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 1.25
+        },
+        "rvq_2x256": {
+          "cosine": 0.521859,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 1.88
+        },
+        "rvq_4x16": {
+          "cosine": 0.269759,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 2.51
+        }
+      }
+    ],
+    "mamba_130m": [
+      {
+        "name": "backbone.layers.10.mixer.dt_proj.weight",
+        "shape": [
+          1536,
+          48
+        ],
+        "elements": 73728,
+        "flat_k256": {
+          "cosine": 0.999562,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 1.07
+        },
+        "rvq_2x16": {
+          "cosine": 0.634855,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.47
+        },
+        "rvq_2x256": {
+          "cosine": 0.866985,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.49
+        },
+        "rvq_4x16": {
+          "cosine": 0.723144,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 0.95
+        }
+      },
+      {
+        "name": "backbone.layers.12.mixer.out_proj.weight",
+        "shape": [
+          768,
+          1536
+        ],
+        "elements": 1179648,
+        "flat_k256": {
+          "cosine": 0.999398,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 2.72
+        },
+        "rvq_2x16": {
+          "cosine": 0.382068,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.61
+        },
+        "rvq_2x256": {
+          "cosine": 0.82388,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.77
+        },
+        "rvq_4x16": {
+          "cosine": 0.455767,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.28
+        }
+      },
+      {
+        "name": "backbone.layers.15.mixer.A_log",
+        "shape": [
+          1536,
+          16
+        ],
+        "elements": 24576,
+        "flat_k256": {
+          "cosine": 0.999983,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 0.97
+        },
+        "rvq_2x16": {
+          "cosine": 0.99062,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.48
+        },
+        "rvq_2x256": {
+          "cosine": 0.998012,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.47
+        },
+        "rvq_4x16": {
+          "cosine": 0.994631,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 0.95
+        }
+      },
+      {
+        "name": "backbone.layers.17.mixer.in_proj.weight",
+        "shape": [
+          3072,
+          768
+        ],
+        "elements": 2359296,
+        "flat_k256": {
+          "cosine": 0.999689,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 4.65
+        },
+        "rvq_2x16": {
+          "cosine": 0.359145,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.74
+        },
+        "rvq_2x256": {
+          "cosine": 0.614803,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 1.28
+        },
+        "rvq_4x16": {
+          "cosine": 0.383111,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.63
+        }
+      },
+      {
+        "name": "backbone.layers.19.mixer.x_proj.weight",
+        "shape": [
+          80,
+          1536
+        ],
+        "elements": 122880,
+        "flat_k256": {
+          "cosine": 0.997336,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 1.14
+        },
+        "rvq_2x16": {
+          "cosine": 0.650218,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.48
+        },
+        "rvq_2x256": {
+          "cosine": 1.0,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.5
+        },
+        "rvq_4x16": {
+          "cosine": 0.863112,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 0.93
+        }
+      },
+      {
+        "name": "backbone.layers.21.mixer.dt_proj.weight",
+        "shape": [
+          1536,
+          48
+        ],
+        "elements": 73728,
+        "flat_k256": {
+          "cosine": 0.999063,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 1.04
+        },
+        "rvq_2x16": {
+          "cosine": 0.653437,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.47
+        },
+        "rvq_2x256": {
+          "cosine": 0.884066,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.46
+        },
+        "rvq_4x16": {
+          "cosine": 0.742983,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 0.97
+        }
+      },
+      {
+        "name": "backbone.layers.23.mixer.out_proj.weight",
+        "shape": [
+          768,
+          1536
+        ],
+        "elements": 1179648,
+        "flat_k256": {
+          "cosine": 0.999386,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 2.69
+        },
+        "rvq_2x16": {
+          "cosine": 0.245428,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.62
+        },
+        "rvq_2x256": {
+          "cosine": 0.807117,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.77
+        },
+        "rvq_4x16": {
+          "cosine": 0.347707,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.28
+        }
+      },
+      {
+        "name": "backbone.layers.5.mixer.A_log",
+        "shape": [
+          1536,
+          16
+        ],
+        "elements": 24576,
+        "flat_k256": {
+          "cosine": 0.99996,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 0.94
+        },
+        "rvq_2x16": {
+          "cosine": 0.922705,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.47
+        },
+        "rvq_2x256": {
+          "cosine": 0.981472,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 0.46
+        },
+        "rvq_4x16": {
+          "cosine": 0.959592,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 0.91
+        }
+      },
+      {
+        "name": "backbone.layers.7.mixer.in_proj.weight",
+        "shape": [
+          3072,
+          768
+        ],
+        "elements": 2359296,
+        "flat_k256": {
+          "cosine": 0.999721,
+          "bits_per_weight": 8,
+          "ratio": "~4x",
+          "time_s": 4.62
+        },
+        "rvq_2x16": {
+          "cosine": 0.187683,
+          "bits_per_weight": 8,
+          "ratio": "~4x (2\u00d74-bit)",
+          "time_s": 0.68
+        },
+        "rvq_2x256": {
+          "cosine": 0.443828,
+          "bits_per_weight": 16,
+          "ratio": "~2x (2\u00d78-bit)",
+          "time_s": 1.27
+        },
+        "rvq_4x16": {
+          "cosine": 0.257413,
+          "bits_per_weight": 16,
+          "ratio": "~2x (4\u00d74-bit)",
+          "time_s": 1.61
+        }
+      }
+    ],
+    "mamba2_1.3b": []
+  },
+  "cost": {
+    "wall_time_s": 93.5,
+    "timestamp": "2026-03-28T11:01:06"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "work_order": "WO-SCALING-PPL-01",
+  "question": "7B PPL with embed_tokens=exact, lm_head=exact",
+  "model": "qwen2.5-7b-instruct",
+  "eval_setup": {
+    "seq_len": 2048,
+    "n_tokens": 8192,
+    "device": "cpu",
+    "dataset": "wikitext-2-raw-v1"
+  },
+  "results": {
+    "helix": {
+      "ppl": 7.6841,
+      "n_tokens": 8192,
+      "helix_modules": 196,
+      "load_time_s": 10.9,
+      "eval_time_s": 1437.6
+    }
+  },
+  "cost": {
+    "wall_time_s": 1453.8,
+    "timestamp_start": "2026-03-27T21:13:14.738238"
+  }
+}

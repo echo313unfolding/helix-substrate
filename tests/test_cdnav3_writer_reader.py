@@ -163,7 +163,7 @@ class TestAutoPolicy:
 
 
 # Integration test with real TinyLlama tensor
-GGUF_PATH = Path("/home/voidstr3m33/helix-cdc/models/gguf/tinyllama-1.1b-chat-v1.0.Q8_0.gguf")
+GGUF_PATH = Path.home() / "helix-cdc" / "models" / "gguf" / "tinyllama-1.1b-chat-v1.0.Q8_0.gguf"
 
 
 @pytest.mark.skipif(not GGUF_PATH.exists(), reason="TinyLlama GGUF not found")

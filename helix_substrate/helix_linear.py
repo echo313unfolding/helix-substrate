@@ -90,6 +90,7 @@ class HelixLinear(nn.Module):
         bias: Optional[torch.Tensor] = None,
         tensor_name: str = "",
         compute_dtype: torch.dtype = torch.float32,
+        channel_scales: Optional[torch.Tensor] = None,
     ):
         super().__init__()
         self.in_features = in_features
@@ -173,6 +174,16 @@ class HelixLinear(nn.Module):
         else:
             self.register_buffer("bias", None)
 
+        # AWQ-style channel scales: when present, input is pre-scaled by 1/scales
+        # before matmul. Codebook/sidecar/SVD are in scaled space. The division
+        # undoes the scaling applied at compression time.
+        # Math: y = W_original @ x = W_scaled @ (x / scales)
+        self.has_channel_scales = channel_scales is not None
+        if self.has_channel_scales:
+            self.register_buffer("channel_scales", channel_scales.contiguous())
+        else:
+            self.register_buffer("channel_scales", None)
+
     def _apply(self, fn, recurse=True):
         """Override nn.Module._apply to refresh dispatch cache after .to()/.cuda()/.cpu()."""
         result = super()._apply(fn, recurse)
@@ -210,9 +221,11 @@ class HelixLinear(nn.Module):
                 )
                 self._cell_skip_svd = not enable_svd
 
+        input_dtype = x.dtype
+
         if self._fused_available and x.is_cuda:
             self._last_dispatch_path = "fused"
-            return self._forward_fused(x)
+            out = self._forward_fused(x)
         else:
             self._last_dispatch_path = "naive"
             if x.is_cuda:
@@ -223,7 +236,13 @@ class HelixLinear(nn.Module):
                     RuntimeWarning,
                     stacklevel=2,
                 )
-            return self._forward_naive(x)
+            out = self._forward_naive(x)
+
+        # Match output dtype to input dtype so downstream nn.Linear modules
+        # (which keep their original precision) don't get a dtype mismatch.
+        if out.dtype != input_dtype:
+            out = out.to(input_dtype)
+        return out
 
     @staticmethod
     def _check_fused_available() -> bool:
@@ -326,6 +345,10 @@ class HelixLinear(nn.Module):
         orig_shape = x.shape
         x_2d = x.reshape(-1, self.in_features)
 
+        # AWQ channel scaling: pre-divide input so codebook operates in scaled space
+        if self.has_channel_scales:
+            x_2d = x_2d / self.channel_scales.unsqueeze(0)
+
         dispatch_log = {}
         # Cell-driven SVD gating: skip SVD correction when cell signals it's unnecessary
         skip_svd = self._cell_skip_svd and self.has_svd
@@ -390,6 +413,10 @@ class HelixLinear(nn.Module):
         CHUNK = 256
         orig_shape = x.shape
         x_2d = x.reshape(-1, self.in_features).float()
+
+        # AWQ channel scaling: pre-divide input so codebook operates in scaled space
+        if self.has_channel_scales:
+            x_2d = x_2d / self.channel_scales.unsqueeze(0)
         N = x_2d.shape[0]
         output = torch.zeros(N, self.out_features, device=x.device, dtype=torch.float32)
 
@@ -441,6 +468,8 @@ class HelixLinear(nn.Module):
             compressed += self.svd_U.numel() * 4
             compressed += self.svd_s.numel() * 4
             compressed += self.svd_Vt.numel() * 4
+        if self.has_channel_scales:
+            compressed += self.channel_scales.numel() * 4  # float32
         return {
             "dense_bytes": dense_bytes,
             "compressed_bytes": compressed,
@@ -522,6 +551,14 @@ def load_helix_linear_from_cdnav3(
             np.load(tensor_dir / "svd_Vt.npy").astype(np.float32).copy()
         )
 
+    # AWQ channel scales: optional (present when compressed with --scale-file)
+    channel_scales = None
+    scales_path = tensor_dir / "channel_scales.npy"
+    if scales_path.exists():
+        channel_scales = torch.from_numpy(
+            np.load(scales_path).astype(np.float32).copy()
+        )
+
     return HelixLinear(
         in_features=cols,
         out_features=rows,
@@ -535,6 +572,7 @@ def load_helix_linear_from_cdnav3(
         bias=bias,
         tensor_name=meta.get("tensor_name", ""),
         compute_dtype=compute_dtype,
+        channel_scales=channel_scales,
     )
 
 
@@ -560,8 +598,20 @@ def load_cdna_factors(
     cdna_dir = Path(cdna_dir)
     result: Dict[str, HelixLinear] = {}
 
-    # Collect biases from original model if provided
+    # Collect biases: first from saved .npy files, then from model if provided
     biases: Dict[str, torch.Tensor] = {}
+
+    # Load bias .npy files (saved by compress.py for models with attention biases)
+    for meta_path in sorted(cdna_dir.glob("*.npy.meta.json")):
+        meta = json.loads(meta_path.read_text())
+        tensor_name = meta.get("tensor_name", "")
+        if tensor_name.endswith(".bias"):
+            npy_path = meta_path.parent / meta_path.name.replace(".meta.json", "")
+            if npy_path.exists():
+                module_path = tensor_name[:-5]  # strip ".bias"
+                biases[module_path] = torch.from_numpy(np.load(npy_path))
+
+    # Override with model biases if model is provided (authoritative)
     if model is not None:
         for name, module in model.named_modules():
             if isinstance(module, nn.Linear) and module.bias is not None:

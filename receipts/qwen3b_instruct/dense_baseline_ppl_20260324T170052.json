@@ -2,7 +2,7 @@
   "work_order": "WO-QWEN3B-DENSE-BASELINE-01",
   "description": "Dense FP32 baseline PPL for Qwen2.5-3B-Instruct on WikiText-2 validation",
   "model": "Qwen2.5-3B-Instruct",
-  "model_path": "/home/voidstr3m33/models/qwen2.5-3b-instruct",
+  "model_path": "~/models/qwen2.5-3b-instruct",
   "dtype": "float32",
   "device": "cpu",
   "n_params": 3085938688,

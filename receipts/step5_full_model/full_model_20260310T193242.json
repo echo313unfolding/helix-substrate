@@ -1,6 +1,6 @@
 {
   "schema": "step5_full_model_perplexity:v1",
-  "model": "/home/voidstr3m33/models/tinyllama_fp32/model.safetensors",
+  "model": "~/models/tinyllama_fp32/model.safetensors",
   "eval_dataset": "wikitext-2-raw-v1/validation",
   "eval_tokens": 4096,
   "n_chunks": 2,

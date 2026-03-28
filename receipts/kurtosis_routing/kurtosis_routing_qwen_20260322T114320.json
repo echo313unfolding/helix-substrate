@@ -1,7 +1,7 @@
 {
   "work_order": "WO-KURTOSIS-ROUTING-QWEN-01",
   "description": "Cross-model kurtosis routing validation on Qwen2.5-Coder-1.5B",
-  "model": "/home/voidstr3m33/models/qwen2.5-coder-1.5b-instruct",
+  "model": "~/models/qwen2.5-coder-1.5b-instruct",
   "n_layers": 28,
   "n_tensors": 196,
   "kurtosis_stats": {

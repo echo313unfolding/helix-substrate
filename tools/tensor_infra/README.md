@@ -39,7 +39,7 @@ Input Tensor (2D float32)
 ## Run Instructions
 
 ```bash
-cd /home/voidstr3m33/helix-substrate/tools/tensor_infra
+cd tools/tensor_infra
 
 # Run individual domain
 python3 bench_activation_checkpoint.py

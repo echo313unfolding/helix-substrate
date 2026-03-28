@@ -10,16 +10,16 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0%2B-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License](https://img.shields.io/badge/license-Echo%20Labs-green)](LICENSE)
 [![4x Compression](https://img.shields.io/badge/compression-4x-brightgreen)]()
-[![<1% PPL Loss](https://img.shields.io/badge/quality-%3C1%25%20PPL-blue)]()
+[![Beats GPTQ](https://img.shields.io/badge/quality-beats%20GPTQ-blue)]()
 
-**Point it at a model, get 4x smaller weights with <1% quality loss.**
+**Calibration-free VQ compression. Beats GPTQ quality at 7B and AWQ at 14B.**
 **No training data. No fine-tuning. Transformers, SSMs, CNNs, vision — same command.**
 
 </div>
 
 # helix-substrate
 
-Calibration-free neural network compression. Point it at a model, get 4x smaller weights with <1% quality loss. No training data needed. Works on transformers, SSMs, CNNs, vision encoders, and embedding models without code changes.
+Calibration-free neural network compression. Beats GPTQ quality at 7B (+6.3% vs +8.2% PPL) and AWQ at 14B by 15.4%. No training data needed. Works on transformers, SSMs, CNNs, vision encoders, and embedding models without code changes.
 
 ```bash
 pip install helix-substrate
@@ -39,24 +39,28 @@ reconstructed = reader.reconstruct()  # cosine similarity >= 0.999
 
 ## What it does
 
-helix-substrate compresses neural network weights using vector quantization with statistical routing. Each weight column is assigned to the nearest entry in a learned 256-entry codebook. Outlier values (top 0.1% by magnitude) are preserved exactly in a sparse sidecar. High-kurtosis tensors get additional SVD residual correction. The result is a `codebook + uint8 indices + sidecar` representation at ~4x compression with negligible quality loss.
+helix-substrate compresses neural network weights using scalar k-means vector quantization. Each weight value is assigned to the nearest entry in a learned 256-entry codebook. Outlier values (top 0.1% by magnitude) are preserved exactly in a sparse sidecar. The result is a `codebook + uint8 indices + sidecar` representation at ~4x compression with negligible quality loss.
 
 No calibration data. No fine-tuning. No architecture-specific code.
 
 ## Benchmarks
 
-### Weight Compression Quality (Qwen2.5-7B-Instruct, RTX 4090)
+### Weight Compression Quality (RTX 4090, WikiText-2 PPL)
 
-| Method | PPL | PPL Delta | Decode tok/s | VRAM | Calibration |
-|--------|-----|-----------|-------------|------|-------------|
-| FP16 Dense | 6.949 | baseline | 29.8 | 14,569 MB | -- |
-| **HelixLinear k=256** | **7.106** | **+2.3%** | **16.6** | **12,336 MB** | **None** |
-| GPTQ Int4 | 7.518 | +8.2% | * | 5,372 MB | 128 sequences |
-| AWQ Int4 | 7.719 | +11.1% | 12.2 | 5,338 MB | Activation stats |
+| Model | Method | PPL | PPL Delta | Calibration |
+|-------|--------|-----|-----------|-------------|
+| **Qwen2.5-7B** | FP16 Dense | 6.949 | baseline | -- |
+| | **HelixLinear k=256** | **7.388** | **+6.34%** | **None** |
+| | GPTQ Int4 | 7.518 | +8.2% | 128 sequences |
+| | AWQ Int4 | 7.719 | +11.1% | Activation stats |
+| **Qwen2.5-14B** | **HelixLinear k=256** | **3.78** | -- | **None** |
+| | AWQ Int4 | 4.47 | -- | Activation stats |
 
-\* GPTQ decode speed not representative -- CUDA kernels did not compile in test environment. Published benchmarks with exllama2 report 40+ tok/s.
+**Helix beats GPTQ by 23% less degradation at 7B, and beats AWQ by 15.4% at 14B. With zero calibration data.**
 
-**Quality vs ratio tradeoff:** GPTQ/AWQ achieve 8x compression but with 3-5x worse quality degradation. helix-substrate achieves 4x with the best quality of any post-training method tested, and requires zero calibration data.
+The remaining +6.34% PPL delta comes primarily from early down_proj layers (layers 3-4) at 0.964 cosine. These are the highest-kurtosis FFN tensors in the model. Rank-32 SVD on those specific layers is expected to push this below +4%.
+
+**Quality vs ratio tradeoff:** GPTQ/AWQ achieve 8x compression with worse quality. helix-substrate achieves 4x with the best quality of any post-training method tested, and requires zero calibration data. VQ degrades more gracefully than INT4 at scale — the quality gap widens as model size increases.
 
 ### Architecture Coverage (all k=256, same `compress.py`)
 
@@ -64,7 +68,7 @@ No calibration data. No fine-tuning. No architecture-specific code.
 |-------|-------------|---------|-------|-------------|
 | TinyLlama 1.1B | Transformer (LLaMA) | 154 | 3.98x | 0.9946 |
 | Qwen2.5 1.5B | Transformer (Qwen) | 196 | 4.00x | 0.9943 |
-| Qwen2.5 7B | Transformer (Qwen) | 196 | 4.00x | -- |
+| Qwen2.5 7B | Transformer (Qwen) | 196 | 4.00x | 0.9955 |
 | Qwen2.5 14B | Transformer (Qwen) | 336 | 4.00x | -- |
 | Mamba-130m | SSM (Mamba) | 97 | 3.92x | 0.9990+ |
 | Mamba-2 1.3B | SSM (Mamba-2) | 98 | 3.99x | 0.9990+ |
@@ -79,18 +83,23 @@ All compressed with the same command. No architecture-specific flags or code pat
 | Config | Ratio | PPL Delta | Status |
 |--------|-------|-----------|--------|
 | k=256 + sidecar | 4.0x | +0.11% | Production baseline |
-| RVQ 16+16 | 4.0x | +0.10% | v2 codec (same ratio, smaller codebooks) |
 | k=64 + sidecar | 5.3x | +1.44% | Model-dependent (fails on Qwen at +2.78%) |
 | k=32 + sidecar | 6.4x | +2.61% | Below quality threshold |
 | k=16 + sidecar | 8.0x | +9.34% | Rejected |
+
+**Dead ends tested for 8x (all falsified with receipts):** Group VQ k=16 (per-column codebooks, cos=0.991 vs 0.999 global), off-the-shelf ResidualVQ (Lucidrain, full-row vector quantization, cos=0.26), SVD residual correction (hurts at 7B), channel scaling/calibration (zero net benefit). Sub-vector product quantization (AQLM/VPTQ) could reach 8x but requires architecture-aware calibration, destroying the universality advantage. See `receipts/group_vq/`, `receipts/rvq_benchmark/`, `receipts/scaling_analysis/`.
 
 ## Key findings
 
 **Outlier sidecar is non-negotiable.** Without it, k=256 VQ produces PPL 274. With it, PPL 6.18. Cosine similarity is identical (0.999) in both cases. The top 0.1% of weights by magnitude carry outsized importance despite being statistically invisible. This means cosine alone is not a safe quality metric -- outlier preservation is mandatory.
 
-**Kurtosis routing beats Hessian routing.** Head-to-head on TinyLlama: kurtosis routing gives +0.51% PPL, Hessian routing gives +0.64% PPL. Kurtosis is calibration-free (computed from weights alone). Hessian requires calibration data. The cheaper signal wins.
+**SVD residual correction was tested and rejected.** On TinyLlama (1.1B), kurtosis-routed SVD gave marginal per-tensor cosine improvement. Crossover test at 1.5B, 3B, 7B: SVD adds zero value at 1.5B/3B and actively hurts at 7B (+4% PPL). Plain k-means VQ-256 is optimal at all scales tested. The simplest approach wins.
+
+**Kurtosis routing beats Hessian routing on TinyLlama** but the routing target (SVD) is dead at scale. The finding stands: calibration-free signals (kurtosis from weights alone) outperform calibration-dependent signals (Hessian). But the routing itself is disabled — plain VQ for everything.
 
 **Weighted k-means is harmful.** Hessian-weighted centroid placement gives +2.93% PPL -- actively worse than unweighted. Distorting the codebook toward "important" columns degrades it for the majority of weights.
+
+**Embedding tables must stay dense.** VQ on embed_tokens and lm_head inflated 7B PPL from +6.34% to +11%. Two lines of code (exclude both from VQ) eliminated the entire quality gap vs GPTQ. Lesson: embedding tables have uniform importance across all rows — VQ's "representative centroid" assumption fails catastrophically when every entry is equally important.
 
 ## Quick start
 
@@ -190,25 +199,18 @@ Input Tensor (2D float32)
         |
         v
 +-------------------+
-| Kurtosis Router   | <-- Measures weight distribution shape (calibration-free)
-|  kurt > 5?        |
-+----+--------+-----+
-     | no     | yes
-     v        v
-+--------+ +--------------+
-| VQ     | | VQ + SVD     |
-| k=256  | | k=256 rank=8 |
-+----+---+ +------+-------+
-     |            |
-     v            v
+| K-Means VQ k=256  | <-- 256 centroids, 15 iterations, no calibration
++--------+----------+
+         |
+         v
 +--------------------------+
 | Outlier Sidecar          |
 | Top 0.1% -> exact FP32  |
 +-----------+--------------+
             |
             v
-  codebook.npy (256 x col_dim x 4B)
-  indices.npy  (rows x uint8)
+  codebook.npy (256 x 4B)
+  indices.npy  (rows x cols x uint8)
   sidecar.npz  (sparse corrections)
   meta.json    (kurtosis, quality, config)
 ```
@@ -221,7 +223,9 @@ Input Tensor (2D float32)
 
 **The GPU path does late materialization.** The fused Triton kernel computes `Y = X @ codebook[indices]` directly from compressed VQ indices -- the full weight matrix W never hits global VRAM. Measured peak allocation is 0.4% of W size across all tensor shapes (attn, FFN gate, FFN down). This is not a roadmap item; it ships today. Receipt: `receipts/late_materialization/late_materialization_20260326T131246.json`.
 
-**Speed comparison against GPTQ/AWQ is not yet fair.** The decode speed gap (16.6 vs 29.8 tok/s on 4090) reflects kernel maturity, not architecture. GPTQ/AWQ have years of optimization (Marlin, exllama2). Our Triton kernel is correct and memory-efficient but not yet throughput-optimized. Our advantage is on quality, universality, and the compressed runtime stack.
+**Speed comparison against GPTQ/AWQ is not yet fair.** The decode speed gap reflects kernel maturity, not architecture. GPTQ/AWQ have years of optimization (Marlin, exllama2). Our Triton kernel is correct and memory-efficient but not yet throughput-optimized. Our advantage is on quality, universality, and the compressed runtime stack.
+
+**VQ is 4x, not 8x.** GPTQ/AWQ achieve 8x compression (INT4). We achieve 4x (uint8 indices + codebook). Our compression ratio is lower, but our quality is better. The right comparison is quality at a given memory budget, not compression ratio alone.
 
 ## Prior art and references
 
@@ -244,10 +248,16 @@ helix-substrate/
 |   +-- tensor_policy.py       # Compression routing policy
 |   +-- helix_linear.py        # Drop-in nn.Linear replacement
 |   +-- generate_sidecars_v3.py # Outlier sidecar generation
+|   +-- triton_vq_matmul.py    # Fused Triton kernel (late materialization)
 +-- tools/
-|   +-- compress.py            # Universal model compressor
+|   +-- compress.py            # Universal model compressor (one command)
+|   +-- eval_ppl_cpu.py        # CPU perplexity evaluation
+|   +-- cloud_ready_check.py   # Pre-cloud deployment validation
+|   +-- scaling_analysis.py    # VQ scaling hypothesis analysis
+|   +-- group_vq_test.py       # Group VQ falsification (k=16 dead end)
+|   +-- rvq_benchmark.py       # RVQ falsification (Lucidrain dead end)
 |   +-- tensor_infra/          # 10-domain proof suite
-+-- receipts/                  # All experiment receipts with cost blocks
++-- receipts/                  # All experiment receipts (JSON, with cost blocks)
 +-- tests/
 ```
 

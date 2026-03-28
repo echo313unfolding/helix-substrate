@@ -1,7 +1,7 @@
 {
   "work_order": "WO-KURTOSIS-ROUTING-01",
   "description": "Kurtosis-based routing vs position-based routing on TinyLlama",
-  "model": "/home/voidstr3m33/models/tinyllama_fp32",
+  "model": "~/models/tinyllama_fp32",
   "n_tensors": 154,
   "old_svd_count": 14,
   "new_svd_count": 6,

@@ -1,0 +1,297 @@
+{
+  "schema": "cloud_ready_check:v1",
+  "model_dir": "~/models/tinyllama_fp32",
+  "full_check": true,
+  "gpu_check": false,
+  "passed": 45,
+  "warnings": 1,
+  "failed": 0,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "phase": "env",
+      "name": "Python >= 3.10",
+      "status": "PASS",
+      "detail": "3.10.12"
+    },
+    {
+      "phase": "env",
+      "name": "torch installed",
+      "status": "PASS",
+      "detail": "v2.6.0+cu124"
+    },
+    {
+      "phase": "env",
+      "name": "transformers installed",
+      "status": "PASS",
+      "detail": "v4.57.0"
+    },
+    {
+      "phase": "env",
+      "name": "numpy installed",
+      "status": "PASS",
+      "detail": "v2.2.6"
+    },
+    {
+      "phase": "env",
+      "name": "safetensors installed",
+      "status": "PASS",
+      "detail": "v0.6.2"
+    },
+    {
+      "phase": "env",
+      "name": "datasets (optional)",
+      "status": "PASS",
+      "detail": "WikiText-2 PPL eval"
+    },
+    {
+      "phase": "env",
+      "name": "scipy (optional)",
+      "status": "PASS",
+      "detail": "k-means in cdnav3_writer"
+    },
+    {
+      "phase": "env",
+      "name": "yaml (optional)",
+      "status": "PASS",
+      "detail": "echo_runtime config"
+    },
+    {
+      "phase": "env",
+      "name": "RAM >= 16 GB",
+      "status": "PASS",
+      "detail": "62.4 GB"
+    },
+    {
+      "phase": "env",
+      "name": "CPU cores",
+      "status": "PASS",
+      "detail": "16 cores"
+    },
+    {
+      "phase": "import",
+      "name": "helix_substrate",
+      "status": "PASS",
+      "detail": "v0.2.1"
+    },
+    {
+      "phase": "import",
+      "name": "helix_substrate.helix_linear",
+      "status": "PASS",
+      "detail": "5 attrs OK"
+    },
+    {
+      "phase": "import",
+      "name": "helix_substrate.cdnav3_writer",
+      "status": "PASS",
+      "detail": "1 attrs OK"
+    },
+    {
+      "phase": "import",
+      "name": "helix_substrate.cdnav3_reader",
+      "status": "PASS",
+      "detail": "1 attrs OK"
+    },
+    {
+      "phase": "import",
+      "name": "helix_substrate.tensor_policy",
+      "status": "PASS",
+      "detail": "5 attrs OK"
+    },
+    {
+      "phase": "import",
+      "name": "triton_vq_matmul (optional)",
+      "status": "WARN",
+      "detail": "RuntimeError: 0 active drivers ([]). There should only be one."
+    },
+    {
+      "phase": "import",
+      "name": "tools/compress.py exists",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "import",
+      "name": "tools/calibrate.py exists",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "import",
+      "name": "tools/eval_ppl_cpu.py exists",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "files",
+      "name": "model_dir exists",
+      "status": "PASS",
+      "detail": "~/models/tinyllama_fp32"
+    },
+    {
+      "phase": "files",
+      "name": "config.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "files",
+      "name": "config.json readable",
+      "status": "PASS",
+      "detail": "LlamaForCausalLM, 22L, h=2048, vocab=32000"
+    },
+    {
+      "phase": "files",
+      "name": "weight files",
+      "status": "PASS",
+      "detail": "1 file(s), 4196 MB"
+    },
+    {
+      "phase": "files",
+      "name": "tokenizer files",
+      "status": "PASS",
+      "detail": "4 tokenizer files"
+    },
+    {
+      "phase": "files",
+      "name": "cdnav3/ directory",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "files",
+      "name": "cdnav3/manifest.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "files",
+      "name": "compressed tensors",
+      "status": "PASS",
+      "detail": "156 .cdnav3 directories"
+    },
+    {
+      "phase": "files",
+      "name": "sample tensor complete (model_layers_3_mlp_down_proj_weight.cdnav3)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "load",
+      "name": "tokenizer",
+      "status": "PASS",
+      "detail": "vocab=32000"
+    },
+    {
+      "phase": "load",
+      "name": "cdna factors",
+      "status": "PASS",
+      "detail": "156 tensors in 1.9s"
+    },
+    {
+      "phase": "load",
+      "name": "swap_to_helix",
+      "status": "PASS",
+      "detail": "155 HelixLinear, 0 dense, 0.3s"
+    },
+    {
+      "phase": "forward",
+      "name": "output shape",
+      "status": "PASS",
+      "detail": "shape=[1, 6, 32000], 4.51s"
+    },
+    {
+      "phase": "forward",
+      "name": "no NaN/Inf",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "forward",
+      "name": "top prediction is real token",
+      "status": "PASS",
+      "detail": "top='j'"
+    },
+    {
+      "phase": "forward",
+      "name": "model.generate()",
+      "status": "PASS",
+      "detail": "16 tokens in 66.2s: 'The quick brown fox jumps over the lazy dog.\n\n### 2.2....'"
+    },
+    {
+      "phase": "roundtrip",
+      "name": "CDNAv3Writer.write_tensor()",
+      "status": "PASS",
+      "detail": "ratio=3.33x"
+    },
+    {
+      "phase": "roundtrip",
+      "name": "CDNAv3Reader.reconstruct()",
+      "status": "PASS",
+      "detail": "shape=(128, 64)"
+    },
+    {
+      "phase": "roundtrip",
+      "name": "cosine >= 0.99",
+      "status": "PASS",
+      "detail": "cos=0.999916"
+    },
+    {
+      "phase": "ppl",
+      "name": "datasets.load_dataset importable",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "ppl",
+      "name": "WikiText-2 loaded",
+      "status": "PASS",
+      "detail": "2891 paragraphs"
+    },
+    {
+      "phase": "ppl",
+      "name": "PPL is finite",
+      "status": "PASS",
+      "detail": "PPL=7.22, 15.5s"
+    },
+    {
+      "phase": "ppl",
+      "name": "PPL is reasonable",
+      "status": "PASS",
+      "detail": "PPL=7.22"
+    },
+    {
+      "phase": "receipt",
+      "name": "receipts/ directory",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "phase": "receipt",
+      "name": "receipt files exist",
+      "status": "PASS",
+      "detail": "334 receipts found"
+    },
+    {
+      "phase": "receipt",
+      "name": "cost block present",
+      "status": "PASS",
+      "detail": "wall_time=16.371s"
+    },
+    {
+      "phase": "receipt",
+      "name": "cost block complete",
+      "status": "PASS",
+      "detail": ""
+    }
+  ],
+  "cost": {
+    "wall_time_s": 98.837,
+    "cpu_time_s": 94.773,
+    "peak_memory_mb": 2275.3,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-27T20:05:24",
+    "timestamp_end": "2026-03-27T20:07:03"
+  }
+}

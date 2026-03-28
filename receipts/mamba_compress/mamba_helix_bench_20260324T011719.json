@@ -25,13 +25,13 @@
   },
   "phases": {
     "phase1_load": {
-      "model_source": "/home/voidstr3m33/models/mamba-130m-hf",
+      "model_source": "~/models/mamba-130m-hf",
       "load_time_s": 2.669,
       "original_linear_count": 97,
       "total_params": 129135360
     },
     "phase2_swap": {
-      "cdna_dir": "/home/voidstr3m33/models/mamba-130m-hf/cdnav3",
+      "cdna_dir": "~/models/mamba-130m-hf/cdnav3",
       "factors_loaded": 97,
       "helix_modules": 96,
       "linear_remaining": 1,

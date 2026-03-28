@@ -225,7 +225,13 @@ def should_compress(name: str, shape: tuple, config: dict) -> str:
         "exact"    — store as-is (1D norms, tiny tensors)
         "skip"     — don't store (tied duplicate, non-weight)
     """
-    # Skip non-weight tensors (biases are 1D, handled separately at load time)
+    # Biases: save exact (critical for models like Qwen2.5 with attention biases)
+    if name.endswith(".bias"):
+        if len(shape) == 1:
+            return "exact"
+        return "skip"
+
+    # Skip other non-weight tensors
     if not name.endswith(".weight") and not name.endswith("_weight"):
         # Some models have A_log, D, etc. (Mamba state params)
         # Compress if 2D, skip if 1D
@@ -237,6 +243,17 @@ def should_compress(name: str, shape: tuple, config: dict) -> str:
 
     # 1D tensors: norms, biases → store exact
     if len(shape) == 1:
+        return "exact"
+
+    # Embedding tables and output heads: store exact, not VQ.
+    # Embeddings are lookup tables (nn.Embedding), not linear projections —
+    # VQ with k=256 on 150K+ vocab rows destroys token identity.
+    # Output heads (lm_head) project to vocab-sized logits — VQ distortion
+    # here corrupts every token probability.
+    # Cost: ~1-2 GB at FP16 for 150K vocab — negligible vs PPL impact.
+    if "embed_tokens" in name or "embed_positions" in name or "wte" in name or "wpe" in name:
+        return "exact"
+    if "lm_head" in name:
         return "exact"
 
     # 2D tensors: the main event
@@ -286,7 +303,10 @@ def detect_tied_weights(names: list[str], source: WeightSource) -> set[str]:
 def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                    k_override: int = None, adaptive: bool = False,
                    quality_target: float = 0.998,
-                   scale_file: Path = None, policy_file: Path = None):
+                   scale_file: Path = None, policy_file: Path = None,
+                   force_svd_layers: set = None,
+                   force_svd_rank: int = 8,
+                   force_k_layers: dict = None):
     """
     Compress a model to CDNA v3 format.
 
@@ -352,6 +372,12 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         print(f"  Mode:        FIXED k={k_override} (info-theoretic {32.0 / np.log2(k_override):.1f}x)")
     else:
         print(f"  Mode:        STANDARD k=256")
+    if force_svd_layers:
+        print(f"  Force SVD:   layers {sorted(force_svd_layers)} → rank={force_svd_rank}")
+    if force_k_layers:
+        layer_ids = sorted(force_k_layers.keys())
+        k_val = next(iter(force_k_layers.values()))
+        print(f"  Force k:     layers {layer_ids} → k={k_val}")
 
     # Open weight source
     source = WeightSource(model_dir)
@@ -421,14 +447,44 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 tensor_np = source.get_tensor(name)
                 np.save(exact_path, tensor_np)
                 del tensor_np
+            # Write meta.json companion (needed for standalone bias loading)
+            meta_path = cdna_dir / f"{safe_name}.npy.meta.json"
+            if not meta_path.exists() or force:
+                meta_path.write_text(json.dumps({
+                    "tensor_name": name,
+                    "action": "exact",
+                    "format": "npy",
+                }))
             continue
 
         # action == "compress"
         safe_name = name.replace("/", "_").replace(".", "_")
         tensor_dir = cdna_dir / f"{safe_name}.cdnav3"
 
-        # Resume: skip if already compressed
-        if tensor_dir.exists() and (tensor_dir / "codebook.npy").exists() and not force:
+        # Resume: skip if already compressed (unless force or layer override needs recompression)
+        needs_recompress = False
+        if force_k_layers and block_idx is not None and block_idx in force_k_layers:
+            # Check if existing compression used a different k
+            stats_path = tensor_dir / "stats.json"
+            if stats_path.exists():
+                s = json.loads(stats_path.read_text())
+                existing_k = s.get("chosen_k", 256)
+                if isinstance(existing_k, str):
+                    existing_k = int(existing_k.split("+")[0])
+                if existing_k != force_k_layers[block_idx]:
+                    needs_recompress = True
+            else:
+                needs_recompress = True
+        if force_svd_layers and block_idx is not None and block_idx in force_svd_layers:
+            # Check if existing compression used a different SVD rank
+            stats_path = tensor_dir / "stats.json"
+            if stats_path.exists():
+                s = json.loads(stats_path.read_text())
+                existing_svd = s.get("svd_residual_rank", 0)
+                if existing_svd != force_svd_rank:
+                    needs_recompress = True
+
+        if tensor_dir.exists() and (tensor_dir / "codebook.npy").exists() and not force and not needs_recompress:
             n_cached += 1
             n_done += 1
             stats_path = tensor_dir / "stats.json"
@@ -440,6 +496,17 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 cached_k = s.get("chosen_k", k_override or 256)
                 k_distribution[cached_k] = k_distribution.get(cached_k, 0) + 1
             continue
+
+        # Clean stale files from previous compression runs (e.g., SVD files from
+        # a run with channel scaling, or channel_scales from a run with --scale-file).
+        # Without this, leftover files from a different compression mode corrupt
+        # inference: HelixLinear loads SVD/scales that don't match the current codebook.
+        if tensor_dir.exists():
+            stale_files = ["svd_U.npy", "svd_s.npy", "svd_Vt.npy", "channel_scales.npy"]
+            for sf in stale_files:
+                stale_path = tensor_dir / sf
+                if stale_path.exists():
+                    stale_path.unlink()
 
         # Load tensor
         tensor_np = source.get_tensor(name)
@@ -507,16 +574,23 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             if overrides:
                 base_policy = dc_replace(base_policy, **overrides)
 
+        # Force SVD on specified layers (--force-svd-layers + --force-svd-rank)
+        if force_svd_layers and block_idx is not None and block_idx in force_svd_layers:
+            base_policy = dc_replace(base_policy, svd_residual_rank=force_svd_rank)
+
+        # Force higher k on specified layers (--force-k-layers)
+        layer_k_override = None
+        if force_k_layers and block_idx is not None and block_idx in force_k_layers:
+            layer_k_override = force_k_layers[block_idx]
+            base_policy = dc_replace(base_policy, n_clusters=layer_k_override)
+
         if adaptive:
             # ── Adaptive k escalation ──
             # Try each k in the ladder. Accept the first that meets quality_target.
             # If none meet it, try k=256 + SVD as final fallback.
             #
-            # IMPORTANT: Preserve SVD from kurtosis routing (base_policy).
-            # Stripping SVD from kurtosis-routed tensors causes PPL
-            # regression even when per-tensor cosine looks fine — proven
-            # by adaptive_ppl runs at 0.998 and 0.999 thresholds both
-            # FAILing at +3.2% despite high cosine.
+            # NOTE: SVD routing disabled (2026-03-28). base_policy.svd_residual_rank
+            # is always 0 now. Crossover test proved SVD adds zero value at all scales.
             chosen_k = None
             stats = None
             base_svd_rank = base_policy.svd_residual_rank
@@ -569,7 +643,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         else:
             # ── Fixed k mode ──
             policy = base_policy
-            if k_override and dp_entry is None:
+            if layer_k_override is None and k_override and dp_entry is None:
                 policy = dc_replace(policy, n_clusters=k_override)
 
             stats = writer.write_tensor(tensor_np, name, policy=policy)
@@ -588,7 +662,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 if stats_path.exists():
                     stats = json.loads(stats_path.read_text())
 
-            chosen_k = k_override or 256
+            chosen_k = layer_k_override or k_override or 256
 
         # Save channel scale factors alongside the tensor artifacts
         if channel_scales is not None:
@@ -763,6 +837,17 @@ def main():
     parser.add_argument("--scale-file", type=Path, default=None,
                         help="Path to act_scales.npz from calibrate.py. "
                              "Enables AWQ-style channel scaling before k-means.")
+    parser.add_argument("--force-svd-layers", type=str, default=None,
+                        help="Force SVD on these layer indices (e.g. '23-27' or '23,24,25,26,27'). "
+                             "Overrides kurtosis routing for specified layers.")
+    parser.add_argument("--force-svd-rank", type=int, default=8,
+                        help="SVD rank to use with --force-svd-layers (default: 8). "
+                             "Higher ranks (16, 32) capture more residual error.")
+    parser.add_argument("--force-k-layers", type=str, default=None,
+                        help="Force higher k on specific layer indices. "
+                             "Format: 'LAYERS:K' e.g. '23-27:512' or '23,24,25,26,27:1024'. "
+                             "NOTE: k>256 requires uint16 indices (not yet supported). "
+                             "Overrides default k=256 for specified layers only.")
     parser.add_argument("--policy-file", type=Path, default=None,
                         help="Path to dynamic_policy.json from calibrate_dynamic.py. "
                              "Per-tensor compression recipes (k, SVD, sidecar mode).")
@@ -771,11 +856,39 @@ def main():
     if args.adaptive and args.k:
         parser.error("--adaptive and --k are mutually exclusive")
 
+    # Parse --force-svd-layers
+    force_svd_layers = set()
+    if args.force_svd_layers:
+        for part in args.force_svd_layers.split(","):
+            part = part.strip()
+            if "-" in part:
+                lo, hi = part.split("-")
+                force_svd_layers.update(range(int(lo), int(hi) + 1))
+            else:
+                force_svd_layers.add(int(part))
+
+    # Parse --force-k-layers (format: "LAYERS:K" e.g. "23-27:512")
+    force_k_layers = {}  # {block_idx: k_value}
+    if args.force_k_layers:
+        layers_part, k_part = args.force_k_layers.rsplit(":", 1)
+        k_val = int(k_part)
+        for part in layers_part.split(","):
+            part = part.strip()
+            if "-" in part:
+                lo, hi = part.split("-")
+                for idx in range(int(lo), int(hi) + 1):
+                    force_k_layers[idx] = k_val
+            else:
+                force_k_layers[int(part)] = k_val
+
     compress_model(args.model_dir, dry_run=args.dry_run, force=args.force,
                    k_override=args.k, adaptive=args.adaptive,
                    quality_target=args.quality_target,
                    scale_file=args.scale_file,
-                   policy_file=args.policy_file)
+                   policy_file=args.policy_file,
+                   force_svd_layers=force_svd_layers,
+                   force_svd_rank=args.force_svd_rank,
+                   force_k_layers=force_k_layers)
 
 
 if __name__ == "__main__":

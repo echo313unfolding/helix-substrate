@@ -45,7 +45,7 @@ from .executor_registry import (
 SCHEMA = "trading_executors:v1"
 
 # FGIP database default path
-FGIP_DB_PATH = Path("/home/voidstr3m33/fgip-engine/fgip.db")
+FGIP_DB_PATH = Path.home() / "fgip-engine" / "fgip.db"
 
 
 # ---------------------------------------------------------------------------

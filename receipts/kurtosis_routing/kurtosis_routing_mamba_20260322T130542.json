@@ -1,7 +1,7 @@
 {
   "work_order": "WO-KURTOSIS-ROUTING-MAMBA-01",
   "description": "Cross-architecture kurtosis validation on Mamba-130m (SSM)",
-  "model": "/home/voidstr3m33/models/mamba-130m-hf",
+  "model": "~/models/mamba-130m-hf",
   "architecture": "MambaForCausalLM",
   "n_layers": 24,
   "n_tensors": 145,

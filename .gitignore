@@ -25,8 +25,13 @@ htmlcov/
 calibration_activations/
 kv_compressed/
 kv_dump/
+kv_dump_long/
 kv_fidelity_test/
+tensor_infra_scratch/
 data/
+
+# ── Database files ──
+*.db
 
 # ── Internal docs (not public-facing) ──
 AI_OS_BASELINE.md
@@ -186,8 +191,21 @@ tools/step11_dual_model_benchmark.py
 tools/targeted_correction_experiment.py
 tools/tensor_dna_prototype.py
 tools/test_*.py
+tools/train_compressed_hybrid.py
 tools/validate_*.py
 tools/viz_*.py
+tools/vpsi_step2_sensitivity.py
+tools/vpsi_step3_semantic_memory.py
+tools/diagnose_layer_error.py
+tools/download_14b_quants.py
+tools/bench_14b_helix.py
+tools/bench_cross_arch_composition.py
+tools/bench_dual_residency.py
+tools/bench_group_vs_global_vq.py
+tools/bench_late_materialization.py
+tools/bench_purchase_validation.py
+tools/bench_triton_cc89.py
+tools/calibrate.py
 
 # ── Receipts: ignore all, then whitelist key ones ──
 receipts/*
@@ -203,3 +221,7 @@ receipts/*
 !receipts/non_llm_proof/
 !receipts/compressed_rag_demo/
 !receipts/kurtosis_routing/
+!receipts/scaling_analysis/
+!receipts/group_vq/
+!receipts/rvq_benchmark/
+!receipts/cloud_checks/

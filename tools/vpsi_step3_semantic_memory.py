@@ -26,56 +26,57 @@ import resource
 from pathlib import Path
 from scipy.stats import kurtosis, skew
 
-DB_PATH = "/home/voidstr3m33/helix-substrate/vpsi_semantic_memory.db"
+HELIX_ROOT = Path(__file__).resolve().parent.parent
+DB_PATH = str(HELIX_ROOT / "vpsi_semantic_memory.db")
 
 MODELS = [
     {
         "model_id": "tinyllama-1.1b",
         "organism": "TinyLlama",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/tinyllama_fp32/cdnav3/",
+        "cdna_dir": "~/models/tinyllama_fp32/cdnav3/",
     },
     {
         "model_id": "qwen-1.5b-coder",
         "organism": "Qwen-1.5B",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/qwen2.5-coder-1.5b-instruct/cdnav3/",
+        "cdna_dir": "~/models/qwen2.5-coder-1.5b-instruct/cdnav3/",
     },
     {
         "model_id": "qwen-3b-coder",
         "organism": "Qwen-3B",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/qwen2.5-coder-3b-instruct/cdnav3/",
+        "cdna_dir": "~/models/qwen2.5-coder-3b-instruct/cdnav3/",
     },
     {
         "model_id": "mamba-130m",
         "organism": "Mamba-130m",
         "arch_class": "SSM",
-        "cdna_dir": "/home/voidstr3m33/models/mamba-130m-hf/cdnav3/",
+        "cdna_dir": "~/models/mamba-130m-hf/cdnav3/",
     },
     {
         "model_id": "mamba2-1.3b",
         "organism": "Mamba2-1.3B",
         "arch_class": "SSM",
-        "cdna_dir": "/home/voidstr3m33/models/mamba2-1.3b/cdnav3/",
+        "cdna_dir": "~/models/mamba2-1.3b/cdnav3/",
     },
     {
         "model_id": "qwen-3b-instruct",
         "organism": "Qwen-3B-Instruct",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/qwen2.5-3b-instruct/cdnav3/",
+        "cdna_dir": "~/models/qwen2.5-3b-instruct/cdnav3/",
     },
     {
         "model_id": "qwen-7b-instruct",
         "organism": "Qwen-7B-Instruct",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/qwen2.5-7b-instruct/cdnav3/",
+        "cdna_dir": "~/models/qwen2.5-7b-instruct/cdnav3/",
     },
     {
         "model_id": "qwen-14b-instruct",
         "organism": "Qwen-14B-Instruct",
         "arch_class": "transformer",
-        "cdna_dir": "/home/voidstr3m33/models/qwen2.5-14b-instruct/cdnav3/",
+        "cdna_dir": "~/models/qwen2.5-14b-instruct/cdnav3/",
     },
 ]
 
@@ -122,7 +123,7 @@ def classify_tensor(tname):
 
 def load_step1_receipt():
     """Load latest Step 1 activation magnitude receipt."""
-    receipt_dir = Path("/home/voidstr3m33/helix-substrate/receipts/vpsi/")
+    receipt_dir = HELIX_ROOT / "receipts" / "vpsi"
     files = sorted(receipt_dir.glob("step1_*.json"))
     if not files:
         return {}
@@ -133,7 +134,7 @@ def load_step1_receipt():
 
 def load_step2_receipt():
     """Load latest Step 2 sensitivity receipt."""
-    receipt_dir = Path("/home/voidstr3m33/helix-substrate/receipts/vpsi/")
+    receipt_dir = HELIX_ROOT / "receipts" / "vpsi"
     files = sorted(receipt_dir.glob("step2_*.json"))
     if not files:
         return {}

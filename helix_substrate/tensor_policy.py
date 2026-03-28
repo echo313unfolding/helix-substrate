@@ -277,62 +277,28 @@ def get_policy(
     n_blocks: int | None = None,
 ) -> TensorPolicy:
     """
-    Kurtosis-based offline codec router.
+    Tensor compression policy router.
 
-    Chooses between VQ_ONLY (svd_residual_rank=0) and VQ_SVD_R8
-    (svd_residual_rank=8) based on weight kurtosis — a distribution
-    property that predicts VQ compression error.
+    Returns the default VQ-256 policy for all tensors. SVD routing was
+    disabled after crossover testing proved it adds zero value at any scale
+    (1.5B, 3B, 7B). Plain k-means VQ-256 is optimal everywhere.
 
-    Routing rules (receipt-backed):
-      Rule 1: Kurtosis > 50 → VQ_SVD_R8 (high-kurtosis outlier tails
-              underserved by k-means centroids, proven rho=+0.78 on 154 tensors)
-      Rule 2: Kurtosis 5-50 → VQ_SVD_R8 (borderline zone — tensors here
-              show 2-3x error vs low-kurtosis neighbors)
-      Rule 3: Last decoder block → VQ_SVD_R8 (zero downstream recovery,
-              proven by focus-budget diagnostics)
-      Default: VQ_ONLY (kurtosis < 5 → compact distribution, VQ handles it)
+    Historical context: kurtosis-based SVD routing (kurtosis > 5 → SVD rank-8)
+    improved per-tensor cosine but had no effect on model PPL at 1.5B/3B
+    and actively hurt at 7B (+4%). The per-tensor metric does not predict
+    model-level behavior.
 
-    Design: kurtosis-grounded routing replaces position-based Block 0 hack.
-    Transfers to any model architecture since kurtosis is a property of the
-    weight distribution, not the block position.
-
-    Key evidence:
-      Per-tensor kurtosis vs error: Spearman rho=+0.7835, p=3.2e-33 (n=154)
-      Per-block max_kurtosis vs max_error: rho=+0.8382, p=1.1e-06 (n=22)
-      Kurtosis>20: 100% precision (3/3 SVD, 0 FP) on TinyLlama
-      Kurtosis>50: 100% precision, catches worst offenders (k_proj=298, q_proj=142)
-
-    Receipts:
-      Step 4:   receipts/step4_sensitivity/sensitivity_map_20260310T182826.json
-      Step 5:   receipts/step5_full_model/full_model_20260310T193242.json
-      Kurtosis: receipts/kurtosis_routing/kurtosis_routing_*.json
-      Focus:    receipts/focus_budget/focus_budget_20260316T120843.json
-      Targeted: receipts/targeted_correction/targeted_correction_20260316T144853.json
+    Receipts: receipts/scaling_analysis/ppl_eval_qwen2.5-*_20260327T*.json
     """
     tc = classify_tensor(name, shape=shape)
     base = get_default_policy(tc)
 
-    # Only route 2D quantized tensors
-    if len(shape) != 2 or base.storage_mode in ("exact", "morpho"):
-        return base
-
-    # Parse block index from name if not provided
-    if block_idx is None:
-        parsed = parse_tensor_name(name)
-        block_idx = parsed.get("layer_idx")
-
-    # Rule 1: High kurtosis → mixed (extreme outlier tails defeat VQ centroids)
-    if kurtosis is not None and kurtosis > 50:
-        return replace(base, svd_residual_rank=8)
-
-    # Rule 2: Borderline kurtosis → mixed (2-3x error vs low-kurtosis neighbors)
-    if kurtosis is not None and kurtosis > 5:
-        return replace(base, svd_residual_rank=8)
-
-    # Rule 3: Last decoder block → mixed (proven by focus-budget + targeted correction)
-    # Last layer has zero downstream error recovery opportunity before lm_head.
-    # Measured: min-token cosine 0.274→0.889, PPL gap 0.78%→0.50% on TinyLlama.
-    if n_blocks is not None and block_idx == n_blocks - 1:
-        return replace(base, svd_residual_rank=8)
-
+    # SVD routing DISABLED (2026-03-28).
+    # Crossover test at 1.5B/3B/7B proved SVD adds zero value at any scale:
+    #   1.5B: 15.31 with SVD → 15.31 without (noise)
+    #   3B:   9.56 with SVD → 9.60 without (noise)
+    #   7B:   7.68 with SVD → 7.39 without (SVD hurts +4%)
+    # Plain k-means VQ-256 is optimal everywhere. Per-tensor cosine improvement
+    # from SVD does not predict model-level PPL improvement.
+    # Receipts: receipts/scaling_analysis/ppl_eval_qwen2.5-*_20260327T*.json
     return base

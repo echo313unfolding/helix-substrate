@@ -138,7 +138,20 @@ def _simple_kmeans(
         cb_range = 1.0  # degenerate: all same value
     abs_tol = rtol * cb_range
 
-    # K-means iterations
+    # GPU k-means: produces identical results to CPU (A/B tested 2026-03-26).
+    # Original corruption was from GPU contention (two compressions on one GPU).
+    # Safe when running a single compression process.
+    try:
+        import torch
+        if torch.cuda.is_available():
+            try:
+                return _gpu_kmeans(data, centroids, n_clusters, max_iters, abs_tol)
+            except torch.cuda.OutOfMemoryError:
+                pass  # Fall through to CPU
+    except ImportError:
+        pass
+
+    # K-means iterations (CPU fallback)
     for _ in range(max_iters):
         # Assign points to nearest centroid
         dists = np.abs(data[:, np.newaxis] - centroids)
@@ -161,6 +174,36 @@ def _simple_kmeans(
         centroids = new_centroids
 
     return centroids, assignments
+
+
+def _gpu_kmeans(data_np, centroids_np, n_clusters, max_iters, abs_tol):
+    """GPU-accelerated 1D k-means using PyTorch."""
+    import torch
+    data = torch.from_numpy(data_np).cuda()
+    centroids = torch.from_numpy(centroids_np).cuda()
+
+    for _ in range(max_iters):
+        # Assign: [N, K] distances
+        dists = torch.abs(data.unsqueeze(1) - centroids.unsqueeze(0))
+        assignments = torch.argmin(dists, dim=1)
+
+        # Update centroids
+        new_centroids = torch.zeros_like(centroids)
+        for i in range(n_clusters):
+            mask = assignments == i
+            if mask.any():
+                new_centroids[i] = data[mask].mean()
+            else:
+                new_centroids[i] = centroids[i]
+
+        max_delta = float((new_centroids - centroids).abs().max())
+        if max_delta < abs_tol:
+            break
+        centroids = new_centroids
+
+    assignments_np = assignments.cpu().numpy().astype(np.uint8)
+    centroids_np = centroids.cpu().numpy()
+    return centroids_np, assignments_np
 
 
 def decode_cdna_to_tensor(cdna_path: Path) -> np.ndarray:

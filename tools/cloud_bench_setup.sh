@@ -20,7 +20,7 @@
 
 set -euo pipefail
 
-ECHO_BOX="voidstr3m33@<YOUR_TAILSCALE_IP_OR_HOSTNAME>"
+ECHO_BOX="${USER}@<YOUR_TAILSCALE_IP_OR_HOSTNAME>"
 WORK_DIR="/workspace/helix_bench"
 MODEL_NAME="qwen2.5-7b-instruct"
 

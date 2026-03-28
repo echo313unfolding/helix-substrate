@@ -5,7 +5,7 @@ import numpy as np
 
 HELIX_ROOT = Path(__file__).resolve().parent.parent.parent  # helix-substrate/
 RECEIPT_BASE = HELIX_ROOT / "receipts" / "tensor_infra"
-MODEL_DIR = Path("/home/voidstr3m33/models/tinyllama_fp32")
+MODEL_DIR = Path.home() / "models" / "tinyllama_fp32"
 
 # ── Add helix_substrate to path ──
 import sys
