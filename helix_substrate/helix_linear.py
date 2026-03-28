@@ -120,12 +120,16 @@ class HelixLinear(nn.Module):
         self._cuda_graph_mode: bool = False
 
         # VQ components (read-only buffers, not parameters)
-        self.register_buffer("codebook", codebook.contiguous())  # [256]
-        # Store indices as uint8 to save memory (4x vs int64).
+        self.register_buffer("codebook", codebook.contiguous())  # [k] (256 or 512+)
+        # Store indices as uint8 (k<=256) or uint16 (k>256) to save memory.
         # Convert to long only during forward() for the gather operation.
-        if indices.dtype != torch.uint8:
-            indices = indices.to(torch.uint8)
-        self.register_buffer("indices", indices.contiguous())  # [out, in] uint8
+        if indices.dtype not in (torch.uint8, torch.int16):
+            # For k<=256 use uint8, for k>256 use int16 (PyTorch lacks uint16)
+            if codebook.shape[0] > 256:
+                indices = indices.to(torch.int16)
+            else:
+                indices = indices.to(torch.uint8)
+        self.register_buffer("indices", indices.contiguous())  # [out, in] uint8 or int16
 
         # FP16 codebook for mixed-precision compute path
         if compute_dtype == torch.float16:
@@ -183,6 +187,42 @@ class HelixLinear(nn.Module):
             self.register_buffer("channel_scales", channel_scales.contiguous())
         else:
             self.register_buffer("channel_scales", None)
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs
+    ):
+        """Override to handle buffer size changes during HF safetensors loading.
+
+        When loading from a converted safetensors file, optional buffers
+        (sidecar_positions, svd_U, etc.) may change from empty [0]-shape
+        placeholders to real data. Standard load_state_dict rejects size
+        mismatches even with assign=True. We intercept and replace directly.
+        """
+        # Buffers that may change size during loading
+        _resizable = {
+            "codebook", "indices",
+            "sidecar_positions", "sidecar_values",
+            "svd_U", "svd_s", "svd_Vt",
+            "bias", "channel_scales",
+            # Derived buffers won't be in the file, but handle if present
+            "codebook_f16", "_sidecar_vq_vals",
+            "_sidecar_rows", "_sidecar_cols", "_sidecar_deltas",
+        }
+
+        for name in list(state_dict.keys()):
+            key = prefix + name
+            if name in _resizable and key in state_dict:
+                new_tensor = state_dict[key]
+                # Replace the buffer directly, bypassing size check
+                if hasattr(self, name):
+                    self.register_buffer(name, new_tensor)
+                    # Remove from state_dict so parent doesn't try to load it again
+                    del state_dict[key]
+
+        # Let parent handle any remaining keys (exact tensors, etc.)
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs
+        )
 
     def _apply(self, fn, recurse=True):
         """Override nn.Module._apply to refresh dispatch cache after .to()/.cuda()/.cpu()."""
@@ -451,9 +491,10 @@ class HelixLinear(nn.Module):
     def memory_savings(self) -> dict:
         """Report memory usage vs equivalent nn.Linear."""
         dense_bytes = self.out_features * self.in_features * 4  # float32
+        index_bytes_each = 2 if self.indices.dtype == torch.int16 else 1
         compressed = (
-            self.codebook.numel() * 4  # codebook: 256 * 4 = 1024
-            + self.indices.numel() * 1  # uint8 indices
+            self.codebook.numel() * 4  # codebook: k * 4
+            + self.indices.numel() * index_bytes_each  # uint8 or int16 indices
         )
         if self.codebook_f16 is not None:
             compressed += self.codebook_f16.numel() * 2  # float16
@@ -476,6 +517,126 @@ class HelixLinear(nn.Module):
             "ratio": round(dense_bytes / max(1, compressed), 2),
             "savings_pct": round(100 * (1 - compressed / dense_bytes), 1),
         }
+
+    def _recompute_derived(self) -> None:
+        """Recompute derived buffers from primary data after safetensors load.
+
+        Called by the HF quantizer in _process_model_after_weight_loading.
+        At this point, safetensors has loaded real data into primary buffers
+        (codebook, indices) and optional buffers (sidecar_*, svd_*, bias,
+        channel_scales). Empty [0]-shaped tensors indicate absent optional data
+        and are normalized back to None here.
+        """
+        # Normalize empty tensors → None for optional buffers
+        _optional = [
+            "sidecar_positions", "sidecar_values",
+            "svd_U", "svd_s", "svd_Vt",
+            "bias", "channel_scales",
+        ]
+        for name in _optional:
+            buf = getattr(self, name, None)
+            if buf is not None and buf.numel() == 0:
+                self.register_buffer(name, None)
+
+        # Sidecar derived buffers
+        if self.sidecar_positions is not None and self.sidecar_values is not None:
+            idx_flat = self.indices.reshape(-1)
+            vq_at_sidecar = self.codebook[idx_flat[self.sidecar_positions].long()]
+            self.register_buffer("_sidecar_vq_vals", vq_at_sidecar.contiguous())
+            self.register_buffer(
+                "_sidecar_rows",
+                (self.sidecar_positions // self.in_features).long(),
+            )
+            self.register_buffer(
+                "_sidecar_cols",
+                (self.sidecar_positions % self.in_features).long(),
+            )
+            self.register_buffer(
+                "_sidecar_deltas",
+                (self.sidecar_values - vq_at_sidecar).contiguous(),
+            )
+        else:
+            self.register_buffer("_sidecar_vq_vals", None)
+            self.register_buffer("_sidecar_rows", None)
+            self.register_buffer("_sidecar_cols", None)
+            self.register_buffer("_sidecar_deltas", None)
+
+        # SVD flag
+        self.has_svd = self.svd_U is not None
+        self.rank = self.svd_U.shape[1] if self.has_svd else 0
+
+        # Channel scales flag
+        self.has_channel_scales = self.channel_scales is not None
+
+        # FP16 codebook
+        if self.compute_dtype == torch.float16 and self.codebook is not None:
+            self.register_buffer("codebook_f16", self.codebook.half().contiguous())
+        else:
+            self.register_buffer("codebook_f16", None)
+
+        # Refresh dispatch cache
+        self._fused_available = self._check_fused_available()
+
+    @classmethod
+    def from_quantized_config(
+        cls,
+        in_features: int,
+        out_features: int,
+        tensor_name: str = "",
+        compute_dtype: torch.dtype = torch.float32,
+        n_clusters: int = 256,
+    ) -> "HelixLinear":
+        """Create a HelixLinear shell for HF quantizer loading.
+
+        Registers all buffers as real tensors (empty [0]-shape for optional
+        buffers) so safetensors can load data into them. After loading,
+        call _recompute_derived() to normalize empty→None and compute
+        derived buffers.
+        """
+        instance = cls.__new__(cls)
+        nn.Module.__init__(instance)
+
+        instance.in_features = in_features
+        instance.out_features = out_features
+        instance.tensor_name = tensor_name
+        instance.compute_dtype = compute_dtype
+        instance._last_dispatch_path = "unknown"
+        instance._fused_available = False
+        instance._cell_skip_svd = False
+        instance._kurtosis_gate = None
+        instance._sidecar_phase = None
+        instance._cuda_graph_mode = False
+        instance.has_svd = False
+        instance.rank = 0
+        instance.has_channel_scales = False
+
+        # Primary buffers — will be overwritten by safetensors load
+        instance.register_buffer("codebook", torch.zeros(n_clusters, dtype=torch.float32))
+        # Use int16 for k>256 (PyTorch lacks uint16), uint8 for k<=256
+        index_dtype = torch.int16 if n_clusters > 256 else torch.uint8
+        instance.register_buffer(
+            "indices",
+            torch.zeros(out_features, in_features, dtype=index_dtype),
+        )
+
+        # Optional primary buffers — empty tensors so safetensors can load into them.
+        # _recompute_derived() normalizes empty→None after loading.
+        instance.register_buffer("sidecar_positions", torch.zeros(0, dtype=torch.int64))
+        instance.register_buffer("sidecar_values", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("svd_U", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("svd_s", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("svd_Vt", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("bias", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("channel_scales", torch.zeros(0, dtype=torch.float32))
+
+        # Derived buffers — will be computed by _recompute_derived()
+        instance.register_buffer("codebook_f16", torch.zeros(0, dtype=torch.float16))
+        instance.register_buffer("_sidecar_vq_vals", torch.zeros(0, dtype=torch.float32))
+        instance.register_buffer("_sidecar_rows", torch.zeros(0, dtype=torch.int64))
+        instance.register_buffer("_sidecar_cols", torch.zeros(0, dtype=torch.int64))
+        instance.register_buffer("_sidecar_deltas", torch.zeros(0, dtype=torch.float32))
+
+        return instance
 
     def extra_repr(self) -> str:
         parts = [
@@ -516,13 +677,15 @@ def load_helix_linear_from_cdnav3(
     meta = json.loads((tensor_dir / "meta.json").read_text())
     rows, cols = meta["shape"]
 
-    # Codebook: [256] float32
+    # Codebook: [k] float32 (k=256 standard, k=512+ for high-resolution tensors)
     codebook = torch.from_numpy(
         np.load(tensor_dir / "codebook.npy").astype(np.float32)
     )
 
-    # Indices: [rows, cols] uint8 — stored as uint8 to save memory
-    raw_indices = np.fromfile(tensor_dir / "indices.bin", dtype=np.uint8)
+    # Indices: [rows, cols] — uint8 for k<=256, uint16 for k>256
+    index_dtype_str = meta.get("index_dtype", "uint8")
+    np_index_dtype = np.uint16 if index_dtype_str == "uint16" else np.uint8
+    raw_indices = np.fromfile(tensor_dir / "indices.bin", dtype=np_index_dtype)
     indices = torch.from_numpy(raw_indices.reshape(rows, cols).copy())
 
     # Sidecar: optional outlier corrections

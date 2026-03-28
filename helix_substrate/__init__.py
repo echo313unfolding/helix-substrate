@@ -26,6 +26,14 @@ from helix_substrate.tensor_policy import classify_tensor, TensorPolicy, TensorC
 from helix_substrate.cdnav3_writer import CDNAv3Writer
 from helix_substrate.cdnav3_reader import CDNAv3Reader
 
+# Step 5: Auto-register with HuggingFace Transformers (if available).
+# Importing hf_integration triggers @register_quantization_config("helix")
+# and @register_quantizer("helix"), so from_pretrained() works on Helix checkpoints.
+try:
+    from helix_substrate.hf_integration import HelixQuantizationConfig, HelixHfQuantizer
+except ImportError:
+    pass
+
 __all__ = [
     "encode_tensor_to_cdna",
     "decode_cdna_to_tensor",

@@ -58,7 +58,10 @@ class CDNAv3Reader:
     def _load_indices(self) -> np.ndarray:
         if self._indices is None:
             rows, cols = self.shape
-            raw = np.fromfile(self.tensor_dir / "indices.bin", dtype=np.uint8)
+            # Support uint16 indices for k>256 codebooks (backward-compat: default uint8)
+            dtype_str = self._meta.get("index_dtype", "uint8")
+            np_dtype = np.uint16 if dtype_str == "uint16" else np.uint8
+            raw = np.fromfile(self.tensor_dir / "indices.bin", dtype=np_dtype)
             self._indices = raw.reshape(rows, cols)
         return self._indices
 

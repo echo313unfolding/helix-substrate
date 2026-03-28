@@ -171,7 +171,8 @@ class CDNAv3Writer:
             codebook = self._build_uniform_codebook(flat, policy.n_clusters)
 
         # --- Assign indices (chunked to avoid OOM) ---
-        indices = self._chunked_assign(flat, codebook)
+        index_dtype = np.uint16 if len(codebook) > 256 else np.uint8
+        indices = self._chunked_assign(flat, codebook, index_dtype)
         indices_2d = indices.reshape(rows, cols)
 
         # --- Compute baseline fidelity (before sidecar) ---
@@ -210,7 +211,7 @@ class CDNAv3Writer:
 
         # --- Write indices ---
         indices_path = out_dir / "indices.bin"
-        indices.astype(np.uint8).tofile(indices_path)
+        indices.astype(index_dtype).tofile(indices_path)
 
         # --- SVD residual correction ---
         svd_bytes = 0
@@ -245,11 +246,13 @@ class CDNAv3Writer:
             cosine_with_svd = float(_cosine(flat, corrected.ravel()))
 
         # --- Write meta.json ---
+        index_dtype_str = "uint16" if index_dtype == np.uint16 else "uint8"
         meta = {
             "format_version": "cdna_v3",
             "tensor_name": tensor_name,
             "shape": [rows, cols],
             "dtype": "float32",
+            "index_dtype": index_dtype_str,
             "storage_mode": policy.storage_mode,
             "tensor_class": policy.tensor_class.value,
             "n_clusters": policy.n_clusters,
@@ -313,7 +316,8 @@ class CDNAv3Writer:
         return np.linspace(vmin, vmax, n_clusters).astype(np.float32)
 
     def _chunked_assign(
-        self, flat: np.ndarray, codebook: np.ndarray
+        self, flat: np.ndarray, codebook: np.ndarray,
+        index_dtype: np.dtype = np.uint8,
     ) -> np.ndarray:
         """Assign codebook indices in chunks to avoid OOM.
 
@@ -322,31 +326,34 @@ class CDNAv3Writer:
         try:
             import torch
             if torch.cuda.is_available():
-                return self._gpu_assign(flat, codebook)
+                return self._gpu_assign(flat, codebook, index_dtype)
         except ImportError:
             pass
 
-        indices = np.empty(len(flat), dtype=np.uint8)
+        indices = np.empty(len(flat), dtype=index_dtype)
         for start in range(0, len(flat), _ASSIGN_CHUNK_SIZE):
             end = min(start + _ASSIGN_CHUNK_SIZE, len(flat))
             chunk = flat[start:end]
             dists = np.abs(chunk[:, np.newaxis] - codebook)
-            indices[start:end] = np.argmin(dists, axis=1).astype(np.uint8)
+            indices[start:end] = np.argmin(dists, axis=1).astype(index_dtype)
         return indices
 
     def _gpu_assign(
-        self, flat: np.ndarray, codebook: np.ndarray
+        self, flat: np.ndarray, codebook: np.ndarray,
+        index_dtype: np.dtype = np.uint8,
     ) -> np.ndarray:
         """GPU-accelerated codebook assignment. ~100x faster than CPU."""
         import torch
-        cb_t = torch.from_numpy(codebook).cuda()  # [256]
-        indices = np.empty(len(flat), dtype=np.uint8)
-        chunk_size = 1024 * 1024  # 1M elements per GPU chunk (~256 MB distance matrix)
+        cb_t = torch.from_numpy(codebook).cuda()  # [k]
+        indices = np.empty(len(flat), dtype=index_dtype)
+        # Scale chunk to fit GPU memory: distance matrix = chunk * k * 4 bytes
+        # Target ~512 MB peak for distance matrix (safe on 4GB T2000)
+        chunk_size = max(1024, (512 * 1024 * 1024) // (len(codebook) * 4))
         for start in range(0, len(flat), chunk_size):
             end = min(start + chunk_size, len(flat))
             chunk_t = torch.from_numpy(flat[start:end]).cuda()
             dists = torch.abs(chunk_t.unsqueeze(1) - cb_t.unsqueeze(0))
-            indices[start:end] = torch.argmin(dists, dim=1).cpu().numpy().astype(np.uint8)
+            indices[start:end] = torch.argmin(dists, dim=1).cpu().numpy().astype(index_dtype)
         return indices
 
 

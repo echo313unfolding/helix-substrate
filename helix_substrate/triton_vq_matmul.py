@@ -479,7 +479,9 @@ def fused_vq_matmul(
     assert x.dtype in (torch.float32, torch.float16, torch.bfloat16), (
         f"Expected float32/float16/bfloat16, got {x.dtype}"
     )
-    assert indices.dtype == torch.uint8, f"Expected uint8 indices, got {indices.dtype}"
+    assert indices.dtype in (torch.uint8, torch.int16), (
+        f"Expected uint8 or int16 indices, got {indices.dtype}"
+    )
 
     output = torch.empty(N, OUT, device=x.device, dtype=torch.float32)
 

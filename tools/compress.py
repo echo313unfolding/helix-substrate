@@ -251,7 +251,7 @@ def should_compress(name: str, shape: tuple, config: dict) -> str:
     # Output heads (lm_head) project to vocab-sized logits — VQ distortion
     # here corrupts every token probability.
     # Cost: ~1-2 GB at FP16 for 150K vocab — negligible vs PPL impact.
-    if "embed_tokens" in name or "embed_positions" in name or "wte" in name or "wpe" in name:
+    if "embed_tokens" in name or "embed_positions" in name or "wte" in name or "wpe" in name or "backbone.embedding" in name:
         return "exact"
     if "lm_head" in name:
         return "exact"
@@ -262,6 +262,12 @@ def should_compress(name: str, shape: tuple, config: dict) -> str:
         if shape[0] * shape[1] < 256:
             return "exact"
         return "compress"
+
+    # conv1d weights: tiny 3D kernels (e.g., 4352×1×4 in Mamba).
+    # VQ-256 is too coarse for these high-kurtosis tensors (~48.6).
+    # Cost of storing exact: ~650 KB total. PPL impact of compressing: +~1% delta.
+    if "conv1d" in name and len(shape) == 3:
+        return "exact"
 
     # 3D+ tensors: rare, but reshape to 2D and compress
     if len(shape) >= 2:
@@ -306,7 +312,8 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                    scale_file: Path = None, policy_file: Path = None,
                    force_svd_layers: set = None,
                    force_svd_rank: int = 8,
-                   force_k_layers: dict = None):
+                   force_k_layers: dict = None,
+                   k_map_file: Path = None):
     """
     Compress a model to CDNA v3 format.
 
@@ -336,7 +343,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     tied = config.get("tie_word_embeddings", False)
 
     # Adaptive k escalation ladder
-    K_LADDER = [64, 128, 256]
+    K_LADDER = [64, 128, 256, 512]
 
     print("=" * 70)
     print(f"  CDNA v3 Universal Compressor")
@@ -364,6 +371,17 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         dynamic_policies = json.loads(policy_file.read_text())
         print(f"  Policy:      Dynamic per-tensor ({len(dynamic_policies)} tensors)")
         print(f"  Policy file: {policy_file}")
+
+    # Load per-tensor k-map if provided (from k_allocator.py)
+    k_map = {}  # tensor_name -> k_value
+    if k_map_file is not None:
+        k_map_file = Path(k_map_file).expanduser().resolve()
+        assert k_map_file.exists(), f"k-map file not found: {k_map_file}"
+        k_map_data = json.loads(k_map_file.read_text())
+        k_map = k_map_data.get("overrides", {})
+        k_map_default = k_map_data.get("k_default", 256)
+        print(f"  k-map:       {len(k_map)} tensor overrides (default k={k_map_default})")
+        print(f"  k-map file:  {k_map_file}")
 
     if adaptive:
         print(f"  Mode:        ADAPTIVE (quality target: {quality_target})")
@@ -461,6 +479,10 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         safe_name = name.replace("/", "_").replace(".", "_")
         tensor_dir = cdna_dir / f"{safe_name}.cdnav3"
 
+        # Parse block index from name early (needed for recompression check + policy routing)
+        block_match = re.search(r'layers?\.(\d+)', name)
+        block_idx = int(block_match.group(1)) if block_match else None
+
         # Resume: skip if already compressed (unless force or layer override needs recompression)
         needs_recompress = False
         if force_k_layers and block_idx is not None and block_idx in force_k_layers:
@@ -483,6 +505,16 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 existing_svd = s.get("svd_residual_rank", 0)
                 if existing_svd != force_svd_rank:
                     needs_recompress = True
+        # k-map override: recompress if tensor has a different k than requested
+        k_map_k = k_map.get(name)
+        if k_map_k is not None:
+            meta_path = tensor_dir / "meta.json"
+            if meta_path.exists():
+                m = json.loads(meta_path.read_text())
+                if m.get("n_clusters", 256) != k_map_k:
+                    needs_recompress = True
+            else:
+                needs_recompress = True
 
         if tensor_dir.exists() and (tensor_dir / "codebook.npy").exists() and not force and not needs_recompress:
             n_cached += 1
@@ -547,10 +579,6 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         # Classify + route
         tc = classify_tensor(name, shape=orig_shape)
         kurt = kurtosis_1d(tensor_np.ravel())
-
-        # Parse block index from name (for last-block rule)
-        block_match = re.search(r'layers?\.(\d+)', name)
-        block_idx = int(block_match.group(1)) if block_match else None
 
         base_policy = get_policy(
             name, orig_shape,
@@ -643,7 +671,12 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         else:
             # ── Fixed k mode ──
             policy = base_policy
-            if layer_k_override is None and k_override and dp_entry is None:
+
+            # k-map override: per-tensor k from k_allocator.py output
+            k_map_k = k_map.get(name)
+            if k_map_k is not None:
+                policy = dc_replace(policy, n_clusters=k_map_k)
+            elif layer_k_override is None and k_override and dp_entry is None:
                 policy = dc_replace(policy, n_clusters=k_override)
 
             stats = writer.write_tensor(tensor_np, name, policy=policy)
@@ -662,7 +695,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 if stats_path.exists():
                     stats = json.loads(stats_path.read_text())
 
-            chosen_k = layer_k_override or k_override or 256
+            chosen_k = k_map_k or layer_k_override or k_override or 256
 
         # Save channel scale factors alongside the tensor artifacts
         if channel_scales is not None:
@@ -779,7 +812,14 @@ def _replace_sidecar_hessian(tensor_dir: Path, original: np.ndarray,
     from helix_substrate.generate_sidecars_v3 import find_outliers_hessian, write_sidecar_npz
 
     codebook = np.load(tensor_dir / "codebook.npy")
-    indices = np.fromfile(tensor_dir / "indices.bin", dtype=np.uint8)
+    # Read index dtype from meta.json (uint16 for k>256, default uint8)
+    meta_path = tensor_dir / "meta.json"
+    idx_dtype = np.uint8
+    if meta_path.exists():
+        meta = json.loads(meta_path.read_text())
+        if meta.get("index_dtype") == "uint16":
+            idx_dtype = np.uint16
+    indices = np.fromfile(tensor_dir / "indices.bin", dtype=idx_dtype)
     quantized = codebook[indices].reshape(original.shape)
 
     positions, values = find_outliers_hessian(original, quantized, hessian_diag, top_k=top_k)
@@ -851,6 +891,10 @@ def main():
     parser.add_argument("--policy-file", type=Path, default=None,
                         help="Path to dynamic_policy.json from calibrate_dynamic.py. "
                              "Per-tensor compression recipes (k, SVD, sidecar mode).")
+    parser.add_argument("--k-map", type=Path, default=None, dest="k_map",
+                        help="Path to k_map.json from k_allocator.py. "
+                             "Per-tensor codebook size assignments (supports k>256 via uint16 indices). "
+                             "Format: {\"overrides\": {\"tensor.name.weight\": 512, ...}, \"k_default\": 256}")
     args = parser.parse_args()
 
     if args.adaptive and args.k:
@@ -888,7 +932,8 @@ def main():
                    policy_file=args.policy_file,
                    force_svd_layers=force_svd_layers,
                    force_svd_rank=args.force_svd_rank,
-                   force_k_layers=force_k_layers)
+                   force_k_layers=force_k_layers,
+                   k_map_file=args.k_map)
 
 
 if __name__ == "__main__":
