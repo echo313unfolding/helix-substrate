@@ -54,6 +54,16 @@ skip_if_done() {
     fi
     return 1
 }
+purge_hf_cache() {
+    # Clear HF download cache to free disk between large models
+    local cache_dir="$HOME/.cache/huggingface/hub"
+    if [ -d "$cache_dir" ]; then
+        local before
+        before=$(du -sm "$cache_dir" 2>/dev/null | cut -f1)
+        rm -rf "$cache_dir"
+        log "Purged HF cache (was ${before}MB)"
+    fi
+}
 
 # Save receipt JSON from python stdout (last JSON line)
 save_receipt() {
@@ -387,6 +397,8 @@ except Exception as e:
         save_receipt "t2_qwen7b_ppl" "$LOG_DIR/t2_qwen7b_ppl.log"
         checkpoint_done "t2_qwen7b_ppl"
     fi
+
+    purge_hf_cache  # Free ~14GB before downloading 14B
 
     # --- Qwen 14B PPL (no dense baseline exists) ---
     if ! skip_if_done "t2_qwen14b_ppl"; then
@@ -949,6 +961,19 @@ Same codec, same `pip install`, multiple architectures (Transformer, Mamba, Mamb
     print(f'  Verified: {n_helix} HelixLinear modules loaded from HF', flush=True)
     steps_done['verified_helix_modules'] = n_helix
     del model; gc.collect()
+
+    # ================================================================
+    # CLEANUP: Delete dense model + tmp to free disk for next model
+    # ================================================================
+    print(f'  Cleaning up {local_dir} and {helix_dir} to free disk...', flush=True)
+    import shutil
+    shutil.rmtree(str(local_dir), ignore_errors=True)
+    shutil.rmtree(str(helix_dir), ignore_errors=True)
+    # Also purge HF cache for this model to avoid double-storage
+    hf_cache = Path.home() / '.cache' / 'huggingface' / 'hub'
+    for d in hf_cache.glob(f'models--{hf_id.replace("/", "--")}*'):
+        shutil.rmtree(str(d), ignore_errors=True)
+    print(f'  Cleanup done.', flush=True)
 
     receipt = {
         'work_order': 'WO-06-T3-SSM',
