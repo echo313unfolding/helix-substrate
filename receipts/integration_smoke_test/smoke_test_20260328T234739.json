@@ -1,0 +1,55 @@
+{
+  "work_order": "WO-04",
+  "description": "Integration smoke test: HelixLinear + CompressedKVCache + session persistence",
+  "model_path": "/home/voidstr3m33/models/tinyllama-1.1b-helix",
+  "n_helix_linear": 155,
+  "n_layers": 22,
+  "kv_config": {
+    "n_clusters": 256,
+    "calibration_tokens": 128,
+    "exact_layers": [
+      0
+    ]
+  },
+  "prompt": "The capital of France is",
+  "max_new_tokens": 20,
+  "run1": {
+    "text": "The capital of France is Paris. The capital of France is Paris.\nThe capital of France is Paris. The capital of",
+    "n_tokens_generated": 20,
+    "generation_time_s": 80.217,
+    "calibration_complete": false,
+    "cache_total_tokens": 25
+  },
+  "run2": {
+    "text": "The capital of France is Paris. The capital of France is Paris.\nThe capital of France is Paris. The capital of",
+    "n_tokens_generated": 20,
+    "generation_time_s": 81.885
+  },
+  "session_persistence": {
+    "file_path": "/home/voidstr3m33/helix-substrate/receipts/integration_smoke_test/test_session.pt",
+    "file_size_bytes": 1142082,
+    "save_info": {
+      "n_layers": 22,
+      "total_tokens": 25,
+      "calibration_complete": false,
+      "file_size_bytes": 1142082,
+      "path": "/home/voidstr3m33/helix-substrate/receipts/integration_smoke_test/test_session.pt"
+    },
+    "loaded_total_tokens": 25,
+    "state_match": true
+  },
+  "verification": {
+    "tokens_match": true,
+    "text_match": true,
+    "session_state_match": true
+  },
+  "cost": {
+    "wall_time_s": 164.013,
+    "cpu_time_s": 163.994,
+    "peak_memory_mb": 3240.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-28T23:44:55",
+    "timestamp_end": "2026-03-28T23:47:39"
+  }
+}
