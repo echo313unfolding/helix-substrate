@@ -1,0 +1,1270 @@
+{
+  "work_order": "WO-SENSING-PROBE-05b+-DWELL",
+  "description": "Deep reanalysis of n_transitions / quiet-zone episode statistics",
+  "source_receipt": "/home/voidstr3m33/helix-substrate/receipts/drift_gated_probe/drift_cosine_expanded_20260329T084037.json",
+  "model": "TinyLlama-1.1B-Chat-v1.0 (dense FP32)",
+  "n_layers": 22,
+  "n_prompts": 24,
+  "best_full_predictor": {
+    "metric": "n_quiet_episodes",
+    "threshold": 0.08,
+    "pearson_r": 0.52518,
+    "pearson_p": 0.008408,
+    "spearman_rho": 0.53737,
+    "spearman_p": 0.00677,
+    "cohens_d": 1.2185,
+    "roc_auc": 0.7778,
+    "loo_mae": 2.242,
+    "loo_rmse": 2.615,
+    "baseline_mae": 2.639,
+    "improvement_pct": 15.05
+  },
+  "best_spearman_predictor": {
+    "metric": "n_quiet_episodes",
+    "threshold": 0.08,
+    "spearman_rho": 0.53737
+  },
+  "full_layer_correlations": {
+    "0.03": {
+      "n_quiet_episodes": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "n_transition_events": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "n_settling_events": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "first_quiet_start": {
+        "pearson_r": -0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": -0.08829,
+        "spearman_p": 0.681614,
+        "mean": 13.25,
+        "std": 10.3531
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.4167,
+        "std": 0.493
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.09775,
+        "pearson_p": 0.649529,
+        "spearman_rho": 0.08829,
+        "spearman_p": 0.681614,
+        "mean": 0.019,
+        "std": 0.0224
+      }
+    },
+    "0.05": {
+      "n_quiet_episodes": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "n_transition_events": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "n_settling_events": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.3251,
+        "pearson_p": 0.121117,
+        "spearman_rho": 0.32841,
+        "spearman_p": 0.117162,
+        "mean": 6.125,
+        "std": 8.8943
+      },
+      "total_quiet_layers": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.7917,
+        "std": 0.4061
+      },
+      "quiet_fraction": {
+        "pearson_r": -0.23734,
+        "pearson_p": 0.264131,
+        "spearman_rho": -0.24499,
+        "spearman_p": 0.248566,
+        "mean": 0.036,
+        "std": 0.0185
+      }
+    },
+    "0.08": {
+      "n_quiet_episodes": {
+        "pearson_r": 0.52518,
+        "pearson_p": 0.008408,
+        "spearman_rho": 0.53737,
+        "spearman_p": 0.00677,
+        "mean": 1.875,
+        "std": 0.8809
+      },
+      "n_transition_events": {
+        "pearson_r": 0.52518,
+        "pearson_p": 0.008408,
+        "spearman_rho": 0.53737,
+        "spearman_p": 0.00677,
+        "mean": 1.875,
+        "std": 0.8809
+      },
+      "n_settling_events": {
+        "pearson_r": 0.52518,
+        "pearson_p": 0.008408,
+        "spearman_rho": 0.53737,
+        "spearman_p": 0.00677,
+        "mean": 1.875,
+        "std": 0.8809
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.30278,
+        "pearson_p": 0.150391,
+        "spearman_rho": 0.31538,
+        "spearman_p": 0.133313,
+        "mean": 1.3229,
+        "std": 0.7322
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.36458,
+        "pearson_p": 0.079843,
+        "spearman_rho": 0.33903,
+        "spearman_p": 0.105088,
+        "mean": 1.75,
+        "std": 1.5069
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.10233,
+        "pearson_p": 0.634207,
+        "spearman_rho": 0.21645,
+        "spearman_p": 0.309694,
+        "mean": 2.7917,
+        "std": 5.4159
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.44986,
+        "pearson_p": 0.027409,
+        "spearman_rho": 0.47451,
+        "spearman_p": 0.019139,
+        "mean": 2.8333,
+        "std": 2.6247
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.44984,
+        "pearson_p": 0.027416,
+        "spearman_rho": 0.47451,
+        "spearman_p": 0.019139,
+        "mean": 0.1288,
+        "std": 0.1193
+      }
+    },
+    "0.1": {
+      "n_quiet_episodes": {
+        "pearson_r": 0.32181,
+        "pearson_p": 0.125156,
+        "spearman_rho": 0.30288,
+        "spearman_p": 0.150246,
+        "mean": 2.5,
+        "std": 0.7638
+      },
+      "n_transition_events": {
+        "pearson_r": 0.32181,
+        "pearson_p": 0.125156,
+        "spearman_rho": 0.30288,
+        "spearman_p": 0.150246,
+        "mean": 2.5,
+        "std": 0.7638
+      },
+      "n_settling_events": {
+        "pearson_r": 0.32181,
+        "pearson_p": 0.125156,
+        "spearman_rho": 0.30288,
+        "spearman_p": 0.150246,
+        "mean": 2.5,
+        "std": 0.7638
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.35917,
+        "pearson_p": 0.084761,
+        "spearman_rho": 0.28905,
+        "spearman_p": 0.170723,
+        "mean": 2.1007,
+        "std": 0.7269
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.31933,
+        "pearson_p": 0.128252,
+        "spearman_rho": 0.26856,
+        "spearman_p": 0.204474,
+        "mean": 3.3333,
+        "std": 1.4337
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.22747,
+        "pearson_p": 0.28508,
+        "spearman_rho": 0.11192,
+        "spearman_p": 0.602593,
+        "mean": 1.4167,
+        "std": 1.8008
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.43615,
+        "pearson_p": 0.033119,
+        "spearman_rho": 0.38517,
+        "spearman_p": 0.063076,
+        "mean": 5.3333,
+        "std": 2.9392
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.43618,
+        "pearson_p": 0.033104,
+        "spearman_rho": 0.38517,
+        "spearman_p": 0.063076,
+        "mean": 0.2424,
+        "std": 0.1336
+      }
+    },
+    "0.12": {
+      "n_quiet_episodes": {
+        "pearson_r": 0.05673,
+        "pearson_p": 0.792328,
+        "spearman_rho": 0.04751,
+        "spearman_p": 0.825504,
+        "mean": 3.7083,
+        "std": 0.9345
+      },
+      "n_transition_events": {
+        "pearson_r": 0.05673,
+        "pearson_p": 0.792328,
+        "spearman_rho": 0.04751,
+        "spearman_p": 0.825504,
+        "mean": 3.7083,
+        "std": 0.9345
+      },
+      "n_settling_events": {
+        "pearson_r": 0.05673,
+        "pearson_p": 0.792328,
+        "spearman_rho": 0.04751,
+        "spearman_p": 0.825504,
+        "mean": 3.7083,
+        "std": 0.9345
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.36987,
+        "pearson_p": 0.075243,
+        "spearman_rho": 0.28509,
+        "spearman_p": 0.176914,
+        "mean": 2.3222,
+        "std": 1.1086
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.38694,
+        "pearson_p": 0.061771,
+        "spearman_rho": 0.33609,
+        "spearman_p": 0.108335,
+        "mean": 4.5417,
+        "std": 2.217
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.22556,
+        "pearson_p": 0.289244,
+        "spearman_rho": 0.11192,
+        "spearman_p": 0.602593,
+        "mean": 1.375,
+        "std": 1.6024
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.44884,
+        "pearson_p": 0.027804,
+        "spearman_rho": 0.42021,
+        "spearman_p": 0.040909,
+        "mean": 8.1667,
+        "std": 2.7487
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.44887,
+        "pearson_p": 0.027793,
+        "spearman_rho": 0.42021,
+        "spearman_p": 0.040909,
+        "mean": 0.3712,
+        "std": 0.1249
+      }
+    },
+    "0.15": {
+      "n_quiet_episodes": {
+        "pearson_r": -0.39677,
+        "pearson_p": 0.054906,
+        "spearman_rho": -0.3275,
+        "spearman_p": 0.118241,
+        "mean": 4.125,
+        "std": 1.1296
+      },
+      "n_transition_events": {
+        "pearson_r": -0.39677,
+        "pearson_p": 0.054906,
+        "spearman_rho": -0.3275,
+        "spearman_p": 0.118241,
+        "mean": 4.125,
+        "std": 1.1296
+      },
+      "n_settling_events": {
+        "pearson_r": -0.39677,
+        "pearson_p": 0.054906,
+        "spearman_rho": -0.3275,
+        "spearman_p": 0.118241,
+        "mean": 4.125,
+        "std": 1.1296
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.43797,
+        "pearson_p": 0.032311,
+        "spearman_rho": 0.35872,
+        "spearman_p": 0.085181,
+        "mean": 3.7285,
+        "std": 1.7559
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.46983,
+        "pearson_p": 0.02053,
+        "spearman_rho": 0.42247,
+        "spearman_p": 0.039725,
+        "mean": 7.1667,
+        "std": 3.8261
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.22306,
+        "pearson_p": 0.294779,
+        "spearman_rho": 0.11192,
+        "spearman_p": 0.602593,
+        "mean": 1.3333,
+        "std": 1.4044
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.35677,
+        "pearson_p": 0.087019,
+        "spearman_rho": 0.32148,
+        "spearman_p": 0.125564,
+        "mean": 13.5417,
+        "std": 2.9718
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.35679,
+        "pearson_p": 0.086998,
+        "spearman_rho": 0.32148,
+        "spearman_p": 0.125564,
+        "mean": 0.6155,
+        "std": 0.1351
+      }
+    },
+    "0.2": {
+      "n_quiet_episodes": {
+        "pearson_r": -0.41,
+        "pearson_p": 0.046613,
+        "spearman_rho": -0.38096,
+        "spearman_p": 0.066262,
+        "mean": 2.2083,
+        "std": 0.9991
+      },
+      "n_transition_events": {
+        "pearson_r": -0.41,
+        "pearson_p": 0.046613,
+        "spearman_rho": -0.38096,
+        "spearman_p": 0.066262,
+        "mean": 2.2083,
+        "std": 0.9991
+      },
+      "n_settling_events": {
+        "pearson_r": -0.41,
+        "pearson_p": 0.046613,
+        "spearman_rho": -0.38096,
+        "spearman_p": 0.066262,
+        "mean": 2.2083,
+        "std": 0.9991
+      },
+      "avg_quiet_episode_length": {
+        "pearson_r": 0.42182,
+        "pearson_p": 0.040061,
+        "spearman_rho": 0.34219,
+        "spearman_p": 0.101688,
+        "mean": 10.7083,
+        "std": 5.7039
+      },
+      "max_quiet_episode_length": {
+        "pearson_r": 0.49644,
+        "pearson_p": 0.013605,
+        "spearman_rho": 0.4622,
+        "spearman_p": 0.022969,
+        "mean": 14.0,
+        "std": 4.3684
+      },
+      "first_quiet_start": {
+        "pearson_r": 0.16467,
+        "pearson_p": 0.44193,
+        "spearman_rho": 0.11192,
+        "spearman_p": 0.602593,
+        "mean": 1.125,
+        "std": 0.439
+      },
+      "total_quiet_layers": {
+        "pearson_r": 0.37171,
+        "pearson_p": 0.073693,
+        "spearman_rho": 0.33536,
+        "spearman_p": 0.109152,
+        "mean": 18.5417,
+        "std": 1.2576
+      },
+      "quiet_fraction": {
+        "pearson_r": 0.37179,
+        "pearson_p": 0.073631,
+        "spearman_rho": 0.33536,
+        "spearman_p": 0.109152,
+        "mean": 0.8428,
+        "std": 0.0572
+      }
+    }
+  },
+  "degradation_by_K": {
+    "4": {
+      "r": -0.21858,
+      "p": 0.304824
+    },
+    "5": {
+      "r": -0.40482,
+      "p": 0.049731
+    },
+    "6": {
+      "r": -0.33929,
+      "p": 0.104809
+    },
+    "7": {
+      "r": -0.33929,
+      "p": 0.104809
+    },
+    "8": {
+      "r": -0.33929,
+      "p": 0.104809
+    },
+    "9": {
+      "r": -0.33929,
+      "p": 0.104809
+    },
+    "10": {
+      "r": -0.21506,
+      "p": 0.312885
+    },
+    "11": {
+      "r": -0.11007,
+      "p": 0.608641
+    },
+    "12": {
+      "r": -0.01744,
+      "p": 0.935547
+    },
+    "13": {
+      "r": -0.01744,
+      "p": 0.935547
+    },
+    "14": {
+      "r": 0.05985,
+      "p": 0.781155
+    },
+    "15": {
+      "r": 0.05985,
+      "p": 0.781155
+    },
+    "16": {
+      "r": 0.05985,
+      "p": 0.781155
+    },
+    "17": {
+      "r": 0.1116,
+      "p": 0.603634
+    },
+    "18": {
+      "r": 0.35245,
+      "p": 0.091183
+    },
+    "19": {
+      "r": 0.41168,
+      "p": 0.045629
+    },
+    "20": {
+      "r": 0.52518,
+      "p": 0.008408
+    },
+    "21": {
+      "r": 0.52518,
+      "p": 0.008408
+    },
+    "22": {
+      "r": 0.52518,
+      "p": 0.008408
+    }
+  },
+  "partial_top10": [
+    {
+      "K": 14,
+      "tau": 0.15,
+      "metric": "avg_quiet_episode_length",
+      "pearson_r": 0.46545,
+      "pearson_p": 0.021903,
+      "spearman_rho": 0.37235
+    },
+    {
+      "K": 16,
+      "tau": 0.15,
+      "metric": "avg_quiet_episode_length",
+      "pearson_r": 0.45069,
+      "pearson_p": 0.02709,
+      "spearman_rho": 0.37236
+    },
+    {
+      "K": 6,
+      "tau": 0.1,
+      "metric": "n_transition_events",
+      "pearson_r": -0.44617,
+      "pearson_p": 0.02886,
+      "spearman_rho": -0.41135
+    },
+    {
+      "K": 6,
+      "tau": 0.12,
+      "metric": "n_transition_events",
+      "pearson_r": -0.41277,
+      "pearson_p": 0.045005,
+      "spearman_rho": -0.41366
+    },
+    {
+      "K": 12,
+      "tau": 0.15,
+      "metric": "avg_quiet_episode_length",
+      "pearson_r": 0.4085,
+      "pearson_p": 0.047497,
+      "spearman_rho": 0.55149
+    },
+    {
+      "K": 16,
+      "tau": 0.12,
+      "metric": "total_quiet_layers",
+      "pearson_r": 0.40621,
+      "pearson_p": 0.04888,
+      "spearman_rho": 0.37385
+    },
+    {
+      "K": 16,
+      "tau": 0.12,
+      "metric": "quiet_fraction",
+      "pearson_r": 0.40621,
+      "pearson_p": 0.04888,
+      "spearman_rho": 0.37385
+    },
+    {
+      "K": 16,
+      "tau": 0.15,
+      "metric": "max_quiet_episode_length",
+      "pearson_r": 0.40619,
+      "pearson_p": 0.04889,
+      "spearman_rho": 0.3459
+    },
+    {
+      "K": 6,
+      "tau": 0.08,
+      "metric": "n_transition_events",
+      "pearson_r": -0.40482,
+      "pearson_p": 0.049731,
+      "spearman_rho": -0.38555
+    },
+    {
+      "K": 14,
+      "tau": 0.12,
+      "metric": "total_quiet_layers",
+      "pearson_r": 0.40409,
+      "pearson_p": 0.050184,
+      "spearman_rho": 0.44098
+    }
+  ],
+  "significant_full_count": 16,
+  "bonferroni_survivors": 0,
+  "early_exit_viable_K12": true,
+  "verdict": {
+    "full_layer_signal": "SIGNIFICANT",
+    "early_exit_useful": true,
+    "summary": "Partial signal at K<=12: early exit MAY be viable. Best full: n_quiet_episodes@\u03c4=0.08 r=+0.5252. LOO MAE=2.24 vs baseline 2.64. Needs larger N."
+  },
+  "per_query": {
+    "factual_capital": {
+      "oracle_exit": 15,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 17.36,
+      "loo_error": 2.36
+    },
+    "factual_element": {
+      "oracle_exit": 15,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 17.36,
+      "loo_error": 2.36
+    },
+    "factual_date": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 3,
+        "n_transition_events": 3,
+        "n_settling_events": 3,
+        "avg_quiet_episode_length": 1.333,
+        "max_quiet_episode_length": 2,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 4,
+        "quiet_fraction": 0.1818
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 20.43,
+      "loo_error": 1.57
+    },
+    "factual_long_bio": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.74,
+      "loo_error": 3.26
+    },
+    "factual_long_process": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 17.18,
+      "loo_error": 0.18
+    },
+    "code_fibonacci": {
+      "oracle_exit": 13,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.2
+      },
+      "loo_prediction": 19.14,
+      "loo_error": 6.14
+    },
+    "code_sorting": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.2
+      },
+      "loo_prediction": 18.96,
+      "loo_error": 1.96
+    },
+    "code_class": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.2
+      },
+      "loo_prediction": 18.96,
+      "loo_error": 1.96
+    },
+    "creative_dream": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 2.0,
+        "max_quiet_episode_length": 3,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 4,
+        "quiet_fraction": 0.1818
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.96,
+      "loo_error": 1.96
+    },
+    "creative_scifi": {
+      "oracle_exit": 21,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.5,
+        "max_quiet_episode_length": 2,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 3,
+        "quiet_fraction": 0.1364
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.79,
+      "loo_error": 2.21
+    },
+    "creative_poetry": {
+      "oracle_exit": 16,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 2.0,
+        "max_quiet_episode_length": 3,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 4,
+        "quiet_fraction": 0.1818
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 19.01,
+      "loo_error": 3.01
+    },
+    "adversarial_repeat": {
+      "oracle_exit": 18,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 2.0,
+        "max_quiet_episode_length": 2,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 2.0,
+        "max_quiet_episode_length": 2,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.2
+      },
+      "loo_prediction": 17.09,
+      "loo_error": 0.91
+    },
+    "adversarial_nonsense": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 19,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 0,
+        "n_transition_events": 0,
+        "n_settling_events": 0,
+        "avg_quiet_episode_length": 0.0,
+        "max_quiet_episode_length": 0,
+        "first_quiet_start": 10,
+        "total_quiet_layers": 0,
+        "quiet_fraction": 0.0
+      },
+      "loo_prediction": 16.73,
+      "loo_error": 5.27
+    },
+    "adversarial_numbers": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 0,
+        "n_transition_events": 0,
+        "n_settling_events": 0,
+        "avg_quiet_episode_length": 0.0,
+        "max_quiet_episode_length": 0,
+        "first_quiet_start": 22,
+        "total_quiet_layers": 0,
+        "quiet_fraction": 0.0
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 0,
+        "n_transition_events": 0,
+        "n_settling_events": 0,
+        "avg_quiet_episode_length": 0.0,
+        "max_quiet_episode_length": 0,
+        "first_quiet_start": 10,
+        "total_quiet_layers": 0,
+        "quiet_fraction": 0.0
+      },
+      "loo_prediction": 14.98,
+      "loo_error": 2.02
+    },
+    "technical_transformer": {
+      "oracle_exit": 19,
+      "full_layer_stats": {
+        "n_quiet_episodes": 3,
+        "n_transition_events": 3,
+        "n_settling_events": 3,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 3,
+        "quiet_fraction": 0.1364
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 20.8,
+      "loo_error": 1.8
+    },
+    "technical_calculus": {
+      "oracle_exit": 21,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.79,
+      "loo_error": 2.21
+    },
+    "technical_chemistry": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.74,
+      "loo_error": 3.26
+    },
+    "conv_greeting": {
+      "oracle_exit": 15,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 17.36,
+      "loo_error": 2.36
+    },
+    "conv_opinion": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.74,
+      "loo_error": 3.26
+    },
+    "conv_instruction": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.0455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 17.18,
+      "loo_error": 0.18
+    },
+    "mixed_legal": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 3,
+        "n_transition_events": 3,
+        "n_settling_events": 3,
+        "avg_quiet_episode_length": 1.667,
+        "max_quiet_episode_length": 3,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 5,
+        "quiet_fraction": 0.2273
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 20.43,
+      "loo_error": 1.57
+    },
+    "mixed_medical": {
+      "oracle_exit": 17,
+      "full_layer_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 2,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.0909
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 18.96,
+      "loo_error": 1.96
+    },
+    "edge_single_word": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 3,
+        "n_transition_events": 3,
+        "n_settling_events": 3,
+        "avg_quiet_episode_length": 4.0,
+        "max_quiet_episode_length": 7,
+        "first_quiet_start": 5,
+        "total_quiet_layers": 12,
+        "quiet_fraction": 0.5455
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 2,
+        "n_transition_events": 1,
+        "n_settling_events": 2,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 5,
+        "total_quiet_layers": 2,
+        "quiet_fraction": 0.2
+      },
+      "loo_prediction": 20.43,
+      "loo_error": 1.57
+    },
+    "edge_question_mark": {
+      "oracle_exit": 22,
+      "full_layer_stats": {
+        "n_quiet_episodes": 4,
+        "n_transition_events": 4,
+        "n_settling_events": 4,
+        "avg_quiet_episode_length": 2.25,
+        "max_quiet_episode_length": 5,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 9,
+        "quiet_fraction": 0.4091
+      },
+      "partial_K10_stats": {
+        "n_quiet_episodes": 1,
+        "n_transition_events": 1,
+        "n_settling_events": 1,
+        "avg_quiet_episode_length": 1.0,
+        "max_quiet_episode_length": 1,
+        "first_quiet_start": 1,
+        "total_quiet_layers": 1,
+        "quiet_fraction": 0.1
+      },
+      "loo_prediction": 22.44,
+      "loo_error": 0.44
+    }
+  },
+  "cost": {
+    "wall_time_s": 0.452,
+    "cpu_time_s": 0.429,
+    "peak_memory_mb": 92.6,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-29T08:53:10",
+    "timestamp_end": "2026-03-29T08:53:10"
+  }
+}
