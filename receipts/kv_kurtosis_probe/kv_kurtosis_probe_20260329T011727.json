@@ -1,0 +1,1994 @@
+{
+  "work_order": "WO-SENSING-PROBE-01",
+  "question": "Does KV activation kurtosis vary by query type?",
+  "verdict": "NO SIGNAL \u2014 kurtosis is static regardless of query type",
+  "action": "STOP: Static policy is optimal. Runtime measurement adds zero value.",
+  "model": "TinyLlama-1.1B (HelixLinear compressed)",
+  "n_layers": 22,
+  "n_prompts": 6,
+  "prompt_ids": [
+    "factual_short",
+    "factual_long",
+    "code",
+    "creative",
+    "adversarial_repetitive",
+    "mixed_technical"
+  ],
+  "measurements": {
+    "kurtosis_varying_layers_k": 17,
+    "kurtosis_varying_layers_v": 22,
+    "entropy_varying_layers_k": 0,
+    "entropy_varying_layers_v": 3,
+    "ranking_changes": false,
+    "unique_top_layers": 1,
+    "between_query_std_k": 2.2571,
+    "between_query_std_v": 1.9194,
+    "within_model_std_k": 4.3162,
+    "within_model_std_v": 8.4543
+  },
+  "analysis_per_layer": [
+    {
+      "layer": 0,
+      "k_kurtosis_mean": 22.174,
+      "k_kurtosis_std": 4.533,
+      "k_kurtosis_cv": 0.2044,
+      "k_kurtosis_range": [
+        15.629,
+        30.459
+      ],
+      "v_kurtosis_mean": 39.159,
+      "v_kurtosis_std": 14.497,
+      "v_kurtosis_cv": 0.3702,
+      "v_kurtosis_range": [
+        24.644,
+        69.333
+      ],
+      "k_entropy_mean": 5.655,
+      "k_entropy_std": 0.115,
+      "v_entropy_mean": 4.371,
+      "v_entropy_std": 0.232
+    },
+    {
+      "layer": 1,
+      "k_kurtosis_mean": 0.495,
+      "k_kurtosis_std": 0.175,
+      "k_kurtosis_cv": 0.3525,
+      "k_kurtosis_range": [
+        0.366,
+        0.873
+      ],
+      "v_kurtosis_mean": 20.406,
+      "v_kurtosis_std": 13.577,
+      "v_kurtosis_cv": 0.6653,
+      "v_kurtosis_range": [
+        8.412,
+        49.458
+      ],
+      "k_entropy_mean": 6.924,
+      "k_entropy_std": 0.04,
+      "v_entropy_mean": 5.133,
+      "v_entropy_std": 0.58
+    },
+    {
+      "layer": 2,
+      "k_kurtosis_mean": 0.706,
+      "k_kurtosis_std": 0.174,
+      "k_kurtosis_cv": 0.2458,
+      "k_kurtosis_range": [
+        0.492,
+        0.993
+      ],
+      "v_kurtosis_mean": 3.149,
+      "v_kurtosis_std": 0.648,
+      "v_kurtosis_cv": 0.2059,
+      "v_kurtosis_range": [
+        2.656,
+        4.445
+      ],
+      "k_entropy_mean": 6.989,
+      "k_entropy_std": 0.059,
+      "v_entropy_mean": 6.219,
+      "v_entropy_std": 0.211
+    },
+    {
+      "layer": 3,
+      "k_kurtosis_mean": 5.24,
+      "k_kurtosis_std": 0.451,
+      "k_kurtosis_cv": 0.0861,
+      "k_kurtosis_range": [
+        4.746,
+        6.165
+      ],
+      "v_kurtosis_mean": 1.71,
+      "v_kurtosis_std": 0.438,
+      "v_kurtosis_cv": 0.2559,
+      "v_kurtosis_range": [
+        1.238,
+        2.601
+      ],
+      "k_entropy_mean": 6.504,
+      "k_entropy_std": 0.063,
+      "v_entropy_mean": 6.415,
+      "v_entropy_std": 0.119
+    },
+    {
+      "layer": 4,
+      "k_kurtosis_mean": 7.853,
+      "k_kurtosis_std": 0.555,
+      "k_kurtosis_cv": 0.0707,
+      "k_kurtosis_range": [
+        6.792,
+        8.578
+      ],
+      "v_kurtosis_mean": 2.414,
+      "v_kurtosis_std": 0.602,
+      "v_kurtosis_cv": 0.2493,
+      "v_kurtosis_range": [
+        1.613,
+        3.454
+      ],
+      "k_entropy_mean": 6.388,
+      "k_entropy_std": 0.022,
+      "v_entropy_mean": 6.19,
+      "v_entropy_std": 0.128
+    },
+    {
+      "layer": 5,
+      "k_kurtosis_mean": 9.167,
+      "k_kurtosis_std": 0.735,
+      "k_kurtosis_cv": 0.0801,
+      "k_kurtosis_range": [
+        8.338,
+        10.36
+      ],
+      "v_kurtosis_mean": 2.055,
+      "v_kurtosis_std": 0.542,
+      "v_kurtosis_cv": 0.2637,
+      "v_kurtosis_range": [
+        1.471,
+        3.043
+      ],
+      "k_entropy_mean": 6.045,
+      "k_entropy_std": 0.129,
+      "v_entropy_mean": 6.301,
+      "v_entropy_std": 0.216
+    },
+    {
+      "layer": 6,
+      "k_kurtosis_mean": 9.01,
+      "k_kurtosis_std": 0.774,
+      "k_kurtosis_cv": 0.0859,
+      "k_kurtosis_range": [
+        8.05,
+        10.318
+      ],
+      "v_kurtosis_mean": 2.554,
+      "v_kurtosis_std": 0.536,
+      "v_kurtosis_cv": 0.2099,
+      "v_kurtosis_range": [
+        1.816,
+        3.481
+      ],
+      "k_entropy_mean": 6.016,
+      "k_entropy_std": 0.111,
+      "v_entropy_mean": 6.366,
+      "v_entropy_std": 0.141
+    },
+    {
+      "layer": 7,
+      "k_kurtosis_mean": 13.446,
+      "k_kurtosis_std": 1.681,
+      "k_kurtosis_cv": 0.125,
+      "k_kurtosis_range": [
+        11.647,
+        16.546
+      ],
+      "v_kurtosis_mean": 1.52,
+      "v_kurtosis_std": 0.465,
+      "v_kurtosis_cv": 0.3059,
+      "v_kurtosis_range": [
+        0.984,
+        2.229
+      ],
+      "k_entropy_mean": 5.834,
+      "k_entropy_std": 0.114,
+      "v_entropy_mean": 6.397,
+      "v_entropy_std": 0.187
+    },
+    {
+      "layer": 8,
+      "k_kurtosis_mean": 9.315,
+      "k_kurtosis_std": 0.625,
+      "k_kurtosis_cv": 0.0671,
+      "k_kurtosis_range": [
+        8.792,
+        10.478
+      ],
+      "v_kurtosis_mean": 3.498,
+      "v_kurtosis_std": 0.899,
+      "v_kurtosis_cv": 0.2569,
+      "v_kurtosis_range": [
+        2.668,
+        5.39
+      ],
+      "k_entropy_mean": 6.002,
+      "k_entropy_std": 0.078,
+      "v_entropy_mean": 6.366,
+      "v_entropy_std": 0.109
+    },
+    {
+      "layer": 9,
+      "k_kurtosis_mean": 13.995,
+      "k_kurtosis_std": 1.836,
+      "k_kurtosis_cv": 0.1312,
+      "k_kurtosis_range": [
+        12.406,
+        17.56
+      ],
+      "v_kurtosis_mean": 3.353,
+      "v_kurtosis_std": 1.64,
+      "v_kurtosis_cv": 0.4891,
+      "v_kurtosis_range": [
+        1.385,
+        6.558
+      ],
+      "k_entropy_mean": 5.896,
+      "k_entropy_std": 0.116,
+      "v_entropy_mean": 6.183,
+      "v_entropy_std": 0.195
+    },
+    {
+      "layer": 10,
+      "k_kurtosis_mean": 8.786,
+      "k_kurtosis_std": 2.242,
+      "k_kurtosis_cv": 0.2552,
+      "k_kurtosis_range": [
+        7.071,
+        13.489
+      ],
+      "v_kurtosis_mean": 1.181,
+      "v_kurtosis_std": 0.285,
+      "v_kurtosis_cv": 0.2415,
+      "v_kurtosis_range": [
+        0.767,
+        1.551
+      ],
+      "k_entropy_mean": 6.162,
+      "k_entropy_std": 0.174,
+      "v_entropy_mean": 6.487,
+      "v_entropy_std": 0.247
+    },
+    {
+      "layer": 11,
+      "k_kurtosis_mean": 7.831,
+      "k_kurtosis_std": 2.665,
+      "k_kurtosis_cv": 0.3403,
+      "k_kurtosis_range": [
+        5.749,
+        13.652
+      ],
+      "v_kurtosis_mean": 1.508,
+      "v_kurtosis_std": 0.555,
+      "v_kurtosis_cv": 0.3683,
+      "v_kurtosis_range": [
+        0.637,
+        2.32
+      ],
+      "k_entropy_mean": 6.053,
+      "k_entropy_std": 0.223,
+      "v_entropy_mean": 6.465,
+      "v_entropy_std": 0.189
+    },
+    {
+      "layer": 12,
+      "k_kurtosis_mean": 12.104,
+      "k_kurtosis_std": 3.902,
+      "k_kurtosis_cv": 0.3224,
+      "k_kurtosis_range": [
+        8.883,
+        20.32
+      ],
+      "v_kurtosis_mean": 1.612,
+      "v_kurtosis_std": 0.754,
+      "v_kurtosis_cv": 0.4679,
+      "v_kurtosis_range": [
+        0.605,
+        2.755
+      ],
+      "k_entropy_mean": 5.917,
+      "k_entropy_std": 0.156,
+      "v_entropy_mean": 6.356,
+      "v_entropy_std": 0.41
+    },
+    {
+      "layer": 13,
+      "k_kurtosis_mean": 10.124,
+      "k_kurtosis_std": 3.34,
+      "k_kurtosis_cv": 0.3299,
+      "k_kurtosis_range": [
+        7.4,
+        17.051
+      ],
+      "v_kurtosis_mean": 2.093,
+      "v_kurtosis_std": 0.741,
+      "v_kurtosis_cv": 0.354,
+      "v_kurtosis_range": [
+        1.225,
+        3.505
+      ],
+      "k_entropy_mean": 6.08,
+      "k_entropy_std": 0.174,
+      "v_entropy_mean": 6.235,
+      "v_entropy_std": 0.109
+    },
+    {
+      "layer": 14,
+      "k_kurtosis_mean": 10.567,
+      "k_kurtosis_std": 3.487,
+      "k_kurtosis_cv": 0.33,
+      "k_kurtosis_range": [
+        8.036,
+        18.031
+      ],
+      "v_kurtosis_mean": 1.548,
+      "v_kurtosis_std": 0.427,
+      "v_kurtosis_cv": 0.2759,
+      "v_kurtosis_range": [
+        1.063,
+        2.392
+      ],
+      "k_entropy_mean": 6.027,
+      "k_entropy_std": 0.202,
+      "v_entropy_mean": 6.58,
+      "v_entropy_std": 0.049
+    },
+    {
+      "layer": 15,
+      "k_kurtosis_mean": 9.85,
+      "k_kurtosis_std": 3.238,
+      "k_kurtosis_cv": 0.3287,
+      "k_kurtosis_range": [
+        7.401,
+        16.823
+      ],
+      "v_kurtosis_mean": 1.023,
+      "v_kurtosis_std": 0.308,
+      "v_kurtosis_cv": 0.3012,
+      "v_kurtosis_range": [
+        0.744,
+        1.661
+      ],
+      "k_entropy_mean": 6.2,
+      "k_entropy_std": 0.101,
+      "v_entropy_mean": 6.7,
+      "v_entropy_std": 0.133
+    },
+    {
+      "layer": 16,
+      "k_kurtosis_mean": 8.776,
+      "k_kurtosis_std": 3.865,
+      "k_kurtosis_cv": 0.4404,
+      "k_kurtosis_range": [
+        5.959,
+        17.214
+      ],
+      "v_kurtosis_mean": 1.262,
+      "v_kurtosis_std": 0.472,
+      "v_kurtosis_cv": 0.3745,
+      "v_kurtosis_range": [
+        0.736,
+        1.996
+      ],
+      "k_entropy_mean": 6.048,
+      "k_entropy_std": 0.199,
+      "v_entropy_mean": 6.605,
+      "v_entropy_std": 0.128
+    },
+    {
+      "layer": 17,
+      "k_kurtosis_mean": 11.169,
+      "k_kurtosis_std": 4.072,
+      "k_kurtosis_cv": 0.3646,
+      "k_kurtosis_range": [
+        7.83,
+        19.292
+      ],
+      "v_kurtosis_mean": 2.456,
+      "v_kurtosis_std": 0.69,
+      "v_kurtosis_cv": 0.2807,
+      "v_kurtosis_range": [
+        1.231,
+        3.431
+      ],
+      "k_entropy_mean": 6.01,
+      "k_entropy_std": 0.169,
+      "v_entropy_mean": 6.244,
+      "v_entropy_std": 0.08
+    },
+    {
+      "layer": 18,
+      "k_kurtosis_mean": 8.006,
+      "k_kurtosis_std": 2.531,
+      "k_kurtosis_cv": 0.3161,
+      "k_kurtosis_range": [
+        5.9,
+        13.499
+      ],
+      "v_kurtosis_mean": 2.1,
+      "v_kurtosis_std": 0.569,
+      "v_kurtosis_cv": 0.271,
+      "v_kurtosis_range": [
+        1.015,
+        2.932
+      ],
+      "k_entropy_mean": 6.314,
+      "k_entropy_std": 0.154,
+      "v_entropy_mean": 6.285,
+      "v_entropy_std": 0.195
+    },
+    {
+      "layer": 19,
+      "k_kurtosis_mean": 11.656,
+      "k_kurtosis_std": 3.459,
+      "k_kurtosis_cv": 0.2968,
+      "k_kurtosis_range": [
+        8.417,
+        18.583
+      ],
+      "v_kurtosis_mean": 3.599,
+      "v_kurtosis_std": 1.023,
+      "v_kurtosis_cv": 0.2842,
+      "v_kurtosis_range": [
+        2.442,
+        5.17
+      ],
+      "k_entropy_mean": 5.981,
+      "k_entropy_std": 0.189,
+      "v_entropy_mean": 6.143,
+      "v_entropy_std": 0.237
+    },
+    {
+      "layer": 20,
+      "k_kurtosis_mean": 12.284,
+      "k_kurtosis_std": 2.705,
+      "k_kurtosis_cv": 0.2202,
+      "k_kurtosis_range": [
+        9.807,
+        17.781
+      ],
+      "v_kurtosis_mean": 2.109,
+      "v_kurtosis_std": 1.06,
+      "v_kurtosis_cv": 0.5027,
+      "v_kurtosis_range": [
+        1.23,
+        4.235
+      ],
+      "k_entropy_mean": 5.911,
+      "k_entropy_std": 0.13,
+      "v_entropy_mean": 6.362,
+      "v_entropy_std": 0.126
+    },
+    {
+      "layer": 21,
+      "k_kurtosis_mean": 11.832,
+      "k_kurtosis_std": 2.611,
+      "k_kurtosis_cv": 0.2207,
+      "k_kurtosis_range": [
+        9.06,
+        16.728
+      ],
+      "v_kurtosis_mean": 3.004,
+      "v_kurtosis_std": 1.498,
+      "v_kurtosis_cv": 0.4988,
+      "v_kurtosis_range": [
+        1.117,
+        5.503
+      ],
+      "k_entropy_mean": 5.883,
+      "k_entropy_std": 0.139,
+      "v_entropy_mean": 6.314,
+      "v_entropy_std": 0.22
+    }
+  ],
+  "raw_results": {
+    "factual_short": {
+      "seq_len": 8,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 21.298,
+          "v_kurtosis": 24.644,
+          "k_entropy": 5.737,
+          "v_entropy": 4.777,
+          "k_std": 1.273611,
+          "v_std": 0.012867,
+          "k_range": 17.0209,
+          "v_range": 0.2505
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.873,
+          "v_kurtosis": 14.425,
+          "k_entropy": 6.914,
+          "v_entropy": 5.679,
+          "k_std": 1.988162,
+          "v_std": 0.028081,
+          "k_range": 16.0256,
+          "v_range": 0.4627
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.993,
+          "v_kurtosis": 2.803,
+          "k_entropy": 6.968,
+          "v_entropy": 6.547,
+          "k_std": 1.812168,
+          "v_std": 0.041645,
+          "k_range": 14.1971,
+          "v_range": 0.4077
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 5.152,
+          "v_kurtosis": 1.483,
+          "k_entropy": 6.477,
+          "v_entropy": 6.66,
+          "k_std": 1.814749,
+          "v_std": 0.121633,
+          "k_range": 16.9944,
+          "v_range": 1.0294
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 8.151,
+          "v_kurtosis": 3.454,
+          "k_entropy": 6.385,
+          "v_entropy": 6.037,
+          "k_std": 2.039772,
+          "v_std": 0.163622,
+          "k_range": 19.1953,
+          "v_range": 2.0629
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 9.79,
+          "v_kurtosis": 1.471,
+          "k_entropy": 5.903,
+          "v_entropy": 6.652,
+          "k_std": 2.123972,
+          "v_std": 0.147126,
+          "k_range": 27.1588,
+          "v_range": 1.2677
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 10.318,
+          "v_kurtosis": 2.244,
+          "k_entropy": 5.97,
+          "v_entropy": 6.6,
+          "k_std": 2.249207,
+          "v_std": 0.147237,
+          "k_range": 27.106,
+          "v_range": 1.2856
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 16.546,
+          "v_kurtosis": 2.229,
+          "k_entropy": 5.603,
+          "v_entropy": 6.457,
+          "k_std": 1.917157,
+          "v_std": 0.17807,
+          "k_range": 28.5208,
+          "v_range": 1.7906
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 10.478,
+          "v_kurtosis": 3.435,
+          "k_entropy": 5.859,
+          "v_entropy": 6.364,
+          "k_std": 2.3763,
+          "v_std": 0.187735,
+          "k_range": 30.3544,
+          "v_range": 1.8745
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 17.56,
+          "v_kurtosis": 2.485,
+          "k_entropy": 5.644,
+          "v_entropy": 6.383,
+          "k_std": 2.34728,
+          "v_std": 0.170872,
+          "k_range": 33.4992,
+          "v_range": 1.8225
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 13.489,
+          "v_kurtosis": 1.126,
+          "k_entropy": 5.811,
+          "v_entropy": 6.817,
+          "k_std": 2.390521,
+          "v_std": 0.183297,
+          "k_range": 31.1216,
+          "v_range": 1.4235
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 13.652,
+          "v_kurtosis": 2.32,
+          "k_entropy": 5.579,
+          "v_entropy": 6.279,
+          "k_std": 2.264542,
+          "v_std": 0.217073,
+          "k_range": 34.3527,
+          "v_range": 2.4909
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 20.32,
+          "v_kurtosis": 1.627,
+          "k_entropy": 5.589,
+          "v_entropy": 6.559,
+          "k_std": 2.325748,
+          "v_std": 0.215603,
+          "k_range": 32.4273,
+          "v_range": 2.0758
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 17.051,
+          "v_kurtosis": 3.505,
+          "k_entropy": 5.702,
+          "v_entropy": 6.283,
+          "k_std": 2.302839,
+          "v_std": 0.200273,
+          "k_range": 30.6519,
+          "v_range": 2.3335
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 18.031,
+          "v_kurtosis": 2.392,
+          "k_entropy": 5.581,
+          "v_entropy": 6.557,
+          "k_std": 2.401983,
+          "v_std": 0.199842,
+          "k_range": 34.1366,
+          "v_range": 1.8964
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 16.823,
+          "v_kurtosis": 1.661,
+          "k_entropy": 6.008,
+          "v_entropy": 6.518,
+          "k_std": 2.343966,
+          "v_std": 0.24793,
+          "k_range": 25.2661,
+          "v_range": 2.4038
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 17.214,
+          "v_kurtosis": 1.996,
+          "k_entropy": 5.62,
+          "v_entropy": 6.689,
+          "k_std": 2.358612,
+          "v_std": 0.247281,
+          "k_range": 34.4059,
+          "v_range": 2.135
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 19.292,
+          "v_kurtosis": 3.431,
+          "k_entropy": 5.687,
+          "v_entropy": 6.244,
+          "k_std": 2.22214,
+          "v_std": 0.31333,
+          "k_range": 29.9614,
+          "v_range": 3.6183
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 13.499,
+          "v_kurtosis": 1.983,
+          "k_entropy": 5.989,
+          "v_entropy": 6.47,
+          "k_std": 2.135093,
+          "v_std": 0.321412,
+          "k_range": 24.6201,
+          "v_range": 3.2283
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 18.583,
+          "v_kurtosis": 2.503,
+          "k_entropy": 5.614,
+          "v_entropy": 6.492,
+          "k_std": 2.129481,
+          "v_std": 0.390984,
+          "k_range": 30.2824,
+          "v_range": 3.8498
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 17.781,
+          "v_kurtosis": 4.235,
+          "k_entropy": 5.689,
+          "v_entropy": 6.222,
+          "k_std": 2.135971,
+          "v_std": 0.354145,
+          "k_range": 29.3838,
+          "v_range": 4.2558
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 16.728,
+          "v_kurtosis": 5.503,
+          "k_entropy": 5.678,
+          "v_entropy": 6.085,
+          "k_std": 1.923578,
+          "v_std": 0.368762,
+          "k_range": 27.5974,
+          "v_range": 4.7411
+        }
+      ]
+    },
+    "factual_long": {
+      "seq_len": 80,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 24.099,
+          "v_kurtosis": 37.04,
+          "k_entropy": 5.445,
+          "v_entropy": 4.276,
+          "k_std": 1.185789,
+          "v_std": 0.012441,
+          "k_range": 20.3077,
+          "v_range": 0.3635
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.485,
+          "v_kurtosis": 8.412,
+          "k_entropy": 6.858,
+          "v_entropy": 5.42,
+          "k_std": 2.180237,
+          "v_std": 0.030768,
+          "k_range": 19.477,
+          "v_range": 0.6266
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.71,
+          "v_kurtosis": 2.656,
+          "k_entropy": 6.932,
+          "v_entropy": 6.123,
+          "k_std": 2.034881,
+          "v_std": 0.04467,
+          "k_range": 17.3283,
+          "v_range": 0.629
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 5.093,
+          "v_kurtosis": 1.441,
+          "k_entropy": 6.618,
+          "v_entropy": 6.331,
+          "k_std": 2.060736,
+          "v_std": 0.113075,
+          "k_range": 19.6993,
+          "v_range": 1.4501
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 8.035,
+          "v_kurtosis": 2.418,
+          "k_entropy": 6.349,
+          "v_entropy": 6.039,
+          "k_std": 2.237844,
+          "v_std": 0.150047,
+          "k_range": 24.8925,
+          "v_range": 2.3295
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 8.338,
+          "v_kurtosis": 1.618,
+          "k_entropy": 6.087,
+          "v_entropy": 6.179,
+          "k_std": 2.340884,
+          "v_std": 0.152641,
+          "k_range": 30.3817,
+          "v_range": 2.1817
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 9.492,
+          "v_kurtosis": 2.954,
+          "k_entropy": 5.896,
+          "v_entropy": 6.116,
+          "k_std": 2.502478,
+          "v_std": 0.154026,
+          "k_range": 36.6632,
+          "v_range": 2.2248
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 12.661,
+          "v_kurtosis": 1.226,
+          "k_entropy": 5.942,
+          "v_entropy": 6.524,
+          "k_std": 2.187143,
+          "v_std": 0.173738,
+          "k_range": 29.8871,
+          "v_range": 1.9524
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 9.038,
+          "v_kurtosis": 2.783,
+          "k_entropy": 5.987,
+          "v_entropy": 6.541,
+          "k_std": 2.571588,
+          "v_std": 0.193925,
+          "k_range": 34.4491,
+          "v_range": 2.0893
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 13.391,
+          "v_kurtosis": 3.638,
+          "k_entropy": 5.941,
+          "v_entropy": 5.915,
+          "k_std": 2.577332,
+          "v_std": 0.183887,
+          "k_range": 34.7666,
+          "v_range": 3.0835
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 7.169,
+          "v_kurtosis": 1.551,
+          "k_entropy": 6.249,
+          "v_entropy": 6.098,
+          "k_std": 2.477572,
+          "v_std": 0.189591,
+          "k_range": 29.4691,
+          "v_range": 2.8696
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 6.971,
+          "v_kurtosis": 1.556,
+          "k_entropy": 6.012,
+          "v_entropy": 6.35,
+          "k_std": 2.547614,
+          "v_std": 0.226713,
+          "k_range": 35.8796,
+          "v_range": 2.8586
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 9.828,
+          "v_kurtosis": 2.755,
+          "k_entropy": 6.001,
+          "v_entropy": 5.757,
+          "k_std": 2.549723,
+          "v_std": 0.214898,
+          "k_range": 34.225,
+          "v_range": 4.1203
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 7.782,
+          "v_kurtosis": 2.282,
+          "k_entropy": 6.164,
+          "v_entropy": 6.12,
+          "k_std": 2.553891,
+          "v_std": 0.231413,
+          "k_range": 31.3252,
+          "v_range": 3.41
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 8.059,
+          "v_kurtosis": 1.616,
+          "k_entropy": 6.161,
+          "v_entropy": 6.511,
+          "k_std": 2.598778,
+          "v_std": 0.235077,
+          "k_range": 32.0646,
+          "v_range": 2.65
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 7.401,
+          "v_kurtosis": 0.744,
+          "k_entropy": 6.316,
+          "v_entropy": 6.811,
+          "k_std": 2.54921,
+          "v_std": 0.280525,
+          "k_range": 28.478,
+          "v_range": 2.5972
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 5.959,
+          "v_kurtosis": 0.974,
+          "k_entropy": 6.172,
+          "v_entropy": 6.456,
+          "k_std": 2.562052,
+          "v_std": 0.268879,
+          "k_range": 32.3898,
+          "v_range": 3.1849
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 7.83,
+          "v_kurtosis": 2.532,
+          "k_entropy": 6.126,
+          "v_entropy": 6.222,
+          "k_std": 2.43082,
+          "v_std": 0.330103,
+          "k_range": 30.9865,
+          "v_range": 4.4785
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 5.9,
+          "v_kurtosis": 2.194,
+          "k_entropy": 6.297,
+          "v_entropy": 6.205,
+          "k_std": 2.375155,
+          "v_std": 0.38868,
+          "k_range": 27.7352,
+          "v_range": 5.3776
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 8.417,
+          "v_kurtosis": 4.643,
+          "k_entropy": 6.17,
+          "v_entropy": 5.988,
+          "k_std": 2.417608,
+          "v_std": 0.455951,
+          "k_range": 29.9312,
+          "v_range": 6.9999
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 9.807,
+          "v_kurtosis": 1.831,
+          "k_entropy": 6.054,
+          "v_entropy": 6.388,
+          "k_std": 2.361479,
+          "v_std": 0.416683,
+          "k_range": 30.7974,
+          "v_range": 5.0922
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 9.06,
+          "v_kurtosis": 1.949,
+          "k_entropy": 6.072,
+          "v_entropy": 6.392,
+          "k_std": 2.328762,
+          "v_std": 0.480733,
+          "k_range": 30.9121,
+          "v_range": 5.8609
+        }
+      ]
+    },
+    "code": {
+      "seq_len": 105,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 15.629,
+          "v_kurtosis": 69.333,
+          "k_entropy": 5.75,
+          "v_entropy": 4.064,
+          "k_std": 1.511105,
+          "v_std": 0.01474,
+          "k_range": 21.7143,
+          "v_range": 0.422
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.367,
+          "v_kurtosis": 49.458,
+          "k_entropy": 6.963,
+          "v_entropy": 4.208,
+          "k_std": 2.245143,
+          "v_std": 0.033932,
+          "k_range": 18.7507,
+          "v_range": 1.381
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.492,
+          "v_kurtosis": 4.445,
+          "k_entropy": 6.926,
+          "v_entropy": 5.884,
+          "k_std": 2.078489,
+          "v_std": 0.045688,
+          "k_range": 17.8724,
+          "v_range": 0.7425
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 6.165,
+          "v_kurtosis": 1.698,
+          "k_entropy": 6.406,
+          "v_entropy": 6.334,
+          "k_std": 2.169123,
+          "v_std": 0.118157,
+          "k_range": 23.9056,
+          "v_range": 1.5129
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 7.963,
+          "v_kurtosis": 1.613,
+          "k_entropy": 6.409,
+          "v_entropy": 6.241,
+          "k_std": 2.252128,
+          "v_std": 0.141189,
+          "k_range": 24.0767,
+          "v_range": 1.9312
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 10.36,
+          "v_kurtosis": 3.043,
+          "k_entropy": 5.989,
+          "v_entropy": 6.113,
+          "k_std": 2.424005,
+          "v_std": 0.155664,
+          "k_range": 33.0188,
+          "v_range": 2.3011
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 9.047,
+          "v_kurtosis": 1.816,
+          "k_entropy": 6.0,
+          "v_entropy": 6.377,
+          "k_std": 2.497691,
+          "v_std": 0.157575,
+          "k_range": 34.1928,
+          "v_range": 1.9387
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 13.253,
+          "v_kurtosis": 1.584,
+          "k_entropy": 5.811,
+          "v_entropy": 6.19,
+          "k_std": 2.225877,
+          "v_std": 0.172753,
+          "k_range": 32.9982,
+          "v_range": 2.448
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 8.792,
+          "v_kurtosis": 2.668,
+          "k_entropy": 6.039,
+          "v_entropy": 6.401,
+          "k_std": 2.645558,
+          "v_std": 0.192645,
+          "k_range": 34.511,
+          "v_range": 2.3027
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 13.071,
+          "v_kurtosis": 1.385,
+          "k_entropy": 5.917,
+          "v_entropy": 6.478,
+          "k_std": 2.602186,
+          "v_std": 0.182718,
+          "k_range": 35.6683,
+          "v_range": 2.1159
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 9.214,
+          "v_kurtosis": 1.007,
+          "k_entropy": 6.069,
+          "v_entropy": 6.428,
+          "k_std": 2.502312,
+          "v_std": 0.185021,
+          "k_range": 32.7663,
+          "v_range": 2.2358
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 7.503,
+          "v_kurtosis": 0.637,
+          "k_entropy": 6.125,
+          "v_entropy": 6.782,
+          "k_std": 2.469684,
+          "v_std": 0.213817,
+          "k_range": 31.8729,
+          "v_range": 2.0248
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 11.016,
+          "v_kurtosis": 0.605,
+          "k_entropy": 5.938,
+          "v_entropy": 6.731,
+          "k_std": 2.603312,
+          "v_std": 0.210987,
+          "k_range": 35.5567,
+          "v_range": 2.0767
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 10.111,
+          "v_kurtosis": 1.225,
+          "k_entropy": 6.07,
+          "v_entropy": 6.408,
+          "k_std": 2.603404,
+          "v_std": 0.215358,
+          "k_range": 33.0862,
+          "v_range": 2.6336
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 9.656,
+          "v_kurtosis": 1.063,
+          "k_entropy": 6.078,
+          "v_entropy": 6.617,
+          "k_std": 2.664437,
+          "v_std": 0.232563,
+          "k_range": 34.2143,
+          "v_range": 2.458
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 9.425,
+          "v_kurtosis": 0.948,
+          "k_entropy": 6.155,
+          "v_entropy": 6.577,
+          "k_std": 2.658794,
+          "v_std": 0.267358,
+          "k_range": 32.2977,
+          "v_range": 2.9096
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 8.245,
+          "v_kurtosis": 0.736,
+          "k_entropy": 6.031,
+          "v_entropy": 6.56,
+          "k_std": 2.716279,
+          "v_std": 0.251009,
+          "k_range": 36.8941,
+          "v_range": 2.7746
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 11.425,
+          "v_kurtosis": 1.231,
+          "k_entropy": 5.929,
+          "v_entropy": 6.4,
+          "k_std": 2.558887,
+          "v_std": 0.324314,
+          "k_range": 35.6316,
+          "v_range": 3.9791
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 7.296,
+          "v_kurtosis": 2.156,
+          "k_entropy": 6.411,
+          "v_entropy": 6.14,
+          "k_std": 2.543855,
+          "v_std": 0.358297,
+          "k_range": 26.7376,
+          "v_range": 5.2071
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 11.536,
+          "v_kurtosis": 3.182,
+          "k_entropy": 5.866,
+          "v_entropy": 6.021,
+          "k_std": 2.494337,
+          "v_std": 0.387965,
+          "k_range": 36.3465,
+          "v_range": 6.0409
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 12.066,
+          "v_kurtosis": 1.23,
+          "k_entropy": 5.794,
+          "v_entropy": 6.456,
+          "k_std": 2.53548,
+          "v_std": 0.38913,
+          "k_range": 38.6537,
+          "v_range": 4.594
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 12.046,
+          "v_kurtosis": 1.983,
+          "k_entropy": 5.744,
+          "v_entropy": 6.23,
+          "k_std": 2.407517,
+          "v_std": 0.513461,
+          "k_range": 38.5623,
+          "v_range": 7.008
+        }
+      ]
+    },
+    "creative": {
+      "seq_len": 82,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 22.088,
+          "v_kurtosis": 41.546,
+          "k_entropy": 5.557,
+          "v_entropy": 4.258,
+          "k_std": 1.253193,
+          "v_std": 0.012731,
+          "k_range": 20.115,
+          "v_range": 0.3635
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.456,
+          "v_kurtosis": 11.952,
+          "k_entropy": 6.924,
+          "v_entropy": 5.231,
+          "k_std": 2.239758,
+          "v_std": 0.030599,
+          "k_range": 19.146,
+          "v_range": 0.7074
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.579,
+          "v_kurtosis": 2.749,
+          "k_entropy": 7.047,
+          "v_entropy": 6.118,
+          "k_std": 2.083596,
+          "v_std": 0.044818,
+          "k_range": 16.4298,
+          "v_range": 0.6277
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 4.949,
+          "v_kurtosis": 1.799,
+          "k_entropy": 6.526,
+          "v_entropy": 6.32,
+          "k_std": 2.071393,
+          "v_std": 0.114725,
+          "k_range": 21.2679,
+          "v_range": 1.4768
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 7.601,
+          "v_kurtosis": 2.271,
+          "k_entropy": 6.373,
+          "v_entropy": 6.173,
+          "k_std": 2.262444,
+          "v_std": 0.151969,
+          "k_range": 24.8665,
+          "v_range": 2.147
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 9.24,
+          "v_kurtosis": 2.226,
+          "k_entropy": 5.888,
+          "v_entropy": 6.107,
+          "k_std": 2.367687,
+          "v_std": 0.154728,
+          "k_range": 35.0312,
+          "v_range": 2.3168
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 8.157,
+          "v_kurtosis": 2.524,
+          "k_entropy": 5.988,
+          "v_entropy": 6.364,
+          "k_std": 2.521668,
+          "v_std": 0.152398,
+          "k_range": 35.2238,
+          "v_range": 1.8717
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 11.647,
+          "v_kurtosis": 1.094,
+          "k_entropy": 5.933,
+          "v_entropy": 6.457,
+          "k_std": 2.117017,
+          "v_std": 0.171862,
+          "k_range": 29.6521,
+          "v_range": 2.0265
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 8.823,
+          "v_kurtosis": 3.464,
+          "k_entropy": 6.059,
+          "v_entropy": 6.173,
+          "k_std": 2.562979,
+          "v_std": 0.200173,
+          "k_range": 33.0845,
+          "v_range": 2.7614
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 12.415,
+          "v_kurtosis": 3.715,
+          "k_entropy": 5.998,
+          "v_entropy": 6.059,
+          "k_std": 2.581585,
+          "v_std": 0.180958,
+          "k_range": 34.0795,
+          "v_range": 2.741
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 7.297,
+          "v_kurtosis": 1.551,
+          "k_entropy": 6.284,
+          "v_entropy": 6.534,
+          "k_std": 2.530004,
+          "v_std": 0.195578,
+          "k_range": 29.1453,
+          "v_range": 2.1752
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 5.749,
+          "v_kurtosis": 1.648,
+          "k_entropy": 6.176,
+          "v_entropy": 6.272,
+          "k_std": 2.51244,
+          "v_std": 0.230748,
+          "k_range": 31.9753,
+          "v_range": 3.0705
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 9.59,
+          "v_kurtosis": 0.984,
+          "k_entropy": 6.071,
+          "v_entropy": 6.574,
+          "k_std": 2.579035,
+          "v_std": 0.215091,
+          "k_range": 33.0745,
+          "v_range": 2.3437
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 7.4,
+          "v_kurtosis": 2.321,
+          "k_entropy": 6.189,
+          "v_entropy": 6.087,
+          "k_std": 2.572486,
+          "v_std": 0.225791,
+          "k_range": 31.4485,
+          "v_range": 3.4026
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 8.679,
+          "v_kurtosis": 1.64,
+          "k_entropy": 6.101,
+          "v_entropy": 6.534,
+          "k_std": 2.635193,
+          "v_std": 0.230358,
+          "k_range": 34.0935,
+          "v_range": 2.5528
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 8.373,
+          "v_kurtosis": 1.102,
+          "k_entropy": 6.288,
+          "v_entropy": 6.714,
+          "k_std": 2.551788,
+          "v_std": 0.278897,
+          "k_range": 28.9401,
+          "v_range": 2.7446
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 7.201,
+          "v_kurtosis": 1.421,
+          "k_entropy": 6.106,
+          "v_entropy": 6.438,
+          "k_std": 2.587574,
+          "v_std": 0.270314,
+          "k_range": 33.4866,
+          "v_range": 3.2062
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 7.837,
+          "v_kurtosis": 2.546,
+          "k_entropy": 6.17,
+          "v_entropy": 6.209,
+          "k_std": 2.394974,
+          "v_std": 0.341082,
+          "k_range": 29.7988,
+          "v_range": 4.6449
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 7.258,
+          "v_kurtosis": 2.932,
+          "k_entropy": 6.336,
+          "v_entropy": 6.16,
+          "k_std": 2.427173,
+          "v_std": 0.384252,
+          "k_range": 27.0835,
+          "v_range": 5.4239
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 9.426,
+          "v_kurtosis": 5.17,
+          "k_entropy": 6.118,
+          "v_entropy": 5.913,
+          "k_std": 2.421887,
+          "v_std": 0.45657,
+          "k_range": 30.4086,
+          "v_range": 7.2721
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 10.589,
+          "v_kurtosis": 2.622,
+          "k_entropy": 5.998,
+          "v_entropy": 6.17,
+          "k_std": 2.463688,
+          "v_std": 0.440216,
+          "k_range": 32.7488,
+          "v_range": 6.2084
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 10.844,
+          "v_kurtosis": 3.268,
+          "k_entropy": 5.959,
+          "v_entropy": 6.047,
+          "k_std": 2.341209,
+          "v_std": 0.430215,
+          "k_range": 32.6222,
+          "v_range": 6.5628
+        }
+      ]
+    },
+    "adversarial_repetitive": {
+      "seq_len": 55,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 30.459,
+          "v_kurtosis": 32.374,
+          "k_entropy": 5.753,
+          "v_entropy": 4.562,
+          "k_std": 1.186551,
+          "v_std": 0.012789,
+          "k_range": 15.8281,
+          "v_range": 0.261
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.366,
+          "v_kurtosis": 17.172,
+          "k_entropy": 6.98,
+          "v_entropy": 5.75,
+          "k_std": 2.259804,
+          "v_std": 0.029792,
+          "k_range": 18.3653,
+          "v_range": 0.4383
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.863,
+          "v_kurtosis": 3.519,
+          "k_entropy": 7.088,
+          "v_entropy": 6.376,
+          "k_std": 2.067484,
+          "v_std": 0.043934,
+          "k_range": 15.5304,
+          "v_range": 0.4817
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 5.332,
+          "v_kurtosis": 2.601,
+          "k_entropy": 6.504,
+          "v_entropy": 6.389,
+          "k_std": 2.14526,
+          "v_std": 0.109123,
+          "k_range": 21.844,
+          "v_range": 1.3064
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 8.578,
+          "v_kurtosis": 2.823,
+          "k_entropy": 6.4,
+          "v_entropy": 6.404,
+          "k_std": 2.379584,
+          "v_std": 0.144846,
+          "k_range": 24.913,
+          "v_range": 1.6999
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 8.927,
+          "v_kurtosis": 2.314,
+          "k_entropy": 6.223,
+          "v_entropy": 6.545,
+          "k_std": 2.484401,
+          "v_std": 0.155962,
+          "k_range": 28.7434,
+          "v_range": 1.674
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 8.05,
+          "v_kurtosis": 3.481,
+          "k_entropy": 6.251,
+          "v_entropy": 6.342,
+          "k_std": 2.639344,
+          "v_std": 0.174181,
+          "k_range": 30.2846,
+          "v_range": 2.1095
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 14.591,
+          "v_kurtosis": 0.984,
+          "k_entropy": 5.832,
+          "v_entropy": 6.642,
+          "k_std": 2.536912,
+          "v_std": 0.176862,
+          "k_range": 35.9781,
+          "v_range": 1.8226
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 9.823,
+          "v_kurtosis": 5.39,
+          "k_entropy": 6.1,
+          "v_entropy": 6.392,
+          "k_std": 2.811243,
+          "v_std": 0.198916,
+          "k_range": 33.2845,
+          "v_range": 2.25
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 15.124,
+          "v_kurtosis": 6.558,
+          "k_entropy": 5.919,
+          "v_entropy": 6.193,
+          "k_std": 2.79581,
+          "v_std": 0.189706,
+          "k_range": 37.3818,
+          "v_range": 2.4454
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 8.474,
+          "v_kurtosis": 0.767,
+          "k_entropy": 6.295,
+          "v_entropy": 6.743,
+          "k_std": 2.786133,
+          "v_std": 0.177144,
+          "k_range": 30.982,
+          "v_range": 1.7092
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 6.934,
+          "v_kurtosis": 1.893,
+          "k_entropy": 6.211,
+          "v_entropy": 6.473,
+          "k_std": 2.631678,
+          "v_std": 0.24037,
+          "k_range": 31.2978,
+          "v_range": 2.7364
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 12.985,
+          "v_kurtosis": 1.31,
+          "k_entropy": 5.901,
+          "v_entropy": 6.706,
+          "k_std": 2.847647,
+          "v_std": 0.214029,
+          "k_range": 39.4517,
+          "v_range": 2.0919
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 10.676,
+          "v_kurtosis": 1.619,
+          "k_entropy": 6.193,
+          "v_entropy": 6.212,
+          "k_std": 2.791709,
+          "v_std": 0.216285,
+          "k_range": 31.9926,
+          "v_range": 3.0005
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 10.94,
+          "v_kurtosis": 1.291,
+          "k_entropy": 6.083,
+          "v_entropy": 6.612,
+          "k_std": 2.820803,
+          "v_std": 0.232937,
+          "k_range": 35.4307,
+          "v_range": 2.4461
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 9.656,
+          "v_kurtosis": 0.784,
+          "k_entropy": 6.204,
+          "v_entropy": 6.911,
+          "k_std": 2.79065,
+          "v_std": 0.263306,
+          "k_range": 32.5126,
+          "v_range": 2.2591
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 7.901,
+          "v_kurtosis": 1.675,
+          "k_entropy": 6.176,
+          "v_entropy": 6.75,
+          "k_std": 2.91379,
+          "v_std": 0.270551,
+          "k_range": 35.5206,
+          "v_range": 2.5405
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 12.521,
+          "v_kurtosis": 2.937,
+          "k_entropy": 5.988,
+          "v_entropy": 6.258,
+          "k_std": 2.725716,
+          "v_std": 0.299575,
+          "k_range": 35.7102,
+          "v_range": 3.9215
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 7.708,
+          "v_kurtosis": 1.015,
+          "k_entropy": 6.457,
+          "v_entropy": 6.63,
+          "k_std": 2.739672,
+          "v_std": 0.332937,
+          "k_range": 27.4986,
+          "v_range": 3.4548
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 12.917,
+          "v_kurtosis": 2.442,
+          "k_entropy": 6.042,
+          "v_entropy": 6.456,
+          "k_std": 2.608521,
+          "v_std": 0.382901,
+          "k_range": 32.8733,
+          "v_range": 4.3697
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 13.149,
+          "v_kurtosis": 1.442,
+          "k_entropy": 5.915,
+          "v_entropy": 6.523,
+          "k_std": 2.551427,
+          "v_std": 0.353376,
+          "k_range": 34.1935,
+          "v_range": 3.922
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 13.068,
+          "v_kurtosis": 4.202,
+          "k_entropy": 5.847,
+          "v_entropy": 6.446,
+          "k_std": 2.501984,
+          "v_std": 0.518255,
+          "k_range": 36.8823,
+          "v_range": 5.6711
+        }
+      ]
+    },
+    "mixed_technical": {
+      "seq_len": 111,
+      "layers": [
+        {
+          "layer": 0,
+          "k_kurtosis": 19.469,
+          "v_kurtosis": 30.019,
+          "k_entropy": 5.685,
+          "v_entropy": 4.29,
+          "k_std": 1.358364,
+          "v_std": 0.013227,
+          "k_range": 20.0789,
+          "v_range": 0.3635
+        },
+        {
+          "layer": 1,
+          "k_kurtosis": 0.423,
+          "v_kurtosis": 21.018,
+          "k_entropy": 6.905,
+          "v_entropy": 4.508,
+          "k_std": 2.241113,
+          "v_std": 0.032137,
+          "k_range": 19.4845,
+          "v_range": 1.1365
+        },
+        {
+          "layer": 2,
+          "k_kurtosis": 0.598,
+          "v_kurtosis": 2.721,
+          "k_entropy": 6.971,
+          "v_entropy": 6.265,
+          "k_std": 2.026549,
+          "v_std": 0.044124,
+          "k_range": 16.846,
+          "v_range": 0.5656
+        },
+        {
+          "layer": 3,
+          "k_kurtosis": 4.746,
+          "v_kurtosis": 1.238,
+          "k_entropy": 6.494,
+          "v_entropy": 6.459,
+          "k_std": 2.096279,
+          "v_std": 0.116298,
+          "k_range": 22.1347,
+          "v_range": 1.3704
+        },
+        {
+          "layer": 4,
+          "k_kurtosis": 6.792,
+          "v_kurtosis": 1.903,
+          "k_entropy": 6.412,
+          "v_entropy": 6.246,
+          "k_std": 2.240546,
+          "v_std": 0.144495,
+          "k_range": 24.2936,
+          "v_range": 1.9564
+        },
+        {
+          "layer": 5,
+          "k_kurtosis": 8.345,
+          "v_kurtosis": 1.658,
+          "k_entropy": 6.179,
+          "v_entropy": 6.209,
+          "k_std": 2.354872,
+          "v_std": 0.150694,
+          "k_range": 29.0204,
+          "v_range": 2.1053
+        },
+        {
+          "layer": 6,
+          "k_kurtosis": 8.997,
+          "v_kurtosis": 2.304,
+          "k_entropy": 5.99,
+          "v_entropy": 6.398,
+          "k_std": 2.462828,
+          "v_std": 0.151643,
+          "k_range": 33.9435,
+          "v_range": 1.8234
+        },
+        {
+          "layer": 7,
+          "k_kurtosis": 11.979,
+          "v_kurtosis": 2.006,
+          "k_entropy": 5.883,
+          "v_entropy": 6.109,
+          "k_std": 2.119552,
+          "v_std": 0.180751,
+          "k_range": 30.9063,
+          "v_range": 2.6952
+        },
+        {
+          "layer": 8,
+          "k_kurtosis": 8.935,
+          "v_kurtosis": 3.251,
+          "k_entropy": 5.968,
+          "v_entropy": 6.327,
+          "k_std": 2.575537,
+          "v_std": 0.190904,
+          "k_range": 35.345,
+          "v_range": 2.3813
+        },
+        {
+          "layer": 9,
+          "k_kurtosis": 12.406,
+          "v_kurtosis": 2.339,
+          "k_entropy": 5.959,
+          "v_entropy": 6.067,
+          "k_std": 2.566868,
+          "v_std": 0.182295,
+          "k_range": 34.89,
+          "v_range": 2.7901
+        },
+        {
+          "layer": 10,
+          "k_kurtosis": 7.071,
+          "v_kurtosis": 1.083,
+          "k_entropy": 6.264,
+          "v_entropy": 6.301,
+          "k_std": 2.547134,
+          "v_std": 0.187116,
+          "k_range": 30.211,
+          "v_range": 2.4732
+        },
+        {
+          "layer": 11,
+          "k_kurtosis": 6.175,
+          "v_kurtosis": 0.995,
+          "k_entropy": 6.216,
+          "v_entropy": 6.637,
+          "k_std": 2.518226,
+          "v_std": 0.235988,
+          "k_range": 31.3963,
+          "v_range": 2.4656
+        },
+        {
+          "layer": 12,
+          "k_kurtosis": 8.883,
+          "v_kurtosis": 2.392,
+          "k_entropy": 6.005,
+          "v_entropy": 5.809,
+          "k_std": 2.570494,
+          "v_std": 0.223971,
+          "k_range": 35.2676,
+          "v_range": 4.1393
+        },
+        {
+          "layer": 13,
+          "k_kurtosis": 7.727,
+          "v_kurtosis": 1.608,
+          "k_entropy": 6.162,
+          "v_entropy": 6.298,
+          "k_std": 2.611981,
+          "v_std": 0.238171,
+          "k_range": 32.5264,
+          "v_range": 3.1227
+        },
+        {
+          "layer": 14,
+          "k_kurtosis": 8.036,
+          "v_kurtosis": 1.287,
+          "k_entropy": 6.159,
+          "v_entropy": 6.646,
+          "k_std": 2.633327,
+          "v_std": 0.240727,
+          "k_range": 32.9184,
+          "v_range": 2.4878
+        },
+        {
+          "layer": 15,
+          "k_kurtosis": 7.425,
+          "v_kurtosis": 0.898,
+          "k_entropy": 6.23,
+          "v_entropy": 6.668,
+          "k_std": 2.579135,
+          "v_std": 0.287158,
+          "k_range": 30.8307,
+          "v_range": 2.9384
+        },
+        {
+          "layer": 16,
+          "k_kurtosis": 6.135,
+          "v_kurtosis": 0.767,
+          "k_entropy": 6.184,
+          "v_entropy": 6.737,
+          "k_std": 2.626878,
+          "v_std": 0.266577,
+          "k_range": 33.4128,
+          "v_range": 2.6074
+        },
+        {
+          "layer": 17,
+          "k_kurtosis": 8.108,
+          "v_kurtosis": 2.061,
+          "k_entropy": 6.158,
+          "v_entropy": 6.133,
+          "k_std": 2.436125,
+          "v_std": 0.33212,
+          "k_range": 30.4893,
+          "v_range": 4.8602
+        },
+        {
+          "layer": 18,
+          "k_kurtosis": 6.375,
+          "v_kurtosis": 2.32,
+          "k_entropy": 6.392,
+          "v_entropy": 6.106,
+          "k_std": 2.389024,
+          "v_std": 0.388889,
+          "k_range": 26.167,
+          "v_range": 5.785
+        },
+        {
+          "layer": 19,
+          "k_kurtosis": 9.057,
+          "v_kurtosis": 3.652,
+          "k_entropy": 6.075,
+          "v_entropy": 5.985,
+          "k_std": 2.312538,
+          "v_std": 0.435458,
+          "k_range": 30.59,
+          "v_range": 6.8419
+        },
+        {
+          "layer": 20,
+          "k_kurtosis": 10.314,
+          "v_kurtosis": 1.293,
+          "k_entropy": 6.016,
+          "v_entropy": 6.415,
+          "k_std": 2.398315,
+          "v_std": 0.399877,
+          "k_range": 32.3174,
+          "v_range": 4.8666
+        },
+        {
+          "layer": 21,
+          "k_kurtosis": 9.245,
+          "v_kurtosis": 1.117,
+          "k_entropy": 5.995,
+          "v_entropy": 6.683,
+          "k_std": 2.31205,
+          "v_std": 0.484334,
+          "k_range": 32.486,
+          "v_range": 4.9018
+        }
+      ]
+    }
+  },
+  "layer_rankings_by_query": {
+    "factual_short": 0,
+    "factual_long": 0,
+    "code": 0,
+    "creative": 0,
+    "adversarial_repetitive": 0,
+    "mixed_technical": 0
+  },
+  "cost": {
+    "wall_time_s": 52.105,
+    "cpu_time_s": 52.059,
+    "peak_memory_mb": 3255.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-29T01:16:35",
+    "timestamp_end": "2026-03-29T01:17:27"
+  }
+}

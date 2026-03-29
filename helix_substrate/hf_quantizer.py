@@ -352,3 +352,14 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
 
     def is_serializable(self, safe_serialization=None) -> bool:
         return True
+
+
+# ---------------------------------------------------------------------------
+# Alias: also register under "helix" (used by convert_to_hf.py / hf_integration.py)
+# ---------------------------------------------------------------------------
+if HAS_HF_QUANTIZER_API:
+    try:
+        register_quantization_config("helix")(CDNAv3Config)
+        register_quantizer("helix")(HelixHfQuantizer)
+    except Exception:
+        pass  # Already registered or API changed

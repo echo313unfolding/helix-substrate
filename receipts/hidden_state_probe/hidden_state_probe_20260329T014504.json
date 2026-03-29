@@ -1,0 +1,51 @@
+{
+  "work_orders": [
+    "WO-SENSING-PROBE-02",
+    "WO-SENSING-PROBE-03"
+  ],
+  "probe_2_question": "Does kurtosis predict early exit quality?",
+  "probe_2_verdict": "WEAK SIGNAL \u2014 top-1 needs 22/22 layers, minimal savings\n  Kurtosis predicts exit quality: r=-0.519",
+  "probe_2_action": "MARGINAL: Early exit saves < 20% compute \u2014 kurtosis is a viable convergence signal",
+  "probe_3_question": "Does composite spectral signal separate query types better than kurtosis alone?",
+  "probe_3_verdict": "SIGNAL EXISTS \u2014 effective_rank has 0.597 avg CV",
+  "probe_3_action": "PROCEED: effective_rank separates queries better than kurtosis alone",
+  "bonus_question": "Is kurtosis a cheap proxy for effective rank?",
+  "bonus_verdict": "WEAK \u2014 kurtosis and effective rank measure different things",
+  "bonus_correlation": {
+    "pearson_r": -0.1895,
+    "pearson_p": 0.025986,
+    "spearman_rho": -0.0849,
+    "spearman_p": 0.32225
+  },
+  "model": "TinyLlama-1.1B-Chat-v1.0 (dense FP32)",
+  "n_layers": 22,
+  "n_prompts": 6,
+  "prompt_ids": [
+    "factual_short",
+    "factual_long",
+    "code",
+    "creative",
+    "adversarial_repetitive",
+    "mixed_technical"
+  ],
+  "early_exit": {
+    "first_perfect_layer": 22,
+    "skippable_layers": 0,
+    "savings_pct": 0.0,
+    "per_query_first_match": {
+      "factual_short": 15,
+      "factual_long": 17,
+      "code": 14,
+      "creative": 17,
+      "adversarial_repetitive": 18,
+      "mixed_technical": 19
+    },
+    "kurt_cos_correlation": -0.5194,
+    "erank_cos_correlation": 0.6981
+  },
+  "metric_discrimination": {
+    "avg_cv_per_metric": {
+      "kurtosis": 0.4173,
+      "entropy": 0.3008,
+      "effective_rank": 0.5967,
+      "stable_rank": 
