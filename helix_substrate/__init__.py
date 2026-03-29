@@ -9,7 +9,7 @@ Core components:
     - Receipts: tamper-evident verification of all operations
 """
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 from helix_substrate.cdna_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
 from helix_substrate.se import compute_tensor_se, compute_routing_decision
