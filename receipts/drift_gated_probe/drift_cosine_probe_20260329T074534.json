@@ -1,0 +1,1507 @@
+{
+  "work_order": "WO-SENSING-PROBE-05b",
+  "question": "Does \u0394\u03a3t (cosine distance drift) outperform CALM-style instantaneous exit?",
+  "equation_term": "\u0394\u03a3t \u22c5 KR(\u03bb\u1d62, \u03b7\u1d62) \u22c5 \u0398(c\u1d62)",
+  "verdict": "CALM BEATS \u0394\u03a3t \u2014 CALM exits at 22.0 vs \u0394\u03a3t at 20.0\n  \u0394\u03a3t does NOT predict difficulty: r=-0.595",
+  "action": "\u0394\u03a3t NOT CONFIRMED: Simpler instantaneous signal is sufficient",
+  "model": "TinyLlama-1.1B-Chat-v1.0 (dense FP32)",
+  "n_layers": 22,
+  "n_prompts": 6,
+  "fixed_exit_layer": 17,
+  "drift_predicts_difficulty": false,
+  "drift_difficulty_correlation": {
+    "r": -0.5953,
+    "p": 0.2125
+  },
+  "max_drift_correlation": {
+    "r": -0.1852,
+    "p": 0.7253
+  },
+  "mid_drift_correlation": {
+    "r": -0.8106,
+    "p": 0.0504
+  },
+  "strategies_summary": {
+    "Oracle": {
+      "avg_layer": 16.67,
+      "avg_cos": 0.6291,
+      "top1_pct": 100.0,
+      "avg_top5": 1.8
+    },
+    "Fixed L17": {
+      "avg_layer": 17.0,
+      "avg_cos": 0.6622,
+      "top1_pct": 66.7,
+      "avg_top5": 1.8
+    },
+    "Full (L22)": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "CALM \u03c4=0.0001": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.0001": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "CALM \u03c4=0.0005": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.0005": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "CALM \u03c4=0.001": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.001": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "CALM \u03c4=0.005": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.005": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "CALM \u03c4=0.01": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.01": {
+      "avg_layer": 20.0,
+      "avg_cos": 0.8267,
+      "top1_pct": 83.3,
+      "avg_top5": 3.0
+    },
+    "CALM \u03c4=0.02": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.02": {
+      "avg_layer": 14.83,
+      "avg_cos": 0.5403,
+      "top1_pct": 16.7,
+      "avg_top5": 0.5
+    },
+    "CALM \u03c4=0.05": {
+      "avg_layer": 22.0,
+      "avg_cos": 0.9853,
+      "top1_pct": 100.0,
+      "avg_top5": 4.2
+    },
+    "\u0394\u03a3t \u03c4=0.05": {
+      "avg_layer": 11.33,
+      "avg_cos": 0.4164,
+      "top1_pct": 0.0,
+      "avg_top5": 0.0
+    }
+  },
+  "per_query": {
+    "factual_short": {
+      "seq_len": 8,
+      "full_top1": 2,
+      "oracle_exit": 15,
+      "cos_distances": [
+        0.30497885,
+        0.04300427,
+        0.16134745,
+        0.17585474,
+        0.15425992,
+        0.13567919,
+        0.13027507,
+        0.2444011,
+        0.18392944,
+        0.16128618,
+        0.11636645,
+        0.11446393,
+        0.14313966,
+        0.14010108,
+        0.11802351,
+        0.15967768,
+        0.14120734,
+        0.08013916,
+        0.08783138,
+        0.08316326,
+        0.0897302,
+        0.22860461
+      ],
+      "cumulative_drift": [
+        0.304979,
+        0.347983,
+        0.509331,
+        0.685185,
+        0.839445,
+        0.975124,
+        1.105399,
+        1.349801,
+        1.53373,
+        1.695016,
+        1.811383,
+        1.925847,
+        2.068986,
+        2.209087,
+        2.327111,
+        2.486789,
+        2.627996,
+        2.708135,
+        2.795966,
+        2.87913,
+        2.96886,
+        3.197464
+      ],
+      "drift_rates": [
+        0.26197457,
+        0.11834317,
+        0.01450729,
+        0.02159482,
+        0.01858073,
+        0.00540411,
+        0.11412603,
+        0.06047165,
+        0.02264327,
+        0.04491973,
+        0.00190252,
+        0.02867573,
+        0.00303859,
+        0.02207756,
+        0.04165417,
+        0.01847035,
+        0.06106818,
+        0.00769222,
+        0.00466812,
+        0.00656694,
+        0.13887441
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": -0.209792,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": -0.120353,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": -0.078448,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": -0.152951,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": 0.099179,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": -0.054912,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": 0.137219,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": -0.03671,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.138141,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.309747,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.168697,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.385662,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.560835,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.628456,
+          "top1_match": false,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.592056,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.55646,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.727392,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.774244,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.803503,
+          "top1_match": false,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.852472,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.91958,
+          "top1_match": false,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.993754,
+          "top1_match": true,
+          "top5_overlap": 5
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 20,
+        "0.02": 20,
+        "0.05": 11
+      }
+    },
+    "factual_long": {
+      "seq_len": 80,
+      "full_top1": 450,
+      "oracle_exit": 17,
+      "cos_distances": [
+        0.2947948,
+        0.01661676,
+        0.17253476,
+        0.12852478,
+        0.09524423,
+        0.09892547,
+        0.10702842,
+        0.18546653,
+        0.16240931,
+        0.12437725,
+        0.1142385,
+        0.15679723,
+        0.14139009,
+        0.16869754,
+        0.15409666,
+        0.17302823,
+        0.20063698,
+        0.11388588,
+        0.12033641,
+        0.13914412,
+        0.1050809,
+        0.22976106
+      ],
+      "cumulative_drift": [
+        0.294795,
+        0.311412,
+        0.483946,
+        0.612471,
+        0.707715,
+        0.806641,
+        0.913669,
+        1.099136,
+        1.261545,
+        1.385922,
+        1.500161,
+        1.656958,
+        1.798348,
+        1.967046,
+        2.121142,
+        2.294171,
+        2.494808,
+        2.608693,
+        2.72903,
+        2.868174,
+        2.973255,
+        3.203016
+      ],
+      "drift_rates": [
+        0.27817804,
+        0.155918,
+        0.04400998,
+        0.03328055,
+        0.00368124,
+        0.00810295,
+        0.0784381,
+        0.02305722,
+        0.03803205,
+        0.01013875,
+        0.04255873,
+        0.01540715,
+        0.02730745,
+        0.01460087,
+        0.01893157,
+        0.02760875,
+        0.0867511,
+        0.00645053,
+        0.01880771,
+        0.03406322,
+        0.12468016
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": 0.067419,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": -0.030953,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": -0.117437,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": -0.17842,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": 0.141166,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": 0.064287,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": 0.241788,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": 0.240912,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.399645,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.435458,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.433432,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.563733,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.446118,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.465207,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.459169,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.522955,
+          "top1_match": false,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.706481,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.707458,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.793199,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.840909,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.909207,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.995606,
+          "top1_match": true,
+          "top5_overlap": 5
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 16,
+        "0.05": 10
+      }
+    },
+    "code": {
+      "seq_len": 105,
+      "full_top1": 28956,
+      "oracle_exit": 14,
+      "cos_distances": [
+        0.33601892,
+        0.03864026,
+        0.21351069,
+        0.09067631,
+        0.06284386,
+        0.15487915,
+        0.10001594,
+        0.21486998,
+        0.25685036,
+        0.20276242,
+        0.14688367,
+        0.16416317,
+        0.15906286,
+        0.1670202,
+        0.13378978,
+        0.15861356,
+        0.22078729,
+        0.11280131,
+        0.10950351,
+        0.11724484,
+        0.08501953,
+        0.26702535
+      ],
+      "cumulative_drift": [
+        0.336019,
+        0.374659,
+        0.58817,
+        0.678846,
+        0.74169,
+        0.896569,
+        0.996585,
+        1.211455,
+        1.468305,
+        1.671068,
+        1.817952,
+        1.982115,
+        2.141178,
+        2.308198,
+        2.441988,
+        2.600601,
+        2.821388,
+        2.93419,
+        3.043693,
+        3.160938,
+        3.245958,
+        3.512983
+      ],
+      "drift_rates": [
+        0.29737866,
+        0.17487043,
+        0.12283438,
+        0.02783245,
+        0.09203529,
+        0.05486321,
+        0.11485404,
+        0.04198039,
+        0.05408794,
+        0.05587876,
+        0.01727951,
+        0.00510031,
+        0.00795734,
+        0.03323042,
+        0.02482378,
+        0.06217372,
+        0.10798597,
+        0.00329781,
+        0.00774133,
+        0.03222531,
+        0.18200582
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": 0.146045,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": 0.13682,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": 0.135853,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": 0.213224,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": 0.186097,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": 0.116371,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": 0.071191,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": 0.148554,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.256135,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.286327,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.326864,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.31732,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.316272,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.313614,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.318352,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.399629,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.473153,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.502922,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.579919,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.659653,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.748775,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.985138,
+          "top1_match": true,
+          "top5_overlap": 5
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 14,
+        "0.02": 13,
+        "0.05": 13
+      }
+    },
+    "creative": {
+      "seq_len": 82,
+      "full_top1": 450,
+      "oracle_exit": 17,
+      "cos_distances": [
+        0.3125717,
+        0.01133662,
+        0.15217394,
+        0.13975656,
+        0.12875694,
+        0.13149714,
+        0.12746304,
+        0.27127796,
+        0.15010071,
+        0.14136565,
+        0.1602788,
+        0.16097277,
+        0.18172359,
+        0.13584501,
+        0.12596726,
+        0.14090234,
+        0.15102243,
+        0.06079447,
+        0.07554013,
+        0.07464021,
+        0.11370325,
+        0.27399307
+      ],
+      "cumulative_drift": [
+        0.312572,
+        0.323908,
+        0.476082,
+        0.615839,
+        0.744596,
+        0.876093,
+        1.003556,
+        1.274834,
+        1.424935,
+        1.5663,
+        1.726579,
+        1.887552,
+        2.069275,
+        2.20512,
+        2.331088,
+        2.47199,
+        2.623012,
+        2.683807,
+        2.759347,
+        2.833987,
+        2.947691,
+        3.221684
+      ],
+      "drift_rates": [
+        0.30123508,
+        0.14083731,
+        0.01241738,
+        0.01099962,
+        0.0027402,
+        0.0040341,
+        0.14381492,
+        0.12117726,
+        0.00873506,
+        0.01891315,
+        0.00069398,
+        0.02075082,
+        0.04587859,
+        0.00987774,
+        0.01493508,
+        0.01012009,
+        0.09022796,
+        0.01474565,
+        0.00089991,
+        0.03906304,
+        0.16028982
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": 0.126234,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": 0.125652,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": 0.127689,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": 0.217677,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": 0.310909,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": 0.581792,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": 0.546371,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": 0.29719,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.128013,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.378218,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.51595,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.45597,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.408165,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.293402,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.237127,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.323533,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.48226,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.584635,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.800288,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.866666,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.949558,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.985818,
+          "top1_match": true,
+          "top5_overlap": 3
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 11,
+        "0.05": 11
+      }
+    },
+    "adversarial_repetitive": {
+      "seq_len": 55,
+      "full_top1": 278,
+      "oracle_exit": 18,
+      "cos_distances": [
+        0.22186702,
+        0.06223047,
+        0.06614769,
+        0.13269407,
+        0.14783388,
+        0.14193273,
+        0.2188642,
+        0.14178324,
+        0.14958018,
+        0.23033053,
+        0.13721049,
+        0.13026279,
+        0.169864,
+        0.16234982,
+        0.14251828,
+        0.20115805,
+        0.15491748,
+        0.08216834,
+        0.14026141,
+        0.16710758,
+        0.09671062,
+        0.35300368
+      ],
+      "cumulative_drift": [
+        0.221867,
+        0.284097,
+        0.350245,
+        0.482939,
+        0.630773,
+        0.772706,
+        0.99157,
+        1.133353,
+        1.282933,
+        1.513264,
+        1.650474,
+        1.780737,
+        1.950601,
+        2.112951,
+        2.255469,
+        2.456627,
+        2.611545,
+        2.693713,
+        2.833975,
+        3.001082,
+        3.097793,
+        3.450797
+      ],
+      "drift_rates": [
+        0.15963656,
+        0.00391722,
+        0.06654638,
+        0.01513982,
+        0.00590116,
+        0.07693148,
+        0.07708097,
+        0.00779694,
+        0.08075035,
+        0.09312004,
+        0.0069477,
+        0.03960121,
+        0.00751418,
+        0.01983154,
+        0.05863976,
+        0.04624057,
+        0.07274914,
+        0.05809307,
+        0.02684617,
+        0.07039696,
+        0.25629306
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": 0.232114,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": 0.323101,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": 0.297832,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": 0.22484,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": -0.031807,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": 0.224068,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": -0.015001,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": 0.226458,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.348584,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.579229,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.423957,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.523783,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.62808,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.541186,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.597447,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.767884,
+          "top1_match": false,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.835829,
+          "top1_match": false,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.862145,
+          "top1_match": true,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.892748,
+          "top1_match": true,
+          "top5_overlap": 4
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.919106,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.946709,
+          "top1_match": true,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.971857,
+          "top1_match": true,
+          "top5_overlap": 3
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 15,
+        "0.05": 13
+      }
+    },
+    "mixed_technical": {
+      "seq_len": 111,
+      "full_top1": 450,
+      "oracle_exit": 19,
+      "cos_distances": [
+        0.29604709,
+        0.01912564,
+        0.16330242,
+        0.14044344,
+        0.14357674,
+        0.11711609,
+        0.11486179,
+        0.1849463,
+        0.13698673,
+        0.11150515,
+        0.08921206,
+        0.13314277,
+        0.12811118,
+        0.14039075,
+        0.11865282,
+        0.12283498,
+        0.14401519,
+        0.07511032,
+        0.08050072,
+        0.07077193,
+        0.09826434,
+        0.23254311
+      ],
+      "cumulative_drift": [
+        0.296047,
+        0.315173,
+        0.478475,
+        0.618919,
+        0.762495,
+        0.879611,
+        0.994473,
+        1.17942,
+        1.316406,
+        1.427911,
+        1.517123,
+        1.650266,
+        1.778377,
+        1.918768,
+        2.037421,
+        2.160256,
+        2.304271,
+        2.379381,
+        2.459882,
+        2.530654,
+        2.628918,
+        2.861462
+      ],
+      "drift_rates": [
+        0.27692145,
+        0.14417678,
+        0.02285898,
+        0.0031333,
+        0.02646065,
+        0.00225431,
+        0.07008451,
+        0.04795957,
+        0.02548158,
+        0.02229309,
+        0.04393071,
+        0.00503159,
+        0.01227957,
+        0.02173793,
+        0.00418216,
+        0.02118021,
+        0.06890488,
+        0.00539041,
+        0.00972879,
+        0.0274924,
+        0.13427877
+      ],
+      "layer_quality": [
+        {
+          "layer": 1,
+          "logits_cos": 0.093351,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 2,
+          "logits_cos": 0.083259,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 3,
+          "logits_cos": 0.057232,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 4,
+          "logits_cos": 0.064238,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 5,
+          "logits_cos": 0.367251,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 6,
+          "logits_cos": 0.321058,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 7,
+          "logits_cos": 0.307345,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 8,
+          "logits_cos": 0.233127,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 9,
+          "logits_cos": 0.376618,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 10,
+          "logits_cos": 0.434076,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 11,
+          "logits_cos": 0.445986,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 12,
+          "logits_cos": 0.185877,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 13,
+          "logits_cos": 0.380641,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 14,
+          "logits_cos": 0.43691,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 15,
+          "logits_cos": 0.395426,
+          "top1_match": false,
+          "top5_overlap": 0
+        },
+        {
+          "layer": 16,
+          "logits_cos": 0.634594,
+          "top1_match": false,
+          "top5_overlap": 1
+        },
+        {
+          "layer": 17,
+          "logits_cos": 0.748259,
+          "top1_match": false,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 18,
+          "logits_cos": 0.741651,
+          "top1_match": false,
+          "top5_overlap": 2
+        },
+        {
+          "layer": 19,
+          "logits_cos": 0.817798,
+          "top1_match": true,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 20,
+          "logits_cos": 0.840676,
+          "top1_match": false,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 21,
+          "logits_cos": 0.933446,
+          "top1_match": false,
+          "top5_overlap": 3
+        },
+        {
+          "layer": 22,
+          "logits_cos": 0.979422,
+          "top1_match": true,
+          "top5_overlap": 4
+        }
+      ],
+      "calm_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 22,
+        "0.02": 22,
+        "0.05": 22
+      },
+      "delta_sigma_exits": {
+        "0.0001": 22,
+        "0.0005": 22,
+        "0.001": 22,
+        "0.005": 22,
+        "0.01": 20,
+        "0.02": 14,
+        "0.05": 10
+      }
+    }
+  },
+  "cost": {
+    "wall_time_s": 32.661,
+    "cpu_time_s": 32.113,
+    "peak_memory_mb": 6978.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-29T07:45:01",
+    "timestamp_end": "2026-03-29T07:45:34"
+  }
+}

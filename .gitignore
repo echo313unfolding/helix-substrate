@@ -225,3 +225,6 @@ receipts/*
 !receipts/group_vq/
 !receipts/rvq_benchmark/
 !receipts/cloud_checks/
+!receipts/kv_kurtosis_probe/
+!receipts/hidden_state_probe/
+!receipts/drift_gated_probe/
