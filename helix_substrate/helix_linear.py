@@ -268,6 +268,19 @@ class HelixLinear(nn.Module):
         """
         self._weight_stub = value
 
+    def __setattr__(self, name, value):
+        """Override to intercept 'weight' assignments from tie_weights().
+
+        PyTorch's Module.__setattr__ checks isinstance(value, Parameter)
+        BEFORE the descriptor protocol, so the @weight.setter never fires
+        for nn.Parameter values.  We catch 'weight' here and redirect to
+        _weight_stub, then delegate everything else to the parent.
+        """
+        if name == "weight":
+            object.__setattr__(self, "_weight_stub", value)
+            return
+        super().__setattr__(name, value)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Compute output = x @ W^T + bias without persistent full-size W.
