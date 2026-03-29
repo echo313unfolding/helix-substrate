@@ -257,6 +257,17 @@ class HelixLinear(nn.Module):
             )
         return self._weight_stub
 
+    @weight.setter
+    def weight(self, value):
+        """Accept weight assignments for tie_weights() compatibility.
+
+        HF's tie_weights() does ``self.lm_head.weight = self.embed_tokens.weight``.
+        Without this setter, PyTorch's __setattr__ calls register_parameter(),
+        which raises KeyError because the property already exists. We silently
+        accept the assignment. The actual computation goes through forward().
+        """
+        self._weight_stub = value
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Compute output = x @ W^T + bias without persistent full-size W.
