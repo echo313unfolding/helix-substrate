@@ -240,6 +240,8 @@ if HF_AVAILABLE:
             compressed_set = set(self.quantization_config.compressed_modules)
             sidecar_data = {}
             bias_data = {}
+            svd_data = {}
+            _svd_suffixes = (".svd_U", ".svd_s", ".svd_Vt")
             with safe_open(str(safetensors_path), framework="pt", device="cpu") as f:
                 for key in f.keys():
                     if ".sidecar_positions" in key or ".sidecar_indices" in key or ".sidecar_values" in key:
@@ -248,6 +250,8 @@ if HF_AVAILABLE:
                         module_path = key.rsplit(".", 1)[0]
                         if module_path in compressed_set:
                             bias_data[key] = f.get_tensor(key)
+                    elif any(key.endswith(s) for s in _svd_suffixes):
+                        svd_data[key] = f.get_tensor(key)
 
             # Wire sidecar data into HelixLinear modules
             for name, module in model.named_modules():
@@ -282,8 +286,18 @@ if HF_AVAILABLE:
                     module.register_buffer("_sidecar_deltas",
                                            (values - vq_at_sidecar).contiguous())
 
-                # Handle SVD factors if loaded
-                if module.svd_U is not None and module.svd_U.numel() > 0:
+                # Load SVD factors if present in safetensors
+                svd_U_key = f"{name}.svd_U"
+                svd_s_key = f"{name}.svd_s"
+                svd_Vt_key = f"{name}.svd_Vt"
+                if svd_U_key in svd_data and svd_s_key in svd_data and svd_Vt_key in svd_data:
+                    device = module.codebook.device
+                    module.register_buffer("svd_U", svd_data[svd_U_key].float().to(device).contiguous())
+                    module.register_buffer("svd_s", svd_data[svd_s_key].float().to(device).contiguous())
+                    module.register_buffer("svd_Vt", svd_data[svd_Vt_key].float().to(device).contiguous())
+                    module.has_svd = True
+                    module.rank = module.svd_U.shape[1] if module.svd_U.dim() > 1 else 0
+                elif module.svd_U is not None and module.svd_U.numel() > 0:
                     module.has_svd = True
                     module.rank = module.svd_U.shape[1] if module.svd_U.dim() > 1 else 0
 
@@ -302,8 +316,13 @@ if HF_AVAILABLE:
             bias_count = sum(1 for n, m in model.named_modules()
                              if isinstance(m, HelixLinear)
                              and m.bias is not None)
+            svd_count = sum(1 for n, m in model.named_modules()
+                            if isinstance(m, HelixLinear)
+                            and m.has_svd)
             logger.info(f"Helix: loaded sidecar corrections for {sidecar_count} modules")
             logger.info(f"Helix: loaded biases for {bias_count} modules")
+            if svd_count:
+                logger.info(f"Helix: loaded SVD factors for {svd_count} modules")
 
             # Reconstruct dense weights for compressed nn.Embedding modules.
             # The codebook/indices buffers were registered in _process_model_before_weight_loading
