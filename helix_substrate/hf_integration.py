@@ -231,14 +231,23 @@ if HF_AVAILABLE:
                     logger.warning("Helix: could not locate model.safetensors for sidecar loading")
                     return model
 
-            # Load sidecar data directly from safetensors
+            # Load sidecar data and biases directly from safetensors.
             # Handle both key conventions: .sidecar_positions (HelixLinear native)
-            # and .sidecar_indices (convert_to_hf.py format)
+            # and .sidecar_indices (convert_to_hf.py format).
+            # Biases for compressed modules must be loaded here because the
+            # HelixLinear shell registers bias=None (not in state_dict), so
+            # the standard HF loader skips them.
+            compressed_set = set(self.quantization_config.compressed_modules)
             sidecar_data = {}
+            bias_data = {}
             with safe_open(str(safetensors_path), framework="pt", device="cpu") as f:
                 for key in f.keys():
                     if ".sidecar_positions" in key or ".sidecar_indices" in key or ".sidecar_values" in key:
                         sidecar_data[key] = f.get_tensor(key)
+                    elif key.endswith(".bias"):
+                        module_path = key.rsplit(".", 1)[0]
+                        if module_path in compressed_set:
+                            bias_data[key] = f.get_tensor(key)
 
             # Wire sidecar data into HelixLinear modules
             for name, module in model.named_modules():
@@ -278,11 +287,23 @@ if HF_AVAILABLE:
                     module.has_svd = True
                     module.rank = module.svd_U.shape[1] if module.svd_U.dim() > 1 else 0
 
+                # Load bias if present in safetensors
+                bias_key = f"{name}.bias"
+                if bias_key in bias_data:
+                    device = module.codebook.device
+                    module.register_buffer(
+                        "bias", bias_data[bias_key].float().to(device).contiguous()
+                    )
+
             sidecar_count = sum(1 for n, m in model.named_modules()
                                 if isinstance(m, HelixLinear)
                                 and m.sidecar_positions is not None
                                 and m.sidecar_positions.numel() > 0)
+            bias_count = sum(1 for n, m in model.named_modules()
+                             if isinstance(m, HelixLinear)
+                             and m.bias is not None)
             logger.info(f"Helix: loaded sidecar corrections for {sidecar_count} modules")
+            logger.info(f"Helix: loaded biases for {bias_count} modules")
 
             # Reconstruct dense weights for compressed nn.Embedding modules.
             # The codebook/indices buffers were registered in _process_model_before_weight_loading
@@ -356,7 +377,7 @@ if HF_AVAILABLE:
             """
             # Extract module name from param_name (e.g., "model.layers.0.self_attn.q_proj.codebook")
             helix_suffixes = {".codebook", ".indices", ".sidecar_indices", ".sidecar_positions",
-                              ".sidecar_values", ".svd_U", ".svd_s", ".svd_Vt"}
+                              ".sidecar_values", ".svd_U", ".svd_s", ".svd_Vt", ".bias"}
 
             for suffix in helix_suffixes:
                 if param_name.endswith(suffix):
@@ -393,7 +414,7 @@ if HF_AVAILABLE:
             from helix_substrate.helix_linear import HelixLinear
 
             helix_suffixes = [".codebook", ".indices", ".sidecar_indices", ".sidecar_positions",
-                              ".sidecar_values", ".svd_U", ".svd_s", ".svd_Vt"]
+                              ".sidecar_values", ".svd_U", ".svd_s", ".svd_Vt", ".bias"]
 
             for suffix in helix_suffixes:
                 if param_name.endswith(suffix):
@@ -445,6 +466,8 @@ if HF_AVAILABLE:
                 if attr_name == "svd_U":
                     module.has_svd = True
                     module.rank = param_value.shape[1] if param_value.dim() > 1 else 0
+            elif attr_name == "bias":
+                module.register_buffer("bias", param_value.float().contiguous())
             else:
                 setattr(module, attr_name, param_value.contiguous())
 

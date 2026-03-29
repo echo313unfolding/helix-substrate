@@ -119,6 +119,11 @@ class HelixLinear(nn.Module):
         # via pre_step_kurtosis(). Toggle with set_cuda_graph_mode().
         self._cuda_graph_mode: bool = False
 
+        # Lazy weight stub for compatibility with model code that accesses
+        # .weight.device (e.g. Mamba2 fast-path check, tie_weights).
+        # The actual computation goes through forward(), never through .weight.
+        self._weight_stub = None
+
         # VQ components (read-only buffers, not parameters)
         self.register_buffer("codebook", codebook.contiguous())  # [k] (256 or 512+)
         # Store indices as uint8 (k<=256) or uint16 (k>256) to save memory.
@@ -209,15 +214,14 @@ class HelixLinear(nn.Module):
             "_sidecar_rows", "_sidecar_cols", "_sidecar_deltas",
         }
 
-        for name in list(state_dict.keys()):
-            key = prefix + name
-            if name in _resizable and key in state_dict:
+        for local_name in list(_resizable):
+            key = prefix + local_name
+            if key in state_dict and hasattr(self, local_name):
                 new_tensor = state_dict[key]
                 # Replace the buffer directly, bypassing size check
-                if hasattr(self, name):
-                    self.register_buffer(name, new_tensor)
-                    # Remove from state_dict so parent doesn't try to load it again
-                    del state_dict[key]
+                self.register_buffer(local_name, new_tensor)
+                # Remove from state_dict so parent doesn't try to load it again
+                del state_dict[key]
 
         # Let parent handle any remaining keys (exact tensors, etc.)
         super()._load_from_state_dict(
@@ -237,6 +241,21 @@ class HelixLinear(nn.Module):
             self.register_buffer("codebook_f16", self.codebook.half().contiguous())
         else:
             self.register_buffer("codebook_f16", None)
+
+    @property
+    def weight(self) -> torch.Tensor:
+        """Compatibility shim for model code that accesses .weight.device or .weight.dtype.
+
+        Returns a zero-element tensor on the correct device so that checks like
+        ``"cuda" in self.in_proj.weight.device.type`` (Mamba2 fast-path) and
+        ``tie_weights()`` device lookups work without materializing the full weight.
+        The actual computation always goes through forward(), never through .weight.
+        """
+        if self._weight_stub is None or self._weight_stub.device != self.codebook.device:
+            self._weight_stub = torch.empty(
+                0, device=self.codebook.device, dtype=self.codebook.dtype
+            )
+        return self._weight_stub
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
