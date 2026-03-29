@@ -14,7 +14,9 @@ from pathlib import Path
 import numpy as np
 
 from helix_substrate.generate_sidecars_v3 import read_sidecar_v3
-from helix_substrate.morpho_codec import morpho_decode, morpho_decode_block
+# Lazy import: morpho_codec requires scipy (heavy dep, dead codec)
+morpho_decode = None
+morpho_decode_block = None
 
 
 class CDNAv3Reader:
@@ -100,7 +102,8 @@ class CDNAv3Reader:
             Reconstructed tensor as float32
         """
         if self.is_morpho:
-            return morpho_decode(self.tensor_dir)
+            from helix_substrate.morpho_codec import morpho_decode as _md
+            return _md(self.tensor_dir)
 
         codebook = self._load_codebook()
         indices = self._load_indices()
@@ -132,7 +135,8 @@ class CDNAv3Reader:
             Tensor block [end_row - start_row, cols] as float32
         """
         if self.is_morpho:
-            return morpho_decode_block(self.tensor_dir, start_row, end_row)
+            from helix_substrate.morpho_codec import morpho_decode_block as _mdb
+            return _mdb(self.tensor_dir, start_row, end_row)
 
         codebook = self._load_codebook()
         indices = self._load_indices()

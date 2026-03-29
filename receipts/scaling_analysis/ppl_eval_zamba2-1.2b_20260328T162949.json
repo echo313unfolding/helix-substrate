@@ -1,0 +1,31 @@
+{
+  "work_order": "WO-SCALING-PPL-01",
+  "question": "7B PPL with embed_tokens=exact, lm_head=exact",
+  "model": "zamba2-1.2b",
+  "eval_setup": {
+    "seq_len": 2048,
+    "n_tokens": 2048,
+    "device": "cpu",
+    "dataset": "wikitext-2-raw-v1"
+  },
+  "results": {
+    "helix": {
+      "ppl": 5.6168,
+      "n_tokens": 2048,
+      "helix_modules": 136,
+      "load_time_s": 1.4,
+      "eval_time_s": 1328.2
+    },
+    "dense": {
+      "ppl": 5.4583,
+      "n_tokens": 2048,
+      "load_time_s": 0.2,
+      "eval_time_s": 1337.5
+    },
+    "delta_pct": 2.9
+  },
+  "cost": {
+    "wall_time_s": 2670.5,
+    "timestamp_start": "2026-03-28T20:29:49.008003"
+  }
+}

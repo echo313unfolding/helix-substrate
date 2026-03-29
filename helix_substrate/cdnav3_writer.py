@@ -30,7 +30,8 @@ from helix_substrate.generate_sidecars_v3 import (
     find_outliers_percentile,
     write_sidecar_npz,
 )
-from helix_substrate.morpho_codec import morpho_encode
+# Lazy import: morpho_codec requires scipy (heavy dep, dead codec)
+morpho_encode = None
 
 # Max elements to subsample for k-means (prevents OOM)
 _KMEANS_MAX_SAMPLES = 500_000
@@ -113,10 +114,16 @@ class CDNAv3Writer:
         policy: TensorPolicy,
     ) -> dict:
         """Write a tensor using morpho codec (wave-grown from seed).
+        Requires scipy: pip install scipy
 
         If policy.morpho_min_cosine > 0, applies a quality gate:
         falls back to exact storage if the morpho fit doesn't meet threshold.
         """
+        global morpho_encode
+        if morpho_encode is None:
+            from helix_substrate.morpho_codec import morpho_encode as _me
+            morpho_encode = _me
+
         safe = _safe_name(tensor_name)
         out_dir = self.base_dir / f"{safe}.cdnav3"
 
