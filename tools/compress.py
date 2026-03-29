@@ -44,6 +44,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.rapl_meter import RaplMeter
 from helix_substrate.tensor_policy import (
     classify_tensor,
     get_policy,
@@ -331,6 +332,8 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     t_start = time.time()
     cpu_start = time.process_time()
     start_iso = time.strftime("%Y-%m-%dT%H:%M:%S")
+    rapl = RaplMeter()
+    rapl.__enter__()
 
     model_dir = Path(model_dir).expanduser().resolve()
     assert model_dir.is_dir(), f"Not a directory: {model_dir}"
@@ -729,6 +732,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
 
     wall = time.time() - t_start
     cpu = time.process_time() - cpu_start
+    rapl.__exit__(None, None, None)
     ratio = round(total_dense / max(1, total_compressed), 2)
 
     # ── Phase 3: Manifest + Receipt ──
@@ -792,6 +796,8 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             "timestamp_end": time.strftime("%Y-%m-%dT%H:%M:%S"),
         },
     }
+    if rapl.available and rapl.joules is not None:
+        receipt["cost"]["energy_joules"] = round(rapl.joules, 3)
 
     receipts_dir = Path(__file__).parent.parent / "receipts" / "compress"
     receipts_dir.mkdir(parents=True, exist_ok=True)

@@ -37,6 +37,27 @@ reader = CDNAv3Reader("./compressed/layer_name.cdnav3")
 reconstructed = reader.reconstruct()  # cosine similarity >= 0.999
 ```
 
+## Model Zoo
+
+Pre-compressed models on HuggingFace. One import, one line to load:
+
+```python
+import helix_substrate.hf_quantizer  # registers cdna_v3
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
+tokenizer = AutoTokenizer.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
+```
+
+| Model | Architecture | Ratio | PPL Delta | Size | Link |
+|-------|-------------|-------|-----------|------|------|
+| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 4.0x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
+| Qwen2.5-Coder-3B | Transformer | 4.44x | +1.92% | 3.84 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
+| TinyLlama-1.1B | Transformer | 3.99x | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
+| Mamba-130M | Pure SSM | 5.61x | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
+
+**Three architectures, one codec.** CDNA v3 compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
+
 ## What it does
 
 helix-substrate compresses neural network weights using scalar k-means vector quantization. Each weight value is assigned to the nearest entry in a learned 256-entry codebook. Outlier values (top 0.1% by magnitude) are preserved exactly in a sparse sidecar. The result is a `codebook + uint8 indices + sidecar` representation at ~4x compression with negligible quality loss.
@@ -74,6 +95,7 @@ The remaining +6.34% PPL delta comes primarily from early down_proj layers (laye
 | Mamba-2 1.3B | SSM (Mamba-2) | 98 | 3.99x | 0.9990+ |
 | MiniLM-L6 | Transformer (BERT) | 73 | 3.94x | 0.9997 |
 | CLIP ViT-B/32 | Vision Transformer | 49 | 3.98x | 0.9997 |
+| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 136 | 4.00x | 0.9973 |
 | ResNet-18 | CNN | 1 (fc) | 3.97x | 0.9998 |
 
 All compressed with the same command. No architecture-specific flags or code paths.
@@ -113,6 +135,18 @@ python tools/compress.py \
 ```
 
 ### Load compressed weights for inference
+
+**From HuggingFace (recommended):**
+
+```python
+import helix_substrate.hf_quantizer  # register quantizer
+from transformers import AutoModelForCausalLM
+
+model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
+output = model.generate(input_ids, max_new_tokens=128)
+```
+
+**From local CDNA v3 directory:**
 
 ```python
 from transformers import AutoModelForCausalLM
@@ -247,6 +281,7 @@ helix-substrate/
 |   +-- cdnav3_reader.py       # Reconstruct from CDNA v3
 |   +-- tensor_policy.py       # Compression routing policy
 |   +-- helix_linear.py        # Drop-in nn.Linear replacement
+|   +-- hf_quantizer.py        # HuggingFace AutoModel integration
 |   +-- generate_sidecars_v3.py # Outlier sidecar generation
 |   +-- triton_vq_matmul.py    # Fused Triton kernel (late materialization)
 +-- tools/

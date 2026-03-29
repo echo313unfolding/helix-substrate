@@ -21,6 +21,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from helix_substrate.rapl_meter import RaplMeter
+
 
 def eval_ppl(model, tokenizer, device="cpu", n_tokens=8192, seq_len=2048):
     """Evaluate perplexity on WikiText-2."""
@@ -70,6 +73,8 @@ def main():
     device = "cpu"
     results = {}
     t_start = time.time()
+    rapl = RaplMeter()
+    rapl.__enter__()
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.model_dir, trust_remote_code=True)
@@ -163,6 +168,7 @@ def main():
 
     # Receipt
     wall = round(time.time() - t_start, 1)
+    rapl.__exit__(None, None, None)
     receipt = {
         "work_order": "WO-SCALING-PPL-01",
         "question": "7B PPL with embed_tokens=exact, lm_head=exact",
@@ -179,6 +185,8 @@ def main():
             "timestamp_start": datetime.utcnow().isoformat(),
         },
     }
+    if rapl.available and rapl.joules is not None:
+        receipt["cost"]["energy_joules"] = round(rapl.joules, 3)
 
     out_dir = Path("receipts/scaling_analysis")
     out_dir.mkdir(parents=True, exist_ok=True)
