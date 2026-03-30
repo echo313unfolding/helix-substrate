@@ -494,6 +494,12 @@ if HF_AVAILABLE:
             if unexpected_keys is not None and param_name in unexpected_keys:
                 unexpected_keys.remove(param_name)
 
+    # Register aliases — backward compat ("cdna_v3") and new branding ("hxq")
+    register_quantization_config("hxq")(HelixQuantizationConfig)
+    register_quantization_config("cdna_v3")(HelixQuantizationConfig)
+    register_quantizer("hxq")(HelixHfQuantizer)
+    register_quantizer("cdna_v3")(HelixHfQuantizer)
+
 
 else:
     # transformers not available — provide stub classes so import doesn't fail

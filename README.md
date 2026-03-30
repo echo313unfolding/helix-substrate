@@ -26,7 +26,7 @@ pip install helix-substrate
 ```
 
 ```python
-from helix_substrate import CDNAv3Writer, CDNAv3Reader
+from helix_substrate import CDNAv3Writer, CDNAv3Reader  # HelixCode format
 
 # Compress any 2D weight tensor
 writer = CDNAv3Writer("./compressed/")
@@ -42,7 +42,7 @@ reconstructed = reader.reconstruct()  # cosine similarity >= 0.999
 Pre-compressed models on HuggingFace. One import, one line to load:
 
 ```python
-import helix_substrate.hf_quantizer  # registers cdna_v3
+import helix_substrate  # registers HXQ quantizer with HuggingFace
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
@@ -51,12 +51,17 @@ tokenizer = AutoTokenizer.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
 
 | Model | Architecture | Ratio | PPL Delta | Size | Link |
 |-------|-------------|-------|-----------|------|------|
+| Qwen2.5-14B | Transformer | 4.0x | pending | ~8.4 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-14b-instruct-helix) |
+| Qwen2.5-7B | Transformer | 4.0x | +6.34% | ~6.5 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-7b-instruct-helix) |
+| Qwen2.5-3B | Transformer | 4.44x | +0.69% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-helix) |
+| Qwen2.5-Coder-3B | Transformer (code) | 4.44x | +1.92% | 3.84 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
+| Qwen2.5-Coder-1.5B | Transformer (code) | 4.7x | +1.73% | 2.1 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-1.5b-helix) |
 | Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 4.0x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
-| Qwen2.5-Coder-3B | Transformer | 4.44x | +1.92% | 3.84 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
 | TinyLlama-1.1B | Transformer | 3.99x | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
+| Mamba2-1.3B | Pure SSM (Mamba2) | 4.0x | +8.0% | 1.4 GB | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-helix) |
 | Mamba-130M | Pure SSM | 5.61x | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
 
-**Three architectures, one codec.** CDNA v3 compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
+**Three architectures, one codec.** HelixCode (HXQ) compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
 
 ## What it does
 
@@ -139,14 +144,14 @@ python tools/compress.py \
 **From HuggingFace (recommended):**
 
 ```python
-import helix_substrate.hf_quantizer  # register quantizer
+import helix_substrate  # registers HXQ quantizer
 from transformers import AutoModelForCausalLM
 
 model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
 output = model.generate(input_ids, max_new_tokens=128)
 ```
 
-**From local CDNA v3 directory:**
+**From local HelixCode directory:**
 
 ```python
 from transformers import AutoModelForCausalLM
@@ -277,11 +282,11 @@ This work builds on and differentiates from:
 ```
 helix-substrate/
 +-- helix_substrate/
-|   +-- cdnav3_writer.py       # Compress tensors to CDNA v3 format
-|   +-- cdnav3_reader.py       # Reconstruct from CDNA v3
+|   +-- cdnav3_writer.py       # Compress tensors to HelixCode format
+|   +-- cdnav3_reader.py       # Reconstruct from HelixCode
 |   +-- tensor_policy.py       # Compression routing policy
 |   +-- helix_linear.py        # Drop-in nn.Linear replacement
-|   +-- hf_quantizer.py        # HuggingFace AutoModel integration
+|   +-- hf_integration.py      # HuggingFace AutoModel integration (HXQ quantizer)
 |   +-- generate_sidecars_v3.py # Outlier sidecar generation
 |   +-- triton_vq_matmul.py    # Fused Triton kernel (late materialization)
 +-- tools/
