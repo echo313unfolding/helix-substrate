@@ -56,12 +56,13 @@ tokenizer = AutoTokenizer.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
 | Qwen2.5-3B | Transformer | 4.44x | +0.69% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-helix) |
 | Qwen2.5-Coder-3B | Transformer (code) | 4.44x | +1.92% | 3.84 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
 | Qwen2.5-Coder-1.5B | Transformer (code) | 4.7x | +1.73% | 2.1 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-1.5b-helix) |
+| Zamba2-2.7B | Hybrid (Mamba2+Transformer) | 1.83x | +6.59% | 2.8 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-2.7b-instruct-helix) |
 | Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 4.0x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
 | TinyLlama-1.1B | Transformer | 3.99x | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
 | Mamba2-1.3B | Pure SSM (Mamba2) | 4.0x | +8.0% | 1.4 GB | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-helix) |
 | Mamba-130M | Pure SSM | 5.61x | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
 
-**Three architectures, one codec.** HelixCode (HXQ) compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
+**Four architectures, one codec.** HelixCode (HXQ) compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
 
 ## What it does
 
