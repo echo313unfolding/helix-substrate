@@ -81,16 +81,23 @@ class CDNAv3Config(QuantizationConfigMixin):
         n_svd_routed: int = 0,
         modules_to_not_convert: Optional[List[str]] = None,
         module_k_map: Optional[Dict[str, int]] = None,
+        # Backward compat with hf_integration.py config format
+        codebook_size: Optional[int] = None,
+        sidecar_enabled: bool = True,
+        exact_patterns: Optional[List[str]] = None,
         **kwargs,
     ):
         if HAS_HF_QUANTIZER_API:
             self.quant_method = "cdna_v3"
         self.bits = bits
-        self.n_clusters = n_clusters
+        # Accept codebook_size (old format) as n_clusters
+        self.n_clusters = codebook_size if codebook_size is not None else n_clusters
         self.compressed_modules = compressed_modules or []
         self.compression_ratio = compression_ratio
         self.n_svd_routed = n_svd_routed
         self.modules_to_not_convert = modules_to_not_convert or []
+        self.sidecar_enabled = sidecar_enabled
+        self.exact_patterns = exact_patterns or []
         # Per-module codebook size overrides (module_path -> k)
         self.module_k_map = module_k_map or {}
 
@@ -123,37 +130,65 @@ def _replace_with_helix_linear(
     compressed_modules: set,
     compute_dtype: torch.dtype = torch.float32,
     module_k_map: Optional[Dict[str, int]] = None,
-) -> int:
+    n_clusters_default: int = 256,
+) -> tuple:
     """Replace nn.Linear modules with HelixLinear shells.
 
     Handles shared modules (e.g., Zamba2's shared_transformer) by tracking
     already-replaced objects to avoid double replacement.
+
+    Also handles nn.Embedding: registers codebook/indices buffers so
+    safetensors can load them, then reconstructs dense weight in
+    _process_model_after_weight_loading.
 
     Args:
         model: HF model (on meta device during loading)
         compressed_modules: Set of module paths to replace
         compute_dtype: Compute precision for HelixLinear
         module_k_map: Optional per-module codebook size overrides
+        n_clusters_default: Default codebook size
 
     Returns:
-        Number of modules replaced.
+        (n_replaced, compressed_embeddings_set)
     """
     HelixLinear = _get_helix_linear_cls()
     replaced = 0
     replaced_ids = set()  # Track object ids to handle shared modules
+    compressed_embeddings = set()
     k_map = module_k_map or {}
 
     for name, module in list(model.named_modules()):
         if name not in compressed_modules:
             continue
-        if not isinstance(module, nn.Linear):
-            continue
+
         # Skip if this exact Python object was already replaced (shared modules)
         if id(module) in replaced_ids:
             continue
 
+        # Handle nn.Embedding: register codebook/indices buffers for safetensors
+        if isinstance(module, nn.Embedding):
+            k = k_map.get(name, n_clusters_default)
+            module.register_buffer(
+                "codebook", torch.zeros(k, dtype=torch.float32)
+            )
+            module.register_buffer(
+                "indices",
+                torch.zeros(
+                    module.num_embeddings,
+                    module.embedding_dim,
+                    dtype=torch.uint8,
+                ),
+            )
+            compressed_embeddings.add(name)
+            replaced_ids.add(id(module))
+            replaced += 1
+            continue
+
+        if not isinstance(module, nn.Linear):
+            continue
+
         # Per-module codebook size (default 256 for backward compat)
-        n_clusters = k_map.get(name, 256)
+        n_clusters = k_map.get(name, n_clusters_default)
 
         # Create shell with matching dimensions
         helix_shell = HelixLinear.from_quantized_config(
@@ -174,7 +209,7 @@ def _replace_with_helix_linear(
         setattr(parent, parts[-1], helix_shell)
         replaced += 1
 
-    return replaced
+    return replaced, compressed_embeddings
 
 
 # ---------------------------------------------------------------------------
@@ -231,11 +266,13 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
             )
             return
 
-        n = _replace_with_helix_linear(
+        n, self._compressed_embeddings = _replace_with_helix_linear(
             model, compressed,
             module_k_map=self.quantization_config.module_k_map,
+            n_clusters_default=self.quantization_config.n_clusters,
         )
-        logger.info(f"CDNA v3: replaced {n} nn.Linear → HelixLinear")
+        logger.info(f"CDNA v3: replaced {n} nn.Linear → HelixLinear"
+                     f" ({len(self._compressed_embeddings)} embeddings)")
 
         # Detect aliased module paths (e.g., Zamba2's shared_transformer).
         # When the same module object appears under multiple named paths,
@@ -270,7 +307,7 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
     def _process_model_after_weight_loading(
         self, model: nn.Module, **kwargs
     ) -> None:
-        """Compute derived buffers for all HelixLinear modules."""
+        """Compute derived buffers for all HelixLinear modules + reconstruct embeddings."""
         HelixLinear = _get_helix_linear_cls()
         count = 0
         for name, module in model.named_modules():
@@ -278,6 +315,34 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
                 module._recompute_derived()
                 count += 1
         logger.info(f"CDNA v3: finalized {count} HelixLinear modules")
+
+        # Reconstruct compressed nn.Embedding modules.
+        # codebook/indices buffers were registered in before_weight_loading
+        # and populated from safetensors. Now: weight = codebook[indices].
+        compressed_embeddings = getattr(self, "_compressed_embeddings", set())
+        embed_count = 0
+        for name, module in model.named_modules():
+            if name not in compressed_embeddings:
+                continue
+            if not isinstance(module, nn.Embedding):
+                continue
+            codebook = getattr(module, "codebook", None)
+            indices = getattr(module, "indices", None)
+            if codebook is None or indices is None:
+                logger.warning(f"CDNA v3: {name} missing codebook/indices")
+                continue
+
+            with torch.no_grad():
+                dense_weight = codebook[indices.long()]
+                module.weight.copy_(dense_weight)
+
+            # Clean up temporary buffers
+            del module.codebook
+            del module.indices
+            embed_count += 1
+
+        if embed_count:
+            logger.info(f"CDNA v3: reconstructed {embed_count} compressed embedding(s)")
 
     def _is_under_alias(self, key: str) -> bool:
         """Check if a state_dict key belongs to an aliased (non-canonical) module path.
@@ -355,11 +420,13 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
 
 
 # ---------------------------------------------------------------------------
-# Alias: also register under "helix" (used by convert_to_hf.py / hf_integration.py)
+# Aliases: register under all known quant_method names for backward compat.
+# Models on HF may have "helix", "cdna_v3", or "hxq" in their config.json.
 # ---------------------------------------------------------------------------
 if HAS_HF_QUANTIZER_API:
-    try:
-        register_quantization_config("helix")(CDNAv3Config)
-        register_quantizer("helix")(HelixHfQuantizer)
-    except Exception:
-        pass  # Already registered or API changed
+    for _alias in ("helix", "hxq"):
+        try:
+            register_quantization_config(_alias)(CDNAv3Config)
+            register_quantizer(_alias)(HelixHfQuantizer)
+        except Exception:
+            pass  # Already registered or API changed

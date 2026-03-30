@@ -49,7 +49,9 @@ except ImportError:
 
 if HF_AVAILABLE:
 
-    @register_quantization_config("helix")
+    # DEPRECATED: Registration moved to hf_quantizer.py (canonical implementation).
+    # This class is kept for backward-compatible imports only.
+    # Do NOT re-add @register_quantization_config — it conflicts with hf_quantizer.py.
     @dataclass
     class HelixQuantizationConfig(QuantizationConfigMixin):
         """
@@ -95,7 +97,7 @@ if HF_AVAILABLE:
     # Step 4: HelixHfQuantizer
     # ---------------------------------------------------------------------------
 
-    @register_quantizer("helix")
+    # DEPRECATED: Registration moved to hf_quantizer.py. Kept for imports only.
     class HelixHfQuantizer(HfQuantizer):
         """
         HuggingFace quantizer for Helix VQ-256 compressed models.
@@ -494,11 +496,7 @@ if HF_AVAILABLE:
             if unexpected_keys is not None and param_name in unexpected_keys:
                 unexpected_keys.remove(param_name)
 
-    # Register aliases — backward compat ("cdna_v3") and new branding ("hxq")
-    register_quantization_config("hxq")(HelixQuantizationConfig)
-    register_quantization_config("cdna_v3")(HelixQuantizationConfig)
-    register_quantizer("hxq")(HelixHfQuantizer)
-    register_quantizer("cdna_v3")(HelixHfQuantizer)
+    # Alias registrations REMOVED — all registration now in hf_quantizer.py
 
 
 else:

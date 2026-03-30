@@ -465,8 +465,12 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             safe_name = name.replace("/", "_").replace(".", "_")
             exact_path = cdna_dir / f"{safe_name}.npy"
             if not exact_path.exists() or force:
-                tensor_np = source.get_tensor(name)
-                np.save(exact_path, tensor_np)
+                tensor_np = source.get_tensor(name)  # FP32 from get_tensor()
+                # Store at FP16 instead of FP32 to avoid BF16→FP32 inflation.
+                # FP16 has more mantissa bits (10) than BF16 (7), so no precision
+                # loss relative to the original model. Saves 50% for exact tensors
+                # — embed_tokens alone goes from 438 MB to 219 MB on 7B models.
+                np.save(exact_path, tensor_np.astype(np.float16))
                 del tensor_np
             # Write meta.json companion (needed for standalone bias loading)
             meta_path = cdna_dir / f"{safe_name}.npy.meta.json"

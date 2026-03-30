@@ -1,0 +1,34 @@
+{
+  "model": "zamba2-2.7b-instruct",
+  "helix_ppl_gpu": 5.6806,
+  "dense_ppl_gpu": 5.3295,
+  "delta_pct": 6.59,
+  "eval_setup": {
+    "dtype": "bfloat16",
+    "device": "cuda",
+    "n_tokens": 8192,
+    "seq_len": 2048,
+    "dataset": "wikitext-2-raw-v1",
+    "method": "swap_to_helix + model.cuda()"
+  },
+  "cpu_comparison": {
+    "helix_ppl_cpu": 10.9992,
+    "dense_ppl_cpu": 8.0022,
+    "delta_pct_cpu": 37.45,
+    "note": "CPU FP32 inflates PPL on both dense and helix, but disproportionately hurts helix"
+  },
+  "sanity_outputs": [
+    "The capital of France is Paris.",
+    "In 1969, humans first set foot on the moon.",
+    "The Python programming language was created by Guido van Rossum and first released in 1991."
+  ],
+  "helix_modules": 147,
+  "compressed_tensors": 147,
+  "exact_tensors": 222,
+  "cost": {
+    "wall_time_s": 42.9,
+    "python_version": "3.10.12",
+    "hostname": "41550c54-8cf3-4994-89e3-55db76d77fd3",
+    "timestamp": "2026-03-30T00:45:00"
+  }
+}

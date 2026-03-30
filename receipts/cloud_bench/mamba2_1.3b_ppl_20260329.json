@@ -1,0 +1,14 @@
+{
+  "model": "mamba2-1.3b-helix",
+  "helix_ppl": 10.0024,
+  "helix_modules": 97,
+  "sidecars_loaded": 97,
+  "sanity_output": "The future of artificial intelligence is in the hands of the people.\n\nThat\u2019s the message of a new re",
+  "cost": {
+    "wall_time_s": 206.503,
+    "python_version": "3.10.12",
+    "hostname": "41550c54-8cf3-4994-89e3-55db76d77fd3",
+    "timestamp_start": "2026-03-29T20:43:59",
+    "timestamp_end": "2026-03-29T20:47:25"
+  }
+}

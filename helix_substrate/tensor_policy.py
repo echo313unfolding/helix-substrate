@@ -179,12 +179,12 @@ _DEFAULT_POLICIES = {
     ),
     TensorClass.EMBEDDING: TensorPolicy(
         tensor_class=TensorClass.EMBEDDING,
-        storage_mode="codebook",
-        n_clusters=256,
-        percentile=99.9,
+        storage_mode="exact",
+        n_clusters=0,
+        percentile=100.0,
         use_kmeans=False,
         sidecar_enabled=False,
-        block_rows=32,
+        block_rows=0,
         max_corrections=0,
     ),
     TensorClass.ATTENTION_QK: TensorPolicy(
