@@ -868,7 +868,7 @@ class ResearchReceipt:
             json.dumps(data, sort_keys=True, default=str).encode()
         ).hexdigest()
 
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, default=str)
 
         return str(path)

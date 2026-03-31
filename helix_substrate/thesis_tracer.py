@@ -406,7 +406,7 @@ class TraceChain:
         filename = f"trace_{self.thesis.thesis_id}_{timestamp}.json" if self.thesis else f"trace_{self.chain_id}_{timestamp}.json"
         path = os.path.join(directory, filename)
 
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(d, f, indent=2, default=str)
 
         return path
@@ -732,7 +732,7 @@ def replay_from_receipt(receipt_path: str) -> Dict[str, Any]:
             integrity: dict — hash verification results
             sha256_valid: bool — file hash matches
     """
-    with open(receipt_path) as f:
+    with open(receipt_path, encoding="utf-8") as f:
         data = json.load(f)
 
     # Verify file-level SHA256

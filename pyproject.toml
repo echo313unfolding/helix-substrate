@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "helix-substrate"
-version = "0.2.6"
+version = "0.3.0"
 description = "Model weight compression and streaming decode library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -38,6 +38,7 @@ classifiers = [
 dependencies = [
     "numpy>=1.24",
     "safetensors>=0.4",
+    "brotli>=1.0",
 ]
 
 [project.urls]
@@ -46,7 +47,7 @@ Repository = "https://github.com/echo313unfolding/helix-substrate"
 Documentation = "https://github.com/echo313unfolding/helix-substrate#readme"
 
 [project.optional-dependencies]
-brotli = ["brotli>=1.0"]
+brotli = ["brotli>=1.0"]  # included in core deps; kept for back-compat
 zstd = ["zstandard>=0.20"]
 torch = ["torch>=2.0"]
 hf = [
@@ -59,9 +60,13 @@ hf = [
 gguf = [
     "gguf>=0.6",
 ]
+scan = [
+    "scipy>=1.10",
+]
 dev = [
     "pytest>=7.0",
     "brotli>=1.0",
+    "scipy>=1.10",
 ]
 all = [
     "torch>=2.0",
@@ -76,6 +81,7 @@ all = [
 
 [project.scripts]
 helix-substrate = "helix_substrate.cli:main"
+helix-kurtosis-scan = "helix_substrate.kurtosis_scan:main"
 
 [tool.setuptools.packages.find]
 include = ["helix_substrate*"]
