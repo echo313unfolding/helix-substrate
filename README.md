@@ -9,7 +9,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://python.org)
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0%2B-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License](https://img.shields.io/badge/license-Echo%20Labs-green)](LICENSE)
-[![4x Compression](https://img.shields.io/badge/compression-4x-brightgreen)]()
+[![~2x from BF16](https://img.shields.io/badge/compression-~2x%20from%20BF16-brightgreen)]()
 [![Beats GPTQ](https://img.shields.io/badge/quality-beats%20GPTQ-blue)]()
 
 **Calibration-free VQ compression. Beats GPTQ quality at 7B and AWQ at 14B.**
@@ -49,24 +49,27 @@ model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
 tokenizer = AutoTokenizer.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
 ```
 
-| Model | Architecture | Ratio | PPL Delta | Size | Link |
-|-------|-------------|-------|-----------|------|------|
-| Qwen2.5-14B | Transformer | 4.0x | pending | ~8.4 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-14b-instruct-helix) |
-| Qwen2.5-7B | Transformer | 4.0x | +6.34% | ~6.5 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-7b-instruct-helix) |
-| Qwen2.5-3B | Transformer | 4.44x | +0.69% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-helix) |
-| Qwen2.5-Coder-3B | Transformer (code) | 4.44x | +1.92% | 3.84 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
-| Qwen2.5-Coder-1.5B | Transformer (code) | 4.7x | +1.73% | 2.1 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-1.5b-helix) |
-| Zamba2-2.7B | Hybrid (Mamba2+Transformer) | 1.83x | +6.59% | 2.8 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-2.7b-instruct-helix) |
-| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 4.0x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
-| TinyLlama-1.1B | Transformer | 3.99x | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
-| Mamba2-1.3B | Pure SSM (Mamba2) | 4.0x | +8.0% | 1.4 GB | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-helix) |
-| Mamba-130M | Pure SSM | 5.61x | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
+| Model | Architecture | Ratio (from BF16) | PPL Delta | Size | Link |
+|-------|-------------|-------------------|-----------|------|------|
+| Qwen2.5-14B | Transformer | 3.4x | pending | 8.4 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-14b-instruct-helix) |
+| Qwen2.5-7B | Transformer | 2.2x | +6.34% | 6.5 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-7b-instruct-helix) |
+| Zamba2-7B | Hybrid (Mamba2+Transformer) | 2.0x | pending | 7.5 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-7b-instruct-hxq) |
+| Qwen2.5-3B | Transformer | 1.6x | +0.69% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-helix) |
+| Qwen2.5-Coder-3B | Transformer (code) | 1.6x | +1.92% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
+| Qwen2.5-Coder-1.5B | Transformer (code) | 1.5x | +1.73% | 2.1 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-1.5b-helix) |
+| Zamba2-2.7B | Hybrid (Mamba2+Transformer) | 1.8x | +6.59% | 2.8 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-2.7b-instruct-helix) |
+| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 1.7x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
+| TinyLlama-1.1B | Transformer | 4.0x* | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
+| Mamba2-1.3B | Pure SSM (Mamba2) | 2.1x | +8.0% | 1.4 GB | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-helix) |
+| Mamba-130M | Pure SSM | 3.8x* | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
+
+*TinyLlama and Mamba-130M ratios are from FP32 source weights. All other ratios are from BF16 source.
 
 **Four architectures, one codec.** HelixCode (HXQ) compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
 
 ## What it does
 
-helix-substrate compresses neural network weights using scalar k-means vector quantization. Each weight value is assigned to the nearest entry in a learned 256-entry codebook. Outlier values (top 0.1% by magnitude) are preserved exactly in a sparse sidecar. The result is a `codebook + uint8 indices + sidecar` representation at ~4x compression with negligible quality loss.
+helix-substrate compresses neural network weights using scalar k-means vector quantization. Each weight value is assigned to the nearest entry in a learned 256-entry codebook. Outlier values (top 0.1% by magnitude) are preserved exactly in a sparse sidecar. The result is a `codebook + uint8 indices + sidecar` representation at ~2x file-level compression from BF16 sources (~4x per-tensor from FP32) with negligible quality loss.
 
 No calibration data. No fine-tuning. No architecture-specific code.
 
@@ -87,33 +90,35 @@ No calibration data. No fine-tuning. No architecture-specific code.
 
 The remaining +6.34% PPL delta comes primarily from early down_proj layers (layers 3-4) at 0.964 cosine. These are the highest-kurtosis FFN tensors in the model. Rank-32 SVD on those specific layers is expected to push this below +4%.
 
-**Quality vs ratio tradeoff:** GPTQ/AWQ achieve 8x compression with worse quality. helix-substrate achieves 4x with the best quality of any post-training method tested, and requires zero calibration data. VQ degrades more gracefully than INT4 at scale — the quality gap widens as model size increases.
+**Quality vs ratio tradeoff:** GPTQ/AWQ achieve 8x compression with worse quality. helix-substrate achieves ~2x from BF16 (~4x per-tensor from FP32) with the best quality of any post-training method tested, and requires zero calibration data. VQ degrades more gracefully than INT4 at scale — the quality gap widens as model size increases.
 
 ### Architecture Coverage (all k=256, same `compress.py`)
 
-| Model | Architecture | Tensors | Ratio | Cosine (min) |
-|-------|-------------|---------|-------|-------------|
-| TinyLlama 1.1B | Transformer (LLaMA) | 154 | 3.98x | 0.9946 |
-| Qwen2.5 1.5B | Transformer (Qwen) | 196 | 4.00x | 0.9943 |
-| Qwen2.5 7B | Transformer (Qwen) | 196 | 4.00x | 0.9955 |
-| Qwen2.5 14B | Transformer (Qwen) | 336 | 4.00x | -- |
-| Mamba-130m | SSM (Mamba) | 97 | 3.92x | 0.9990+ |
-| Mamba-2 1.3B | SSM (Mamba-2) | 98 | 3.99x | 0.9990+ |
-| MiniLM-L6 | Transformer (BERT) | 73 | 3.94x | 0.9997 |
-| CLIP ViT-B/32 | Vision Transformer | 49 | 3.98x | 0.9997 |
-| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 136 | 4.00x | 0.9973 |
-| ResNet-18 | CNN | 1 (fc) | 3.97x | 0.9998 |
+| Model | Architecture | Tensors | Per-Tensor Ratio | File Ratio (from BF16) | Cosine (min) |
+|-------|-------------|---------|-----------------|----------------------|-------------|
+| TinyLlama 1.1B | Transformer (LLaMA) | 154 | 3.98x | 4.0x (FP32 source) | 0.9946 |
+| Qwen2.5 1.5B | Transformer (Qwen) | 196 | 4.00x | 1.5x | 0.9943 |
+| Qwen2.5 7B | Transformer (Qwen) | 196 | 4.00x | 2.2x | 0.9955 |
+| Qwen2.5 14B | Transformer (Qwen) | 336 | 4.00x | 3.4x | -- |
+| Mamba-130m | SSM (Mamba) | 97 | 3.92x | 3.8x (FP32 source) | 0.9990+ |
+| Mamba-2 1.3B | SSM (Mamba-2) | 98 | 3.99x | 2.1x | 0.9990+ |
+| MiniLM-L6 | Transformer (BERT) | 73 | 3.94x | -- | 0.9997 |
+| CLIP ViT-B/32 | Vision Transformer | 49 | 3.98x | -- | 0.9997 |
+| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 136 | 4.00x | 1.7x | 0.9973 |
+| ResNet-18 | CNN | 1 (fc) | 3.97x | -- | 0.9998 |
 
-All compressed with the same command. No architecture-specific flags or code paths.
+Per-tensor ratio is FP32 weight → codebook+indices+sidecar (~4x for k=256). File ratio is the actual size reduction from the BF16 source model — lower because exact tensors (norms, embeddings, biases) are stored at full precision. All compressed with the same command. No architecture-specific flags or code paths.
 
-### Compression Quality Frontier (TinyLlama, PPL on WikiText-2)
+### Compression Quality Frontier (TinyLlama FP32 source, PPL on WikiText-2)
 
-| Config | Ratio | PPL Delta | Status |
-|--------|-------|-----------|--------|
+| Config | Per-Tensor Ratio | PPL Delta | Status |
+|--------|-----------------|-----------|--------|
 | k=256 + sidecar | 4.0x | +0.11% | Production baseline |
 | k=64 + sidecar | 5.3x | +1.44% | Model-dependent (fails on Qwen at +2.78%) |
 | k=32 + sidecar | 6.4x | +2.61% | Below quality threshold |
 | k=16 + sidecar | 8.0x | +9.34% | Rejected |
+
+Note: These are per-tensor ratios on TinyLlama (FP32 source). For BF16 source models, file-level ratios are ~2x at k=256.
 
 **Dead ends tested for 8x (all falsified with receipts):** Group VQ k=16 (per-column codebooks, cos=0.991 vs 0.999 global), off-the-shelf ResidualVQ (Lucidrain, full-row vector quantization, cos=0.26), SVD residual correction (hurts at 7B), channel scaling/calibration (zero net benefit). Sub-vector product quantization (AQLM/VPTQ) could reach 8x but requires architecture-aware calibration, destroying the universality advantage. See `receipts/group_vq/`, `receipts/rvq_benchmark/`, `receipts/scaling_analysis/`.
 
@@ -200,12 +205,12 @@ The same codec handles any 2D float32 tensor. No modifications needed across dom
 | Gradient compression | TinyLlama backward pass | SGD step cos=1.000 | PASS |
 | Embedding tables | TinyLlama embed_tokens | Row cos min=0.983 | WEAK |
 | Activation checkpointing | TinyLlama activations | cos min=0.996, 3.90x | PASS |
-| Federated learning deltas | SGD weight deltas | Weight cos=1.000, 4.0x | PASS |
+| Federated learning deltas | SGD weight deltas | Weight cos=1.000 | PASS |
 | Neural codec weights | CLIP ViT + ResNet-18 | cos 0.9997+, 100% pred match | STRONG |
 | RAG index | MiniLM embeddings | top-1 100%, top-5 4.9/5 | STRONG |
 | LoRA adapters | PEFT LoRA matrices | All 88 matrices cos>=0.9997 | STRONG |
 | MoE tiered compression | Simulated expert split | Fidelity tiers work | MIXED |
-| Continual learning | Model snapshots | Full 4.0x, delta cos=1.0 | PASS |
+| Continual learning | Model snapshots | delta cos=1.0 | PASS |
 | Sensor / scientific data | scRNA-seq + protein PDB | ARI 0.75-0.92 | MIXED |
 
 All receipts in `receipts/tensor_infra/`.
@@ -226,7 +231,7 @@ Online KV cache compression using the same VQ codec. Fits codebooks on the first
 
 Unified inference runtime wiring HelixLinear + CompressedKVCache + CDC-03 attention into one forward pass. One config file, one command.
 
-- 155/155 weight modules compressed (3.98x)
+- 155/155 weight modules compressed
 - 22-layer KV cache (layer 0 exact, 1-21 streaming VQ)
 - 21 CDC-03 hybrid attention layers
 - 1404 MB peak VRAM on Quadro T2000 (4 GB card)
@@ -259,13 +264,13 @@ Input Tensor (2D float32)
 
 **We do not claim to have invented VQ for neural networks.** VQ weight compression dates to the 1980s, with DNN applications since 2015. Our differentiators are: calibration-free operation, architecture-agnostic coverage including SSMs (no prior work compresses Mamba through the same pipeline as LLaMA), kurtosis-based statistical routing that outperforms Hessian-based approaches, and the intelligence layer (adaptive routing, symbolic governance, semantic memory indexing).
 
-**4x is the universal number. 5.3x is model-dependent.** k=64 passes on TinyLlama (+1.44%) but fails on Qwen-1.5B (+2.78%). We do not claim universal 5.3x compression.
+**~2x from BF16 is the honest file-level number. ~4x is the per-tensor codec ratio from FP32.** The codec compresses each weight tensor ~4x (FP32 → uint8 indices + codebook). But most source models are BF16, and exact tensors (norms, embeddings, biases) are stored at full precision. File-level ratios from BF16 range from 1.5x to 3.4x depending on the model's ratio of compressible to exact parameters. k=64 passes on TinyLlama (+1.44%) but fails on Qwen-1.5B (+2.78%). We do not claim universal 5.3x compression.
 
 **The GPU path does late materialization.** The fused Triton kernel computes `Y = X @ codebook[indices]` directly from compressed VQ indices -- the full weight matrix W never hits global VRAM. Measured peak allocation is 0.4% of W size across all tensor shapes (attn, FFN gate, FFN down). This is not a roadmap item; it ships today. Receipt: `receipts/late_materialization/late_materialization_20260326T131246.json`.
 
 **Speed comparison against GPTQ/AWQ is not yet fair.** The decode speed gap reflects kernel maturity, not architecture. GPTQ/AWQ have years of optimization (Marlin, exllama2). Our Triton kernel is correct and memory-efficient but not yet throughput-optimized. Our advantage is on quality, universality, and the compressed runtime stack.
 
-**VQ is 4x, not 8x.** GPTQ/AWQ achieve 8x compression (INT4). We achieve 4x (uint8 indices + codebook). Our compression ratio is lower, but our quality is better. The right comparison is quality at a given memory budget, not compression ratio alone.
+**VQ is ~2x from BF16 (4x per-tensor from FP32), not 8x.** GPTQ/AWQ achieve 8x compression (INT4 from FP16). We achieve ~2x file-level from BF16 (uint8 indices + codebook + exact tensors). Our compression ratio is lower, but our quality is better and requires zero calibration. The right comparison is quality at a given memory budget, not compression ratio alone.
 
 ## Prior art and references
 
