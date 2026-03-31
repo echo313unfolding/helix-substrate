@@ -222,7 +222,7 @@ formalized version of the original entropy-validated sequence scoring.
 
 **Production (Mar 2026):** `helix_substrate/helix_linear.py`
 
-The `.cdnav3` directory IS the `.hxz vault`. It's compressed (4.0x), executable
+The `.cdnav3` directory IS the `.hxz vault`. It's compressed (~4x per-tensor from FP32), executable
 without decompression (`codebook[indices]` runs directly), and "expresses" when
 injected into a PyTorch model via `swap_to_helix()`. The biological metaphor of a
 computational gene that self-expresses in a compatible host is architecturally exact.
