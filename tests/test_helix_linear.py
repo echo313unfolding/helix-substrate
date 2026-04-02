@@ -323,8 +323,8 @@ def test_no_parameters():
         tensor_dir = _write_cdnav3(tmpdir, tensor, "test.params.weight", policy)
         helix = load_helix_linear_from_cdnav3(tensor_dir)
 
-        params = list(helix.parameters())
-        assert len(params) == 0, f"Expected 0 parameters, got {len(params)}"
+        trainable = [p for p in helix.parameters() if p.requires_grad]
+        assert len(trainable) == 0, f"Expected 0 trainable parameters, got {len(trainable)}"
 
         buffers = list(helix.buffers())
         assert len(buffers) > 0, "Expected at least codebook + indices as buffers"

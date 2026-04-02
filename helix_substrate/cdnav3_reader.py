@@ -57,14 +57,22 @@ class CDNAv3Reader:
             self._codebook = np.load(self.tensor_dir / "codebook.npy")
         return self._codebook
 
+    @property
+    def vector_dim(self) -> int:
+        return self._meta.get("vector_dim", 1)
+
     def _load_indices(self) -> np.ndarray:
         if self._indices is None:
             rows, cols = self.shape
+            d = self.vector_dim
             # Support uint16 indices for k>256 codebooks (backward-compat: default uint8)
             dtype_str = self._meta.get("index_dtype", "uint8")
             np_dtype = np.uint16 if dtype_str == "uint16" else np.uint8
             raw = np.fromfile(self.tensor_dir / "indices.bin", dtype=np_dtype)
-            self._indices = raw.reshape(rows, cols)
+            if d > 1:
+                self._indices = raw.reshape(rows, cols // d)
+            else:
+                self._indices = raw.reshape(rows, cols)
         return self._indices
 
     def _load_sidecar(self) -> tuple[np.ndarray, np.ndarray] | None:
@@ -107,7 +115,15 @@ class CDNAv3Reader:
 
         codebook = self._load_codebook()
         indices = self._load_indices()
-        tensor = codebook[indices]
+        d = self.vector_dim
+        rows, cols = self.shape
+
+        if d > 1:
+            # Vector VQ: codebook is [k, d], indices are [rows, cols/d]
+            # Gather: [rows, cols/d, d] → reshape to [rows, cols]
+            tensor = codebook[indices].reshape(rows, cols)
+        else:
+            tensor = codebook[indices]
 
         sidecar = self._load_sidecar()
         if sidecar is not None:
@@ -140,12 +156,18 @@ class CDNAv3Reader:
 
         codebook = self._load_codebook()
         indices = self._load_indices()
-        block = codebook[indices[start_row:end_row]]
+        d = self.vector_dim
+        rows, cols = self.shape
+
+        if d > 1:
+            # Vector VQ: codebook [k, d], indices [rows, cols/d]
+            block = codebook[indices[start_row:end_row]].reshape(end_row - start_row, cols)
+        else:
+            block = codebook[indices[start_row:end_row]]
 
         sidecar = self._load_sidecar()
         if sidecar is not None:
             positions, values = sidecar
-            rows, cols = self.shape
             # Filter sidecar entries to this row range
             flat_start = start_row * cols
             flat_end = end_row * cols

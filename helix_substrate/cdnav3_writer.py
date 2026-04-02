@@ -65,19 +65,22 @@ class CDNAv3Writer:
         Returns:
             Stats dict with encoding metrics
         """
-        tensor = tensor.astype(np.float32)
-
         if policy is None:
             tc = classify_tensor(tensor_name, shape=tensor.shape)
             policy = get_default_policy(tc)
 
         # Morpho codec: grow from seed (handles 1D and 2D)
         if policy.storage_mode == "morpho":
+            tensor = tensor.astype(np.float32)
             return self._write_morpho(tensor, tensor_name, policy)
 
-        # 1D tensors: save exact as .npy
+        # 1D tensors and exact-policy tensors: save as float16 (not float32)
+        # to match typical BF16/FP16 source models and avoid 2x size inflation.
         if tensor.ndim == 1 or policy.storage_mode == "exact":
-            return self._write_exact(tensor, tensor_name)
+            return self._write_exact(tensor.astype(np.float16), tensor_name)
+
+        # Cast to float32 for k-means quantization (needs FP32 precision)
+        tensor = tensor.astype(np.float32)
 
         # 2D tensors: quantize with optional sidecar
         if tensor.ndim > 2:
@@ -170,20 +173,37 @@ class CDNAv3Writer:
 
         rows, cols = tensor.shape
         flat = tensor.ravel()
+        vector_dim = getattr(policy, "vector_dim", 1)
 
-        # --- Build codebook ---
-        if policy.use_kmeans:
-            codebook = self._build_kmeans_codebook(flat, policy.n_clusters)
+        # --- Build codebook + assign indices ---
+        if vector_dim > 1:
+            # Multi-dimensional VQ path
+            assert cols % vector_dim == 0, (
+                f"in_features ({cols}) must be divisible by vector_dim ({vector_dim})"
+            )
+            codebook, indices = self._build_vector_codebook_and_assign(
+                tensor, policy.n_clusters, vector_dim
+            )
+            index_dtype = np.uint16 if policy.n_clusters > 256 else np.uint8
+            indices = indices.astype(index_dtype)
+            # indices shape: [rows * cols // vector_dim]
+            indices_2d = indices.reshape(rows, cols // vector_dim)
         else:
-            codebook = self._build_uniform_codebook(flat, policy.n_clusters)
-
-        # --- Assign indices (chunked to avoid OOM) ---
-        index_dtype = np.uint16 if len(codebook) > 256 else np.uint8
-        indices = self._chunked_assign(flat, codebook, index_dtype)
-        indices_2d = indices.reshape(rows, cols)
+            # Scalar VQ path (production default)
+            if policy.use_kmeans:
+                codebook = self._build_kmeans_codebook(flat, policy.n_clusters)
+            else:
+                codebook = self._build_uniform_codebook(flat, policy.n_clusters)
+            index_dtype = np.uint16 if len(codebook) > 256 else np.uint8
+            indices = self._chunked_assign(flat, codebook, index_dtype)
+            indices_2d = indices.reshape(rows, cols)
 
         # --- Compute baseline fidelity (before sidecar) ---
-        reconstructed = codebook[indices]
+        if vector_dim > 1:
+            # Reconstruct: codebook[indices] → [N_vectors, d] → flatten to [M*N]
+            reconstructed = codebook[indices.ravel()].reshape(-1)
+        else:
+            reconstructed = codebook[indices]
         cosine_no_sidecar = float(_cosine(flat, reconstructed))
         max_abs_diff = float(np.max(np.abs(flat - reconstructed)))
 
@@ -267,6 +287,7 @@ class CDNAv3Writer:
             "use_kmeans": policy.use_kmeans,
             "sidecar_enabled": policy.sidecar_enabled,
             "block_rows": policy.block_rows,
+            "vector_dim": vector_dim,
             "codebook_sha256": codebook_sha256,
             "svd_residual_rank": svd_rank_actual,
             "source_artifact": source_artifact,
@@ -297,6 +318,90 @@ class CDNAv3Writer:
         (out_dir / "stats.json").write_text(json.dumps(stats, indent=2))
 
         return stats
+
+    def _build_vector_codebook_and_assign(
+        self, tensor: np.ndarray, n_clusters: int, vector_dim: int
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Build vector codebook and assign indices for multi-dim VQ.
+
+        Args:
+            tensor: [rows, cols] float32 tensor
+            n_clusters: Number of codebook entries
+            vector_dim: Dimensionality of each vector (2, 4, etc.)
+
+        Returns:
+            (codebook [k, d], indices [rows * cols // d])
+        """
+        from helix_substrate.cdna_encoder import _vector_kmeans
+
+        rows, cols = tensor.shape
+        # Group adjacent elements along in_features (row-wise, memory-contiguous)
+        vectors = tensor.reshape(-1, vector_dim)  # [rows * cols/d, d]
+        n_vectors = len(vectors)
+
+        # Subsample for codebook fitting (same approach as scalar path)
+        max_fit_samples = min(n_vectors, _KMEANS_MAX_SAMPLES)
+        if n_vectors > max_fit_samples:
+            rng = np.random.RandomState(42)
+            fit_idx = rng.choice(n_vectors, max_fit_samples, replace=False)
+            fit_vectors = vectors[fit_idx]
+        else:
+            fit_vectors = vectors
+
+        # Fit codebook on subsample
+        codebook, _ = _vector_kmeans(fit_vectors, n_clusters, max_iters=10)
+
+        # Assign ALL vectors using chunked matmul distance
+        indices = self._chunked_vector_assign(vectors, codebook, n_clusters)
+        return codebook.astype(np.float32), indices
+
+    def _chunked_vector_assign(
+        self, vectors: np.ndarray, codebook: np.ndarray, n_clusters: int,
+        chunk_size: int = 50000,
+    ) -> np.ndarray:
+        """Assign vector codebook indices in chunks to avoid OOM.
+
+        Uses GPU torch.cdist when available (150x faster), falls back to
+        CPU matmul trick: ||x-c||^2 = ||x||^2 + ||c||^2 - 2*x@c.T.
+        """
+        index_dtype = np.uint8 if n_clusters <= 256 else np.uint16
+        n = len(vectors)
+
+        # GPU path: torch.cdist in chunks (500K vectors per chunk fits ~8GB VRAM)
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gpu_chunk = 500000
+                indices = np.empty(n, dtype=index_dtype)
+                cb_g = torch.from_numpy(codebook.astype(np.float32)).cuda()
+                for start in range(0, n, gpu_chunk):
+                    end = min(start + gpu_chunk, n)
+                    data_g = torch.from_numpy(
+                        vectors[start:end].astype(np.float32)
+                    ).cuda()
+                    dists = torch.cdist(data_g, cb_g)
+                    idx = torch.argmin(dists, dim=1).cpu().numpy().astype(index_dtype)
+                    indices[start:end] = idx
+                    del data_g, dists, idx
+                del cb_g
+                torch.cuda.empty_cache()
+                return indices
+        except (ImportError, torch.cuda.OutOfMemoryError):
+            pass
+
+        # CPU fallback
+        indices = np.empty(n, dtype=index_dtype)
+        C_sq = np.sum(codebook ** 2, axis=1, keepdims=True).T  # [1, k]
+
+        for start in range(0, n, chunk_size):
+            end = min(start + chunk_size, n)
+            X_chunk = vectors[start:end].astype(np.float32)
+            X_sq = np.sum(X_chunk ** 2, axis=1, keepdims=True)  # [chunk, 1]
+            dists = X_sq + C_sq - 2.0 * (X_chunk @ codebook.T)  # [chunk, k]
+            indices[start:end] = np.argmin(dists, axis=1).astype(index_dtype)
+
+        return indices
 
     def _build_kmeans_codebook(
         self, flat: np.ndarray, n_clusters: int
@@ -362,6 +467,8 @@ class CDNAv3Writer:
             dists = torch.abs(chunk_t.unsqueeze(1) - cb_t.unsqueeze(0))
             indices[start:end] = torch.argmin(dists, dim=1).cpu().numpy().astype(index_dtype)
         return indices
+
+
 
 
 def _safe_name(tensor_name: str) -> str:

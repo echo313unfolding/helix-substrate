@@ -1,15 +1,14 @@
 """
-HuggingFace Transformers integration for Helix VQ compression.
+HuggingFace Transformers integration for HXQ (HelixCode) VQ compression.
 
-Registers HelixQuantizationConfig and HelixHfQuantizer so that
-`AutoModelForCausalLM.from_pretrained()` works on Helix-compressed checkpoints.
+DEPRECATED: Canonical registration is now in hf_quantizer.py.
+This module is kept for backward-compatible imports only.
 
 Usage:
-    import helix_substrate  # triggers registration
+    import helix_substrate  # triggers registration via hf_quantizer.py
 
     model = AutoModelForCausalLM.from_pretrained(
-        "path/to/helix-checkpoint",
-        trust_remote_code=True,
+        "EchoLabs33/zamba2-1.2b-helix",  # quant_method: "hxq"
     )
     # All compressed layers are HelixLinear modules.
     # Forward pass works normally.
@@ -55,11 +54,14 @@ if HF_AVAILABLE:
     @dataclass
     class HelixQuantizationConfig(QuantizationConfigMixin):
         """
-        Configuration for Helix VQ-256 compressed models.
+        Configuration for HXQ (HelixCode) VQ-256 compressed models.
+
+        DEPRECATED: Use hf_quantizer.py (CDNAv3Config) for new models.
+        This class is kept for backward-compatible imports only.
 
         Stored in config.json as:
             "quantization_config": {
-                "quant_method": "helix",
+                "quant_method": "hxq",
                 "codebook_size": 256,
                 "sidecar_enabled": true,
                 "exact_patterns": ["embed_tokens", "lm_head", ...],

@@ -81,6 +81,11 @@ class CDNAv3Config(QuantizationConfigMixin):
         n_svd_routed: int = 0,
         modules_to_not_convert: Optional[List[str]] = None,
         module_k_map: Optional[Dict[str, int]] = None,
+        # Multi-dimensional VQ
+        vector_dim: int = 1,
+        module_vector_dim_map: Optional[Dict[str, int]] = None,
+        # 12-bit packed index storage (saves 25% VRAM for k>256)
+        index_packing: Optional[str] = None,
         # Backward compat with hf_integration.py config format
         codebook_size: Optional[int] = None,
         sidecar_enabled: bool = True,
@@ -100,6 +105,12 @@ class CDNAv3Config(QuantizationConfigMixin):
         self.exact_patterns = exact_patterns or []
         # Per-module codebook size overrides (module_path -> k)
         self.module_k_map = module_k_map or {}
+        # Multi-dimensional VQ: 1=scalar (default), 2=2D pairs, 4=4D quads
+        self.vector_dim = vector_dim
+        # Per-module vector_dim overrides (module_path -> d)
+        self.module_vector_dim_map = module_vector_dim_map or {}
+        # 12-bit packed index storage: "12bit" or None
+        self.index_packing = index_packing
 
     def to_dict(self) -> dict:
         d = {
@@ -112,6 +123,10 @@ class CDNAv3Config(QuantizationConfigMixin):
         }
         if self.module_k_map:
             d["module_k_map"] = self.module_k_map
+        if self.vector_dim > 1:
+            d["vector_dim"] = self.vector_dim
+        if self.module_vector_dim_map:
+            d["module_vector_dim_map"] = self.module_vector_dim_map
         return d
 
 
@@ -131,6 +146,9 @@ def _replace_with_helix_linear(
     compute_dtype: torch.dtype = torch.float32,
     module_k_map: Optional[Dict[str, int]] = None,
     n_clusters_default: int = 256,
+    vector_dim_default: int = 1,
+    module_vector_dim_map: Optional[Dict[str, int]] = None,
+    index_packing: Optional[str] = None,
 ) -> tuple:
     """Replace nn.Linear modules with HelixLinear shells.
 
@@ -147,6 +165,8 @@ def _replace_with_helix_linear(
         compute_dtype: Compute precision for HelixLinear
         module_k_map: Optional per-module codebook size overrides
         n_clusters_default: Default codebook size
+        vector_dim_default: Default vector dimension (1=scalar)
+        module_vector_dim_map: Optional per-module vector_dim overrides
 
     Returns:
         (n_replaced, compressed_embeddings_set)
@@ -156,6 +176,7 @@ def _replace_with_helix_linear(
     replaced_ids = set()  # Track object ids to handle shared modules
     compressed_embeddings = set()
     k_map = module_k_map or {}
+    vd_map = module_vector_dim_map or {}
 
     for name, module in list(model.named_modules()):
         if name not in compressed_modules:
@@ -189,6 +210,7 @@ def _replace_with_helix_linear(
 
         # Per-module codebook size (default 256 for backward compat)
         n_clusters = k_map.get(name, n_clusters_default)
+        vd = vd_map.get(name, vector_dim_default)
 
         # Create shell with matching dimensions
         helix_shell = HelixLinear.from_quantized_config(
@@ -197,6 +219,8 @@ def _replace_with_helix_linear(
             tensor_name=f"{name}.weight",
             compute_dtype=compute_dtype,
             n_clusters=n_clusters,
+            vector_dim=vd,
+            index_packing=index_packing if n_clusters > 256 else None,
         )
 
         replaced_ids.add(id(module))
@@ -266,10 +290,42 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
             )
             return
 
+        # Expand compressed_modules with aliased paths from tied weights.
+        # In transformers 5.x, shared modules (e.g., Zamba2's shared_transformer)
+        # are separate Python objects, not aliases. The config only lists canonical
+        # paths (e.g., model.layers.5.shared_transformer.*.weight), but layers
+        # 11/17/23/29/35 have their own copies that also need replacement.
+        tied_keys = getattr(model, "all_tied_weights_keys", {})
+        k_map = dict(self.quantization_config.module_k_map or {})
+        vd_map = dict(getattr(self.quantization_config, "module_vector_dim_map", None) or {})
+        n_expanded = 0
+        for target_key, source_key in tied_keys.items():
+            # Strip .weight suffix to get module path
+            if source_key.endswith(".weight"):
+                source_mod = source_key[:-7]
+                if source_mod in compressed and target_key.endswith(".weight"):
+                    target_mod = target_key[:-7]
+                    if target_mod not in compressed:
+                        compressed.add(target_mod)
+                        # Propagate k_map and vd_map from canonical to alias
+                        if source_mod in k_map and target_mod not in k_map:
+                            k_map[target_mod] = k_map[source_mod]
+                        if source_mod in vd_map and target_mod not in vd_map:
+                            vd_map[target_mod] = vd_map[source_mod]
+                        n_expanded += 1
+        if n_expanded:
+            logger.info(
+                f"CDNA v3: expanded compressed_modules with {n_expanded} "
+                f"aliased paths from tied weights"
+            )
+
         n, self._compressed_embeddings = _replace_with_helix_linear(
             model, compressed,
-            module_k_map=self.quantization_config.module_k_map,
+            module_k_map=k_map,
             n_clusters_default=self.quantization_config.n_clusters,
+            vector_dim_default=getattr(self.quantization_config, "vector_dim", 1),
+            module_vector_dim_map=vd_map,
+            index_packing=getattr(self.quantization_config, "index_packing", None),
         )
         logger.info(f"CDNA v3: replaced {n} nn.Linear → HelixLinear"
                      f" ({len(self._compressed_embeddings)} embeddings)")
@@ -309,12 +365,67 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
     ) -> None:
         """Compute derived buffers for all HelixLinear modules + reconstruct embeddings."""
         HelixLinear = _get_helix_linear_cls()
+
+        # Copy compressed buffers from canonical HelixLinears to aliased ones.
+        # In transformers 5.x, shared modules are separate objects. The safetensors
+        # only loads into the canonical path (e.g., layer 5). Aliased paths
+        # (layers 11/17/23/29/35) have empty shells that need their buffers copied.
+        tied_keys = getattr(model, "all_tied_weights_keys", {})
+        _copy_bufs = ("codebook", "indices", "sidecar_positions", "sidecar_values",
+                       "svd_U", "svd_s", "svd_Vt", "bias", "channel_scales",
+                       "codebook_f16")
+        copied_count = 0
+        for target_key, source_key in tied_keys.items():
+            if not source_key.endswith(".weight") or not target_key.endswith(".weight"):
+                continue
+            source_path = source_key[:-7]
+            target_path = target_key[:-7]
+            try:
+                src_mod = model.get_submodule(source_path)
+                tgt_mod = model.get_submodule(target_path)
+            except (AttributeError, ValueError):
+                continue
+            if not isinstance(src_mod, HelixLinear) or not isinstance(tgt_mod, HelixLinear):
+                continue
+            if src_mod is tgt_mod:
+                continue  # Already shared (transformers 4.x)
+            # Copy buffers from canonical to alias if alias has empty codebook
+            tgt_cb = getattr(tgt_mod, "codebook", None)
+            if tgt_cb is not None and tgt_cb.numel() > 0:
+                continue  # Already populated
+            for buf_name in _copy_bufs:
+                src_buf = getattr(src_mod, buf_name, None)
+                if src_buf is not None:
+                    tgt_mod.register_buffer(buf_name, src_buf)
+            # Copy non-buffer attributes
+            tgt_mod.has_svd = src_mod.has_svd
+            tgt_mod.rank = src_mod.rank
+            tgt_mod.has_channel_scales = src_mod.has_channel_scales
+            tgt_mod.vector_dim = src_mod.vector_dim
+            copied_count += 1
+        if copied_count:
+            logger.info(f"CDNA v3: copied buffers to {copied_count} aliased HelixLinear modules")
+
         count = 0
         for name, module in model.named_modules():
             if isinstance(module, HelixLinear):
                 module._recompute_derived()
                 count += 1
         logger.info(f"CDNA v3: finalized {count} HelixLinear modules")
+
+        # Recompute rotary embedding inv_freq if present.
+        # When model is created on meta device, inv_freq (computed from config
+        # in __init__) becomes a meta tensor. If not stored in safetensors,
+        # it gets materialized as torch.empty() garbage after weight loading.
+        config = getattr(model, "config", None)
+        for name, module in model.named_modules():
+            inv = getattr(module, "inv_freq", None)
+            if inv is not None and isinstance(inv, torch.Tensor) and inv.numel() > 0:
+                dim = inv.shape[0] * 2
+                base = getattr(config, "rope_theta", 10000.0) if config else 10000.0
+                new_inv = 1.0 / (base ** (torch.arange(0, dim, 2, dtype=torch.float32) / dim))
+                module.inv_freq = new_inv.to(inv.device)
+                logger.info(f"CDNA v3: recomputed inv_freq for {name}")
 
         # Reconstruct compressed nn.Embedding modules.
         # codebook/indices buffers were registered in before_weight_loading
@@ -368,6 +479,7 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
             "._sidecar_deltas",
             ".svd_U", ".svd_s", ".svd_Vt",
             ".bias", ".channel_scales",
+            ".weight",
         }
         compressed = set(self.quantization_config.compressed_modules)
         filtered = []
@@ -395,6 +507,7 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
             "._sidecar_deltas",
             ".svd_U", ".svd_s", ".svd_Vt",
             ".bias", ".channel_scales",
+            ".weight",
         }
         loaded = set(loaded_keys)
         compressed = set(self.quantization_config.compressed_modules)

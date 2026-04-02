@@ -91,12 +91,16 @@ class HelixLinear(nn.Module):
         tensor_name: str = "",
         compute_dtype: torch.dtype = torch.float32,
         channel_scales: Optional[torch.Tensor] = None,
+        vector_dim: int = 1,
     ):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.tensor_name = tensor_name
         self.compute_dtype = compute_dtype
+        # Multi-dimensional VQ: 1=scalar, 2=2D pairs, 4=4D quads.
+        # When d>1, codebook is [k, d] and indices are [out, in/d].
+        self.vector_dim = vector_dim
         self._last_dispatch_path: str = "unknown"
         # Cached dispatch decision — frozen at init, updated on .to()/.cuda()
         # Avoids per-forward property evaluation (154 calls/token).
@@ -119,10 +123,22 @@ class HelixLinear(nn.Module):
         # via pre_step_kurtosis(). Toggle with set_cuda_graph_mode().
         self._cuda_graph_mode: bool = False
 
-        # Lazy weight stub for compatibility with model code that accesses
-        # .weight.device (e.g. Mamba2 fast-path check, tie_weights).
+        # Weight stub for compatibility with model code that accesses
+        # .weight.device (e.g. Mamba2 fast-path check, tie_weights) and
+        # transformers' get_parameter/get_parameter_or_buffer() which checks
+        # _parameters/_buffers dicts.  Registered as a non-trainable Parameter
+        # so that both get_parameter() and get_parameter_or_buffer() succeed
+        # (transformers 5.x's mark_tied_weights_as_initialized requires this).
         # The actual computation goes through forward(), never through .weight.
-        self._weight_stub = None
+        self.weight = nn.Parameter(torch.empty(0, dtype=compute_dtype), requires_grad=False)
+
+        # 12-bit packed index storage: when True, indices buffer is uint8 1D
+        # containing pairs of 12-bit values packed into 3-byte groups.
+        # Saves 25% VRAM on index storage for k>256 (6 bits/weight vs 8).
+        self.index_packing: Optional[str] = None
+        # Original index matrix dimensions for unpacking
+        self._idx_rows: int = out_features
+        self._idx_cols: int = in_features // vector_dim if vector_dim > 1 else in_features
 
         # VQ components (read-only buffers, not parameters)
         self.register_buffer("codebook", codebook.contiguous())  # [k] (256 or 512+)
@@ -148,8 +164,14 @@ class HelixLinear(nn.Module):
             self.register_buffer("sidecar_values", sidecar_values.contiguous())
             # Precompute VQ values at sidecar positions for fused kernel
             # (avoids re-gather during forward)
-            idx_flat = indices.reshape(-1)
-            vq_at_sidecar = codebook[idx_flat[sidecar_positions].long()]
+            if vector_dim > 1:
+                rows = sidecar_positions // in_features
+                cols = sidecar_positions % in_features
+                idx_2d = indices.long()[rows, cols // vector_dim]
+                vq_at_sidecar = codebook[idx_2d, cols % vector_dim]
+            else:
+                idx_flat = indices.reshape(-1).long()
+                vq_at_sidecar = codebook[idx_flat[sidecar_positions]]
             self.register_buffer("_sidecar_vq_vals", vq_at_sidecar.contiguous())
             # Precompute row/col/delta for chunked naive + fused paths (Phase 4)
             self.register_buffer("_sidecar_rows", (sidecar_positions // in_features).long())
@@ -208,7 +230,7 @@ class HelixLinear(nn.Module):
             "codebook", "indices",
             "sidecar_positions", "sidecar_values",
             "svd_U", "svd_s", "svd_Vt",
-            "bias", "channel_scales",
+            "bias", "channel_scales", "weight",
             # Derived buffers won't be in the file, but handle if present
             "codebook_f16", "_sidecar_vq_vals",
             "_sidecar_rows", "_sidecar_cols", "_sidecar_deltas",
@@ -242,43 +264,28 @@ class HelixLinear(nn.Module):
         else:
             self.register_buffer("codebook_f16", None)
 
-    @property
-    def weight(self) -> torch.Tensor:
-        """Compatibility shim for model code that accesses .weight.device or .weight.dtype.
-
-        Returns a zero-element tensor on the correct device so that checks like
-        ``"cuda" in self.in_proj.weight.device.type`` (Mamba2 fast-path) and
-        ``tie_weights()`` device lookups work without materializing the full weight.
-        The actual computation always goes through forward(), never through .weight.
-        """
-        if self._weight_stub is None or self._weight_stub.device != self.codebook.device:
-            self._weight_stub = torch.empty(
-                0, device=self.codebook.device, dtype=self.codebook.dtype
-            )
-        return self._weight_stub
-
-    @weight.setter
-    def weight(self, value):
-        """Accept weight assignments for tie_weights() compatibility.
-
-        HF's tie_weights() does ``self.lm_head.weight = self.embed_tokens.weight``.
-        Without this setter, PyTorch's __setattr__ calls register_parameter(),
-        which raises KeyError because the property already exists. We silently
-        accept the assignment. The actual computation goes through forward().
-        """
-        self._weight_stub = value
-
     def __setattr__(self, name, value):
         """Override to intercept 'weight' assignments from tie_weights().
 
-        PyTorch's Module.__setattr__ checks isinstance(value, Parameter)
-        BEFORE the descriptor protocol, so the @weight.setter never fires
-        for nn.Parameter values.  We catch 'weight' here and redirect to
-        _weight_stub, then delegate everything else to the parent.
+        HF's tie_weights() does ``self.lm_head.weight = self.embed_tokens.weight``.
+        We accept any Tensor and store it as a non-trainable Parameter so both
+        get_parameter() and get_parameter_or_buffer() work across transformers
+        versions (4.x uses buffers, 5.x requires parameters).
         """
         if name == "weight":
-            object.__setattr__(self, "_weight_stub", value)
-            return
+            # Handle legacy buffer-based weight (transformers 4.x models)
+            if hasattr(self, "_buffers") and "weight" in self._buffers:
+                self._buffers["weight"] = value if isinstance(value, torch.Tensor) else torch.empty(0)
+                return
+            # Handle parameter-based weight (transformers 5.x compat)
+            if hasattr(self, "_parameters") and "weight" in self._parameters:
+                if isinstance(value, nn.Parameter):
+                    self._parameters["weight"] = value
+                elif isinstance(value, torch.Tensor):
+                    self._parameters["weight"] = nn.Parameter(value, requires_grad=False)
+                else:
+                    self._parameters["weight"] = nn.Parameter(torch.empty(0), requires_grad=False)
+                return
         super().__setattr__(name, value)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -327,9 +334,19 @@ class HelixLinear(nn.Module):
             out = out.to(input_dtype)
         return out
 
-    @staticmethod
-    def _check_fused_available() -> bool:
+    def _check_fused_available(self) -> bool:
         """One-time check if fused Triton kernel is available."""
+        d = getattr(self, "vector_dim", 1)
+        if d == 2:
+            # 2D VQ: use dedicated vq2d kernel
+            try:
+                from helix_substrate.triton_vq2d_matmul import is_available
+                return is_available()
+            except (ImportError, RuntimeError):
+                return False
+        elif d > 2:
+            # VQ_DIM > 2: not yet supported
+            return False
         try:
             from helix_substrate.triton_vq_matmul import is_available
             return is_available()
@@ -423,6 +440,9 @@ class HelixLinear(nn.Module):
 
     def _forward_fused(self, x: torch.Tensor) -> torch.Tensor:
         """Fused VQ gather-matmul via Triton. W never in global memory."""
+        if getattr(self, "vector_dim", 1) == 2:
+            return self._forward_fused_vq2d(x)
+
         from helix_substrate.triton_vq_matmul import fused_vq_matmul
 
         orig_shape = x.shape
@@ -454,6 +474,52 @@ class HelixLinear(nn.Module):
 
         return output.reshape(*orig_shape[:-1], self.out_features)
 
+    def _forward_fused_vq2d(self, x: torch.Tensor) -> torch.Tensor:
+        """Fused 2D VQ gather-matmul via dedicated Triton kernel.
+
+        Codebook [K, 2] stays in L1 (32KB for K=4096). Two loads per index
+        instead of one. Same tl.dot path as scalar, paired reduction.
+        """
+        from helix_substrate.triton_vq2d_matmul import fused_vq2d_matmul
+
+        orig_shape = x.shape
+        x_2d = x.reshape(-1, self.in_features)
+
+        if self.has_channel_scales:
+            x_2d = x_2d / self.channel_scales.unsqueeze(0)
+
+        # Unpack 12-bit indices for Triton kernel (kernel reads int16 2D)
+        if self.index_packing == "12bit":
+            from helix_substrate.index_packing import unpack_12bit
+            indices_for_kernel = unpack_12bit(
+                self.indices, self._idx_rows * self._idx_cols
+            ).reshape(self._idx_rows, self._idx_cols)
+        else:
+            indices_for_kernel = self.indices
+
+        dispatch_log = {}
+        output = fused_vq2d_matmul(
+            x=x_2d,
+            codebook=self.codebook,
+            indices=indices_for_kernel,
+            sidecar_rows=self._sidecar_rows,
+            sidecar_cols=self._sidecar_cols,
+            sidecar_deltas=self._sidecar_deltas,
+            bias=self.bias,
+            _dispatch_log=dispatch_log,
+            sidecar_phase=self._sidecar_phase,
+        )
+        self._last_dispatch = dispatch_log
+
+        # SVD residual (if present and not gated off)
+        if self.has_svd and not self._cell_skip_svd:
+            x_f32 = x_2d.float()
+            down = x_f32 @ self.svd_Vt.t()
+            scaled = down * self.svd_s.unsqueeze(0)
+            output += scaled @ self.svd_U.t()
+
+        return output.reshape(*orig_shape[:-1], self.out_features)
+
     def _dequant_tile(self, start_row: int, end_row: int) -> torch.Tensor:
         """
         Dequantize a tile of weight rows from compressed representation.
@@ -469,7 +535,20 @@ class HelixLinear(nn.Module):
             [end_row - start_row, in_features] float32 tensor with VQ + sidecar + SVD applied.
         """
         # VQ gather for this tile
-        tile = self.codebook[self.indices[start_row:end_row].long()]
+        if self.index_packing == "12bit":
+            from helix_substrate.index_packing import unpack_12bit_rows
+            idx_slice = unpack_12bit_rows(
+                self.indices, start_row, end_row, self._idx_cols
+            ).long()
+        else:
+            idx_slice = self.indices[start_row:end_row].long()
+        if self.vector_dim > 1:
+            # Vector VQ: codebook [k, d], indices [rows, in/d]
+            # Gather: [rows, in/d, d] → reshape to [rows, in]
+            raw = self.codebook[idx_slice]  # [rows, in/d, d]
+            tile = raw.reshape(end_row - start_row, self.in_features)
+        else:
+            tile = self.codebook[idx_slice]  # [rows, in]
 
         # Sidecar correction (precomputed rows/cols/deltas)
         if self._sidecar_rows is not None:
@@ -514,7 +593,7 @@ class HelixLinear(nn.Module):
             if use_fp16:
                 output[:, i:end] = (x_compute @ W_tile.half().t()).float()
             else:
-                output[:, i:end] = x_compute @ W_tile.t()
+                output[:, i:end] = x_compute @ W_tile.float().t()
 
         # Bias
         if self.bias is not None:
@@ -570,6 +649,26 @@ class HelixLinear(nn.Module):
         channel_scales). Empty [0]-shaped tensors indicate absent optional data
         and are normalized back to None here.
         """
+        # Infer vector_dim from codebook shape: [k] = scalar, [k, d] = vector
+        if self.codebook is not None and self.codebook.ndim == 2:
+            self.vector_dim = self.codebook.shape[1]
+        elif not hasattr(self, "vector_dim"):
+            self.vector_dim = 1
+
+        # Detect 12-bit packed indices: uint8 dtype with k > 256
+        # (normal uint8 indices only used for k <= 256)
+        if not hasattr(self, "index_packing"):
+            self.index_packing = None
+        k = self.codebook.shape[0] if self.codebook is not None else 0
+        if (self.indices is not None and self.indices.dtype == torch.uint8
+                and self.indices.ndim == 1 and k > 256):
+            self.index_packing = "12bit"
+        # Set index matrix dimensions for unpacking
+        if not hasattr(self, "_idx_rows"):
+            idx_cols = self.in_features // self.vector_dim if self.vector_dim > 1 else self.in_features
+            self._idx_rows = self.out_features
+            self._idx_cols = idx_cols
+
         # Normalize empty tensors → None for optional buffers
         _optional = [
             "sidecar_positions", "sidecar_values",
@@ -582,9 +681,30 @@ class HelixLinear(nn.Module):
                 self.register_buffer(name, None)
 
         # Sidecar derived buffers
+        # For 12-bit packed indices, temporarily unpack for sidecar computation
         if self.sidecar_positions is not None and self.sidecar_values is not None:
-            idx_flat = self.indices.reshape(-1)
-            vq_at_sidecar = self.codebook[idx_flat[self.sidecar_positions].long()]
+            if self.index_packing == "12bit":
+                from helix_substrate.index_packing import unpack_12bit
+                _indices_2d = unpack_12bit(
+                    self.indices, self._idx_rows * self._idx_cols
+                ).reshape(self._idx_rows, self._idx_cols)
+            else:
+                _indices_2d = self.indices
+
+            d = getattr(self, "vector_dim", 1)
+            if d > 1:
+                # Vector VQ: position p in flat [out*in] space maps to
+                # index at p//d in flat indices, sub-element p%d in codebook vector
+                rows = self.sidecar_positions // self.in_features
+                cols = self.sidecar_positions % self.in_features
+                idx_rows = rows
+                idx_cols = cols // d
+                sub_elem = cols % d
+                idx_2d = _indices_2d.long()[idx_rows, idx_cols]
+                vq_at_sidecar = self.codebook[idx_2d, sub_elem]
+            else:
+                idx_flat = _indices_2d.reshape(-1).long()
+                vq_at_sidecar = self.codebook[idx_flat[self.sidecar_positions]]
             self.register_buffer("_sidecar_vq_vals", vq_at_sidecar.contiguous())
             self.register_buffer(
                 "_sidecar_rows",
@@ -628,6 +748,8 @@ class HelixLinear(nn.Module):
         tensor_name: str = "",
         compute_dtype: torch.dtype = torch.float32,
         n_clusters: int = 256,
+        vector_dim: int = 1,
+        index_packing: Optional[str] = None,
     ) -> "HelixLinear":
         """Create a HelixLinear shell for HF quantizer loading.
 
@@ -635,6 +757,10 @@ class HelixLinear(nn.Module):
         buffers) so safetensors can load data into them. After loading,
         call _recompute_derived() to normalize empty→None and compute
         derived buffers.
+
+        Args:
+            index_packing: None for standard int16/uint8, "12bit" for packed
+                           12-bit indices (saves 25% VRAM for k>256).
         """
         instance = cls.__new__(cls)
         nn.Module.__init__(instance)
@@ -643,6 +769,7 @@ class HelixLinear(nn.Module):
         instance.out_features = out_features
         instance.tensor_name = tensor_name
         instance.compute_dtype = compute_dtype
+        instance.vector_dim = vector_dim
         instance._last_dispatch_path = "unknown"
         instance._fused_available = False
         instance._cell_skip_svd = False
@@ -653,14 +780,38 @@ class HelixLinear(nn.Module):
         instance.rank = 0
         instance.has_channel_scales = False
 
+        # Weight stub for get_parameter/get_parameter_or_buffer/tie_weights compat
+        instance.weight = nn.Parameter(torch.empty(0, dtype=compute_dtype), requires_grad=False)
+
         # Primary buffers — will be overwritten by safetensors load
-        instance.register_buffer("codebook", torch.zeros(n_clusters, dtype=torch.float32))
-        # Use int16 for k>256 (PyTorch lacks uint16), uint8 for k<=256
-        index_dtype = torch.int16 if n_clusters > 256 else torch.uint8
-        instance.register_buffer(
-            "indices",
-            torch.zeros(out_features, in_features, dtype=index_dtype),
-        )
+        # Codebook: [k] for scalar, [k, d] for vector VQ
+        if vector_dim > 1:
+            instance.register_buffer("codebook", torch.zeros(n_clusters, vector_dim, dtype=torch.float32))
+        else:
+            instance.register_buffer("codebook", torch.zeros(n_clusters, dtype=torch.float32))
+
+        # Indices buffer — shape depends on packing mode
+        idx_cols = in_features // vector_dim if vector_dim > 1 else in_features
+        instance._idx_rows = out_features
+        instance._idx_cols = idx_cols
+
+        if index_packing == "12bit" and n_clusters > 256:
+            # 12-bit packed: uint8 1D, 3 bytes per 2 indices
+            n_indices = out_features * idx_cols
+            packed_bytes = n_indices * 3 // 2
+            instance.register_buffer(
+                "indices",
+                torch.zeros(packed_bytes, dtype=torch.uint8),
+            )
+            instance.index_packing = "12bit"
+        else:
+            # Standard: int16 for k>256, uint8 for k<=256
+            index_dtype = torch.int16 if n_clusters > 256 else torch.uint8
+            instance.register_buffer(
+                "indices",
+                torch.zeros(out_features, idx_cols, dtype=index_dtype),
+            )
+            instance.index_packing = None
 
         # Optional primary buffers — empty tensors so safetensors can load into them.
         # _recompute_derived() normalizes empty→None after loading.
@@ -719,17 +870,19 @@ def load_helix_linear_from_cdnav3(
     tensor_dir = Path(tensor_dir)
     meta = json.loads((tensor_dir / "meta.json").read_text())
     rows, cols = meta["shape"]
+    vector_dim = meta.get("vector_dim", 1)
 
-    # Codebook: [k] float32 (k=256 standard, k=512+ for high-resolution tensors)
+    # Codebook: [k] float32 for scalar, [k, d] for vector VQ
     codebook = torch.from_numpy(
         np.load(tensor_dir / "codebook.npy").astype(np.float32)
     )
 
-    # Indices: [rows, cols] — uint8 for k<=256, uint16 for k>256
+    # Indices: [rows, cols] for scalar, [rows, cols/d] for vector VQ
     index_dtype_str = meta.get("index_dtype", "uint8")
     np_index_dtype = np.uint16 if index_dtype_str == "uint16" else np.uint8
     raw_indices = np.fromfile(tensor_dir / "indices.bin", dtype=np_index_dtype)
-    indices = torch.from_numpy(raw_indices.reshape(rows, cols).copy())
+    idx_cols = cols // vector_dim if vector_dim > 1 else cols
+    indices = torch.from_numpy(raw_indices.reshape(rows, idx_cols).copy())
 
     # Sidecar: optional outlier corrections
     sidecar_positions = None
@@ -779,6 +932,7 @@ def load_helix_linear_from_cdnav3(
         tensor_name=meta.get("tensor_name", ""),
         compute_dtype=compute_dtype,
         channel_scales=channel_scales,
+        vector_dim=vector_dim,
     )
 
 

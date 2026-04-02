@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import json
 import platform
+import re
 import resource
 import shutil
 import sys
@@ -68,15 +69,27 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
             module_path = tensor_name
 
         rows, cols = meta["shape"]
+        vector_dim = meta.get("vector_dim", 1)
 
-        # Codebook: [256] float32
+        # Codebook: [k] float32 for scalar, [k, d] for vector VQ
         codebook = np.load(tensor_path / "codebook.npy").astype(np.float32)
         tensors[f"{module_path}.codebook"] = torch.from_numpy(codebook)
 
-        # Indices: [rows, cols] uint8
-        raw_indices = np.fromfile(tensor_path / "indices.bin", dtype=np.uint8)
-        indices = raw_indices.reshape(rows, cols)
-        tensors[f"{module_path}.indices"] = torch.from_numpy(indices.copy())
+        # Indices: [rows, cols] for scalar, [rows, cols/d] for vector VQ
+        idx_dtype_str = meta.get("index_dtype", "uint8")
+        np_idx_dtype = np.uint16 if idx_dtype_str == "uint16" else np.uint8
+        raw_indices = np.fromfile(tensor_path / "indices.bin", dtype=np_idx_dtype)
+        idx_cols = cols // vector_dim if vector_dim > 1 else cols
+        indices = raw_indices.reshape(rows, idx_cols)
+
+        k = meta.get("n_clusters", 256)
+        if k > 256 and indices.max() < 4096:
+            # 12-bit packing: 25% smaller index storage
+            from helix_substrate.index_packing import pack_12bit
+            idx_tensor = torch.from_numpy(indices.copy().astype(np.int16))
+            tensors[f"{module_path}.indices"] = pack_12bit(idx_tensor)
+        else:
+            tensors[f"{module_path}.indices"] = torch.from_numpy(indices.copy())
 
         # Sidecar: optional outlier corrections
         sidecar_path = tensor_path / "sidecar.npz"
@@ -95,6 +108,7 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
             "module": module_path,
             "shape": [rows, cols],
             "n_clusters": meta.get("n_clusters", 256),
+            "vector_dim": vector_dim,
             "sidecar": sidecar_path.exists(),
         })
 
@@ -192,6 +206,9 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
     else:
         config = {}
 
+    # Determine if any module uses 12-bit packing
+    has_12bit = any(m.get("n_clusters", 256) > 256 for m in compressed_modules)
+
     config["quantization_config"] = {
         "quant_method": "hxq",
         "codebook_size": 256,
@@ -201,6 +218,8 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
                            "backbone.embedding"],
         "compressed_modules": [m["module"] for m in compressed_modules],
     }
+    if has_12bit:
+        config["quantization_config"]["index_packing"] = "12bit"
 
     config_path = output_dir / "config.json"
     with open(config_path, "w") as f:
@@ -243,7 +262,256 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
         for detail in receipt["validation"].get("details", []):
             print(f"    {detail}", file=sys.stderr)
 
+    # ── Gate 2: Completeness validation against original dense model ──
+    gate2 = validate_completeness_gate(safetensors_path, model_dir, compressed_modules)
+
+    # Save gate2 receipt alongside model
+    gate2_path = output_dir / "completeness_gate_receipt.json"
+    with open(gate2_path, "w") as f:
+        json.dump(gate2, f, indent=2)
+
+    if gate2["verdict"] == "PASS":
+        print(f"\n  GATE 2 PASS — {gate2['summary']['dense_tensors']} dense tensors accounted for, "
+              f"{gate2['summary']['skip_tensors_found']} skip tensors verified present")
+    else:
+        print(f"\n  GATE 2 FAIL — completeness validation failed:", file=sys.stderr)
+        for detail in gate2.get("failures", []):
+            print(f"    FAIL: {detail}", file=sys.stderr)
+        raise RuntimeError(
+            f"GATE 2 FAIL: {len(gate2.get('failures', []))} completeness checks failed. "
+            f"Output safetensors is missing tensors from the dense model. "
+            f"See {gate2_path} for details."
+        )
+
     return compressed_modules, exact_tensors, receipt
+
+
+def validate_completeness_gate(
+    safetensors_path: Path,
+    dense_model_dir: Path,
+    compressed_modules: list = None,
+) -> dict:
+    """Validate that the converted safetensors contains ALL tensors from the dense model.
+
+    This is the hard gate: if ANY tensor from the dense model is unaccounted for
+    in the output, the pipeline MUST stop. This catches the class of bugs where
+    skip tensors (norms, SSM params, embeddings, output heads) silently vanish
+    during conversion.
+
+    Can be called:
+      1. Automatically at the end of convert_cdnav3_to_hf() (Gate 2)
+      2. Standalone for auditing existing converted models:
+           python3 tools/convert_to_hf.py --audit \\
+               --safetensors ~/models/foo-helix/model.safetensors \\
+               --dense-model ~/models/foo
+
+    Args:
+        safetensors_path: Path to the output .safetensors file
+        dense_model_dir: Path to the original dense model directory
+        compressed_modules: List of compressed module dicts (from conversion).
+            If None, inferred from safetensors keys.
+
+    Returns:
+        dict with verdict (PASS/FAIL), summary, failures list.
+    """
+    failures = []
+
+    # ── Load output safetensors keys ──
+    try:
+        with safe_open(str(safetensors_path), framework="pt") as f:
+            output_keys = set(f.keys())
+    except Exception as e:
+        return {
+            "verdict": "FAIL",
+            "failures": [f"Cannot open output safetensors: {e}"],
+            "summary": {},
+        }
+
+    # ── Load dense model tensor list ──
+    dense_keys = set()
+    orig_sf_files = sorted(dense_model_dir.glob("model*.safetensors"))
+    if orig_sf_files:
+        for sf in orig_sf_files:
+            with safe_open(str(sf), framework="pt") as f:
+                dense_keys.update(f.keys())
+    else:
+        pt_path = dense_model_dir / "pytorch_model.bin"
+        if pt_path.exists():
+            import torch as _torch
+            state = _torch.load(pt_path, map_location="cpu", weights_only=True)
+            dense_keys = set(state.keys())
+            del state
+        else:
+            return {
+                "verdict": "FAIL",
+                "failures": ["No dense model weights found (no safetensors or pytorch_model.bin)"],
+                "summary": {},
+            }
+
+    if not dense_keys:
+        return {
+            "verdict": "FAIL",
+            "failures": ["Dense model has zero tensors — corrupt or empty"],
+            "summary": {},
+        }
+
+    # ── Build the coverage map ──
+    # For each dense tensor, determine how it should appear in the output:
+    #   - Compressed weight: replaced by {module}.codebook + {module}.indices (+ optional sidecar)
+    #   - Everything else: must appear with its original key name
+
+    # Discover which original weight keys were compressed by examining output keys
+    # A compressed module "{module}" produces keys like:
+    #   {module}.codebook, {module}.indices, {module}.sidecar_positions, {module}.sidecar_values
+    # Build set of original dense keys that were compressed.
+    # Compressed modules store "module" = tensor_name minus ".weight" suffix.
+    # For tensors that originally ended in ".weight", the dense key is module + ".weight".
+    # For tensors that did NOT end in ".weight" (rare: 2D SSM params), the dense key
+    # is the module path itself. We check both possibilities against the dense keys.
+    compressed_weight_keys = set()
+    if compressed_modules:
+        for m in compressed_modules:
+            candidate_with_weight = m["module"] + ".weight"
+            if candidate_with_weight in dense_keys:
+                compressed_weight_keys.add(candidate_with_weight)
+            elif m["module"] in dense_keys:
+                compressed_weight_keys.add(m["module"])
+            else:
+                # Fallback: assume .weight suffix (the common case)
+                compressed_weight_keys.add(candidate_with_weight)
+    else:
+        # Infer from output keys: any key ending in .codebook implies compression
+        for k in output_keys:
+            if k.endswith(".codebook"):
+                module_path = k[: -len(".codebook")]
+                candidate_with_weight = module_path + ".weight"
+                if candidate_with_weight in dense_keys:
+                    compressed_weight_keys.add(candidate_with_weight)
+                elif module_path in dense_keys:
+                    compressed_weight_keys.add(module_path)
+                else:
+                    compressed_weight_keys.add(candidate_with_weight)
+
+    # Map dense keys to their expected output representation
+    accounted = set()
+    skip_tensor_report = []
+
+    # Known skip tensor patterns (tensors that compress.py marks "skip" and
+    # are NOT stored in cdnav3/ — they must be copied verbatim from dense model)
+    SKIP_PATTERNS = [
+        # LayerNorm / RMSNorm
+        (r"\.norm.*\.weight$", "layernorm"),
+        (r"\.layernorm.*\.weight$", "layernorm"),
+        (r"\.layer_norm.*\.weight$", "layernorm"),
+        (r"\.rmsnorm.*\.weight$", "layernorm"),
+        (r"\.input_layernorm\.weight$", "layernorm"),
+        (r"\.post_attention_layernorm\.weight$", "layernorm"),
+        (r"\.final_layernorm\.weight$", "layernorm"),
+        (r"model\.norm\.weight$", "layernorm"),
+        (r"model\.final_layernorm\.weight$", "layernorm"),
+        # Mamba / Zamba SSM parameters (1D, non-weight)
+        (r"\.A_log$", "ssm_param"),
+        (r"\.D$", "ssm_param"),
+        (r"\.dt_bias$", "ssm_param"),
+        # Embeddings
+        (r"embed_tokens\.weight$", "embedding"),
+        (r"embed_positions\.weight$", "embedding"),
+        (r"\.wte\.weight$", "embedding"),
+        (r"\.wpe\.weight$", "embedding"),
+        (r"backbone\.embedding.*\.weight$", "embedding"),
+        # Output head
+        (r"lm_head\.weight$", "output_head"),
+        # Biases (1D)
+        (r"\.bias$", "bias"),
+    ]
+    _skip_compiled = [(re.compile(pat), label) for pat, label in SKIP_PATTERNS]
+
+    def classify_skip(name: str):
+        """Return skip category if name matches a known skip pattern, else None."""
+        for pat, label in _skip_compiled:
+            if pat.search(name):
+                return label
+        return None
+
+    # Check every dense tensor
+    missing_from_output = []
+    skip_found = {}     # category -> list of tensor names
+    skip_missing = {}   # category -> list of tensor names
+
+    for dense_key in sorted(dense_keys):
+        if dense_key in compressed_weight_keys:
+            # This weight was compressed — check that codebook+indices exist
+            module_path = dense_key[: -len(".weight")] if dense_key.endswith(".weight") else dense_key
+            cb_key = f"{module_path}.codebook"
+            idx_key = f"{module_path}.indices"
+            if cb_key in output_keys and idx_key in output_keys:
+                accounted.add(dense_key)
+            else:
+                missing_parts = []
+                if cb_key not in output_keys:
+                    missing_parts.append(f"codebook ({cb_key})")
+                if idx_key not in output_keys:
+                    missing_parts.append(f"indices ({idx_key})")
+                failures.append(
+                    f"Compressed tensor {dense_key} missing parts: {', '.join(missing_parts)}"
+                )
+                missing_from_output.append(dense_key)
+        elif dense_key in output_keys:
+            # Present as exact copy
+            accounted.add(dense_key)
+            cat = classify_skip(dense_key)
+            if cat:
+                skip_found.setdefault(cat, []).append(dense_key)
+        else:
+            # NOT in output at all — this is a failure
+            accounted.discard(dense_key)  # not accounted
+            missing_from_output.append(dense_key)
+            cat = classify_skip(dense_key)
+            if cat:
+                skip_missing.setdefault(cat, []).append(dense_key)
+            failures.append(f"DROPPED: {dense_key} (category: {cat or 'unknown'})")
+
+    # ── Verify expected skip categories are present ──
+    # If the dense model has tensors matching skip patterns, at least some must appear
+    # in the output. If a whole category vanishes, that's a red flag.
+    expected_categories = set()
+    for dense_key in dense_keys:
+        cat = classify_skip(dense_key)
+        if cat:
+            expected_categories.add(cat)
+
+    category_verdict = {}
+    for cat in sorted(expected_categories):
+        n_found = len(skip_found.get(cat, []))
+        n_missing = len(skip_missing.get(cat, []))
+        n_total = n_found + n_missing
+        if n_missing > 0:
+            category_verdict[cat] = f"INCOMPLETE ({n_found}/{n_total})"
+            # Already logged individual failures above
+        else:
+            category_verdict[cat] = f"OK ({n_found}/{n_total})"
+
+    # ── Build summary ──
+    n_skip_total = sum(len(v) for v in skip_found.values())
+    summary = {
+        "dense_tensors": len(dense_keys),
+        "output_tensors": len(output_keys),
+        "compressed_weights": len(compressed_weight_keys),
+        "accounted": len(accounted),
+        "missing": len(missing_from_output),
+        "skip_tensors_found": n_skip_total,
+        "skip_categories": category_verdict,
+    }
+
+    verdict = "PASS" if len(failures) == 0 else "FAIL"
+
+    return {
+        "verdict": verdict,
+        "summary": summary,
+        "failures": failures,
+        "missing_tensors": missing_from_output[:50],  # cap for readability
+        "skip_found": {cat: names for cat, names in skip_found.items()},
+    }
 
 
 def validate_safetensors(safetensors_path: Path, compressed_modules: list,
@@ -271,7 +539,7 @@ def validate_safetensors(safetensors_path: Path, compressed_modules: list,
 
     # 1. Readable
     try:
-        f = safe_open(str(safetensors_path), framework="numpy")
+        f = safe_open(str(safetensors_path), framework="pt")
         all_keys = set(f.keys())
         checks["readable"] = True
     except Exception as e:
@@ -303,18 +571,40 @@ def validate_safetensors(safetensors_path: Path, compressed_modules: list,
 
         # Validate codebook shape
         cb = f.get_tensor(cb_key)
-        if cb.ndim != 1 or cb.shape[0] != k:
-            checks["compressed_complete"] = False
-            details.append(f"BAD codebook shape {cb_key}: {cb.shape}, expected [{k}]")
+        vd = mod.get("vector_dim", 1)
+        if vd > 1:
+            if cb.ndim != 2 or cb.shape[0] != k or cb.shape[1] != vd:
+                checks["compressed_complete"] = False
+                details.append(f"BAD codebook shape {cb_key}: {cb.shape}, expected [{k}, {vd}]")
+        else:
+            if cb.ndim != 1 or cb.shape[0] != k:
+                checks["compressed_complete"] = False
+                details.append(f"BAD codebook shape {cb_key}: {cb.shape}, expected [{k}]")
         del cb
 
         # Validate indices shape and range
         idx = f.get_tensor(idx_key)
-        expected_shape = tuple(mod["shape"])
-        if idx.shape != expected_shape:
-            checks["compressed_complete"] = False
-            details.append(f"BAD indices shape {idx_key}: {idx.shape}, expected {expected_shape}")
-        max_idx = int(idx.max())
+        rows, cols = mod["shape"]
+        idx_cols = cols // vd if vd > 1 else cols
+
+        if idx.dtype == torch.uint8 and idx.ndim == 1 and k > 256:
+            # 12-bit packed format: validate packed size
+            expected_packed = rows * idx_cols * 3 // 2
+            if idx.shape[0] != expected_packed:
+                checks["compressed_complete"] = False
+                details.append(f"BAD packed indices size {idx_key}: {idx.shape[0]}, expected {expected_packed}")
+            # Unpack to validate range
+            from helix_substrate.index_packing import unpack_12bit
+            idx_unpacked = unpack_12bit(idx, rows * idx_cols)
+            max_idx = int(idx_unpacked.to(torch.int32).max())
+        else:
+            # Standard format
+            expected_shape = (rows, idx_cols)
+            if idx.shape != expected_shape:
+                checks["compressed_complete"] = False
+                details.append(f"BAD indices shape {idx_key}: {idx.shape}, expected {expected_shape}")
+            max_idx = int(idx.to(torch.int32).max())
+
         if max_idx >= k:
             checks["indices_in_range"] = False
             details.append(f"INDEX OUT OF RANGE {idx_key}: max={max_idx}, codebook_size={k}")
@@ -338,9 +628,9 @@ def validate_safetensors(safetensors_path: Path, compressed_modules: list,
             details.append(f"MISSING exact tensor: {tensor_name}")
             continue
         t = f.get_tensor(tensor_name)
-        if not np.isfinite(t).all():
+        if not torch.isfinite(t).all():
             checks["exact_no_nan"] = False
-            n_bad = int((~np.isfinite(t)).sum())
+            n_bad = int((~torch.isfinite(t)).sum())
             details.append(f"NaN/Inf in {tensor_name}: {n_bad} bad values")
         del t
 
@@ -407,13 +697,121 @@ def emit_conversion_receipt(model_name: str, validation_result: dict,
     return receipt_path
 
 
+def _run_standalone_audit(safetensors_path: Path, dense_model_dir: Path):
+    """Run completeness gate as a standalone audit on an existing converted model.
+
+    Usage:
+        python3 tools/convert_to_hf.py --audit \
+            --safetensors ~/models/foo-helix/model.safetensors \
+            --dense-model ~/models/foo
+    """
+    t_start = time.time()
+    cpu_start = time.process_time()
+
+    print(f"{'=' * 70}")
+    print(f"  Completeness Gate — Standalone Audit")
+    print(f"{'=' * 70}")
+    print(f"  Safetensors:  {safetensors_path}")
+    print(f"  Dense model:  {dense_model_dir}")
+    print()
+
+    if not safetensors_path.exists():
+        print(f"  ERROR: {safetensors_path} does not exist", file=sys.stderr)
+        sys.exit(1)
+    if not dense_model_dir.exists():
+        print(f"  ERROR: {dense_model_dir} does not exist", file=sys.stderr)
+        sys.exit(1)
+
+    result = validate_completeness_gate(safetensors_path, dense_model_dir)
+
+    # Print summary
+    summary = result.get("summary", {})
+    print(f"  Dense tensors:       {summary.get('dense_tensors', '?')}")
+    print(f"  Output tensors:      {summary.get('output_tensors', '?')}")
+    print(f"  Compressed weights:  {summary.get('compressed_weights', '?')}")
+    print(f"  Accounted:           {summary.get('accounted', '?')}")
+    print(f"  Missing:             {summary.get('missing', '?')}")
+    print(f"  Skip tensors found:  {summary.get('skip_tensors_found', '?')}")
+
+    # Print skip category breakdown
+    categories = summary.get("skip_categories", {})
+    if categories:
+        print(f"\n  Skip tensor categories:")
+        for cat, status in sorted(categories.items()):
+            print(f"    {cat:20s}  {status}")
+
+    # Print failures
+    failures = result.get("failures", [])
+    if failures:
+        print(f"\n  Failures ({len(failures)}):")
+        for f_msg in failures[:30]:
+            print(f"    {f_msg}")
+        if len(failures) > 30:
+            print(f"    ... and {len(failures) - 30} more")
+
+    wall = time.time() - t_start
+    cpu = time.process_time() - cpu_start
+
+    print(f"\n  Time: {wall:.1f}s wall, {cpu:.1f}s CPU")
+
+    if result["verdict"] == "PASS":
+        print(f"\n  GATE PASS — all {summary.get('dense_tensors', '?')} dense tensors accounted for")
+    else:
+        print(f"\n  GATE FAIL — {len(failures)} tensors missing or incomplete", file=sys.stderr)
+
+    # Save receipt
+    receipt_path = safetensors_path.parent / "audit_completeness_gate.json"
+    result["cost"] = {
+        "wall_time_s": round(wall, 3),
+        "cpu_time_s": round(cpu, 3),
+        "peak_memory_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
+        "python_version": platform.python_version(),
+        "hostname": platform.node(),
+        "timestamp_end": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    with open(receipt_path, "w") as fh:
+        json.dump(result, fh, indent=2)
+    print(f"  Receipt: {receipt_path}")
+
+    sys.exit(0 if result["verdict"] == "PASS" else 1)
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Convert CDNA v3 to HF safetensors")
-    parser.add_argument("--model-dir", type=Path, required=True,
-                        help="Model directory containing cdnav3/ subfolder")
-    parser.add_argument("--output-dir", type=Path, required=True,
-                        help="Output directory for HF-compatible checkpoint")
+    parser = argparse.ArgumentParser(
+        description="Convert CDNA v3 to HF safetensors (with completeness gate)",
+        epilog="Standalone audit mode:\n"
+               "  python3 tools/convert_to_hf.py --audit \\\n"
+               "      --safetensors ~/models/foo-helix/model.safetensors \\\n"
+               "      --dense-model ~/models/foo\n",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    # Conversion mode args
+    parser.add_argument("--model-dir", type=Path, default=None,
+                        help="Model directory containing cdnav3/ subfolder (conversion mode)")
+    parser.add_argument("--output-dir", type=Path, default=None,
+                        help="Output directory for HF-compatible checkpoint (conversion mode)")
+
+    # Audit mode args
+    parser.add_argument("--audit", action="store_true",
+                        help="Run completeness gate as standalone audit (no conversion)")
+    parser.add_argument("--safetensors", type=Path, default=None,
+                        help="Path to output .safetensors file (audit mode)")
+    parser.add_argument("--dense-model", type=Path, default=None,
+                        help="Path to original dense model directory (audit mode)")
+
     args = parser.parse_args()
+
+    # ── Audit mode ──
+    if args.audit:
+        if not args.safetensors or not args.dense_model:
+            parser.error("--audit requires --safetensors and --dense-model")
+        _run_standalone_audit(args.safetensors, args.dense_model)
+        return  # _run_standalone_audit calls sys.exit
+
+    # ── Conversion mode ──
+    if not args.model_dir or not args.output_dir:
+        parser.error("Conversion mode requires --model-dir and --output-dir")
 
     # Timing instrumentation (WO-RECEIPT-COST-01)
     t_start = time.time()

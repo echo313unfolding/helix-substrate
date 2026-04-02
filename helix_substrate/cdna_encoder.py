@@ -144,6 +144,7 @@ def _simple_kmeans(
     try:
         import torch
         if torch.cuda.is_available():
+            torch.cuda.empty_cache()
             try:
                 return _gpu_kmeans(data, centroids, n_clusters, max_iters, abs_tol)
             except torch.cuda.OutOfMemoryError:
@@ -203,6 +204,143 @@ def _gpu_kmeans(data_np, centroids_np, n_clusters, max_iters, abs_tol):
 
     assignments_np = assignments.cpu().numpy().astype(np.uint8)
     centroids_np = centroids.cpu().numpy()
+    return centroids_np, assignments_np
+
+
+def _vector_kmeans(
+    data: np.ndarray,
+    n_clusters: int,
+    max_iters: int = 10,
+    rtol: float = 0.001,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Multi-dimensional k-means for vector quantization.
+
+    Args:
+        data: [N_vectors, d] array of d-dimensional vectors
+        n_clusters: Number of clusters (codebook entries)
+        max_iters: Maximum iterations
+        rtol: Relative convergence tolerance
+
+    Returns:
+        (centroids [k, d], assignments [N_vectors] uint8/uint16)
+    """
+    n, d = data.shape
+    n_clusters = min(n_clusters, n)
+    index_dtype = np.uint8 if n_clusters <= 256 else np.uint16
+
+    # K-means++ initialization: random first centroid, then distance-weighted
+    rng = np.random.RandomState(42)
+    centroids = np.zeros((n_clusters, d), dtype=np.float32)
+    centroids[0] = data[rng.randint(n)]
+
+    for i in range(1, min(n_clusters, 64)):
+        # Matmul trick for init distances: ||x-c||^2 = ||x||^2 + ||c||^2 - 2*x@c.T
+        C_init = centroids[:i]
+        C_sq = np.sum(C_init ** 2, axis=1, keepdims=True).T  # [1, i]
+        # Subsample for init if data is very large
+        if n > 100000:
+            sub_idx = rng.choice(n, 100000, replace=False)
+            sub = data[sub_idx]
+        else:
+            sub = data
+            sub_idx = None
+        X_sq = np.sum(sub ** 2, axis=1, keepdims=True)  # [sub_n, 1]
+        dists = X_sq + C_sq - 2.0 * (sub @ C_init.T)  # [sub_n, i]
+        np.maximum(dists, 0, out=dists)  # clip negative from float precision
+        min_dists = dists.min(axis=1)
+        probs = min_dists / max(min_dists.sum(), 1e-30)
+        chosen = rng.choice(len(sub), p=probs)
+        centroids[i] = sub[chosen]
+    if n_clusters > 64:
+        centroids[64:] = data[rng.choice(n, n_clusters - 64, replace=False)]
+
+    # Convergence threshold
+    cb_range = float(centroids.max() - centroids.min())
+    if cb_range < 1e-30:
+        cb_range = 1.0
+    abs_tol = rtol * cb_range
+
+    # GPU path
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()  # Release cached memory from prior tensors
+            try:
+                return _gpu_vector_kmeans(data, centroids, n_clusters, d, max_iters, abs_tol, index_dtype)
+            except torch.cuda.OutOfMemoryError:
+                pass  # Fall through to CPU
+    except ImportError:
+        pass
+
+    # CPU iterations — use matmul trick for squared distances to avoid [N, k, d] broadcast
+    # ||x - c||^2 = ||x||^2 + ||c||^2 - 2 * x @ c.T
+    chunk_size = max(10000, n // 10)  # Chunk assignment to limit memory
+
+    for _ in range(max_iters):
+        # Chunked assignment to avoid [N, k] memory explosion for large N and k
+        C_sq = np.sum(centroids ** 2, axis=1, keepdims=True).T  # [1, k]
+        assignments = np.empty(n, dtype=np.int32)
+        for start in range(0, n, chunk_size):
+            end = min(start + chunk_size, n)
+            X_chunk = data[start:end]
+            X_sq = np.sum(X_chunk ** 2, axis=1, keepdims=True)  # [chunk, 1]
+            dists = X_sq + C_sq - 2.0 * (X_chunk @ centroids.T)  # [chunk, k]
+            assignments[start:end] = np.argmin(dists, axis=1)
+
+        # Vectorized centroid update via bincount (avoids Python loop over k)
+        counts = np.bincount(assignments, minlength=n_clusters).astype(np.float32)
+        new_centroids = np.zeros_like(centroids)
+        for dim in range(d):
+            sums = np.bincount(assignments, weights=data[:, dim], minlength=n_clusters)
+            new_centroids[:, dim] = np.where(
+                counts > 0, sums / np.maximum(counts, 1), centroids[:, dim]
+            )
+
+        max_delta = float(np.max(np.abs(new_centroids - centroids)))
+        if max_delta < abs_tol:
+            break
+        centroids = new_centroids
+
+    # Final assignment (chunked)
+    C_sq = np.sum(centroids ** 2, axis=1, keepdims=True).T
+    assignments = np.empty(n, dtype=np.int32)
+    for start in range(0, n, chunk_size):
+        end = min(start + chunk_size, n)
+        X_chunk = data[start:end]
+        X_sq = np.sum(X_chunk ** 2, axis=1, keepdims=True)
+        dists = X_sq + C_sq - 2.0 * (X_chunk @ centroids.T)
+        assignments[start:end] = np.argmin(dists, axis=1)
+
+    return centroids.astype(np.float32), assignments.astype(index_dtype)
+
+
+def _gpu_vector_kmeans(data_np, centroids_np, n_clusters, d, max_iters, abs_tol, index_dtype):
+    """GPU-accelerated multi-dimensional k-means using torch.cdist."""
+    import torch
+    data = torch.from_numpy(data_np).cuda()
+    centroids = torch.from_numpy(centroids_np).cuda()
+
+    for _ in range(max_iters):
+        dists = torch.cdist(data, centroids)  # [N, k]
+        assignments = torch.argmin(dists, dim=1)  # [N]
+
+        # Vectorized centroid update via scatter_add (no Python loop over k)
+        counts = torch.zeros(n_clusters, device=data.device)
+        counts.scatter_add_(0, assignments, torch.ones(len(data), device=data.device))
+        sums = torch.zeros(n_clusters, d, device=data.device)
+        sums.scatter_add_(0, assignments.unsqueeze(1).expand(-1, d), data)
+        alive = counts > 0
+        new_centroids = centroids.clone()
+        new_centroids[alive] = sums[alive] / counts[alive].unsqueeze(1)
+
+        max_delta = float((new_centroids - centroids).abs().max())
+        if max_delta < abs_tol:
+            break
+        centroids = new_centroids
+
+    centroids_np = centroids.cpu().numpy().astype(np.float32)
+    assignments_np = assignments.cpu().numpy().astype(index_dtype)
     return centroids_np, assignments_np
 
 

@@ -36,6 +36,10 @@ class TensorPolicy:
     sidecar_enabled: bool = True
     block_rows: int = 16
     max_corrections: int = 512
+    # Multi-dimensional VQ: 1=scalar (backward compat), 2=2D pairs, 4=4D quads.
+    # With d>1, each uint8 index covers d weights → d× fewer indices.
+    # Codebook shape becomes [k, d] instead of [k].
+    vector_dim: int = 1
     # SVD residual correction (rank > 0 enables VQ + low-rank residual decoder)
     svd_residual_rank: int = 0
     # Morpho codec parameters (only used when storage_mode="morpho")

@@ -13,7 +13,7 @@ Fused path (this kernel):
         Load indices tile -> gather codebook in registers -> tiled matmul
     Sidecar + SVD applied as small post-corrections.
 
-Three kernel variants:
+Kernel variants:
     v1 (original): Scalar k-loop -- one input column per iteration.
     v2 (blocked):  K_BLOCK=16 columns per iteration with unrolled inner loop.
                    Optional FP16 multiply with FP32 accumulate.
@@ -21,7 +21,13 @@ Three kernel variants:
                    tiles, casts to FP16, then uses tl.dot for tiled matmul.
                    3-5x faster than v2 on CC 7.5. Default kernel.
 
-Memory: only codebook (1KB) + indices (uint8) touched. W never exists.
+VQ_DIM support (v3):
+    VQ_DIM=1 (scalar): codebook [k], indices [OUT, IN].        1 index → 1 weight.  ~4x from FP32.
+    VQ_DIM=2 (pairs):  codebook [k*2], indices [OUT, IN//2].   1 index → 2 weights. ~8x from FP32.
+    VQ_DIM=4 (quads):  codebook [k*4], indices [OUT, IN//4].   1 index → 4 weights. ~16x from FP32.
+    Same kernel, same tl.dot path. VQ_DIM is a constexpr — Triton compiles separate versions.
+
+Memory: only codebook + indices (uint8) touched. W never exists.
 Peak VRAM delta: zero (vs out*in*4 bytes for naive path).
 
 Work Order: WO-HELIX-LINEAR-01
@@ -42,7 +48,7 @@ except ImportError:
     HAS_TRITON = False
 
 # --- Kernel Version Constants ---
-KERNEL_VERSION = "v4_manifest_fp16dot"
+KERNEL_VERSION = "v5_vqdim_fp16dot"
 KERNEL_IMPL = "triton_vq_matmul"
 
 # --- Static shape-keyed config manifest ---
@@ -227,9 +233,11 @@ if HAS_TRITON:
                 # Gather from codebook
                 w_col = tl.load(codebook_ptr + idx_col.to(tl.int32))
 
-                # Outer product with optional FP16 compute
+                # Outer product with optional reduced-precision compute
+                # BF16 (not FP16): FP16 max ±65504 can overflow on large activations.
+                # BF16 matches model compute dtype and FP32 range.
                 if USE_FP16:
-                    acc += (x_col.to(tl.float16)[:, None] * w_col.to(tl.float16)[None, :]).to(tl.float32)
+                    acc += (x_col.to(tl.bfloat16)[:, None] * w_col.to(tl.bfloat16)[None, :]).to(tl.float32)
                 else:
                     acc += x_col[:, None] * w_col[None, :]
 
@@ -242,38 +250,41 @@ if HAS_TRITON:
     def _vq_gather_matmul_tiled_kernel(
         # Pointers
         x_ptr,          # [N, IN] float32 input activations
-        codebook_ptr,   # [256] float32 cluster centers
-        indices_ptr,    # [OUT, IN] uint8 cluster indices
+        codebook_ptr,   # [k * VQ_DIM] float32 cluster centers (flattened)
+        indices_ptr,    # [OUT, IN // VQ_DIM] uint8 cluster indices
         output_ptr,     # [N, OUT] float32 output
         # Dimensions
         N,              # batch size (flattened)
-        IN,             # input features
+        IN,             # input features (weight columns, NOT index columns)
         OUT,            # output features
         # Strides
         stride_xn,      # x stride along N
         stride_xi,      # x stride along IN
         stride_idx_o,   # indices stride along OUT
-        stride_idx_i,   # indices stride along IN
+        stride_idx_i,   # indices stride along IN // VQ_DIM
         stride_on,      # output stride along N
         stride_oo,      # output stride along OUT
         # Block sizes (constexpr for compilation)
         BLOCK_M: tl.constexpr,   # batch tile (16)
         BLOCK_N: tl.constexpr,   # output tile (64)
-        BLOCK_K: tl.constexpr,   # reduction tile (32)
+        BLOCK_K: tl.constexpr,   # reduction tile (32) — must be divisible by VQ_DIM
+        VQ_DIM: tl.constexpr,    # 1=scalar, 2=pairs, 4=quads
     ):
         """
-        Tiled VQ gather-matmul with tl.dot (v3).
+        Tiled VQ gather-matmul with tl.dot (v3) and multi-dimensional VQ support.
 
         Gathers codebook[indices] into [BLOCK_N, BLOCK_K] tiles, casts to FP16,
         then uses tl.dot for a proper tiled matrix multiply. FP16 multiply with
         FP32 accumulate.
 
-        3-5x faster than v2 outer-product kernel on CC 7.5 because tl.dot
-        enables better instruction scheduling even without tensor cores.
+        VQ_DIM controls how many weight values each index covers:
+            VQ_DIM=1: codebook[idx] → 1 scalar per index (original behavior)
+            VQ_DIM=2: codebook[idx*2 + sub_k] → 2 values per index (2D VQ)
+            VQ_DIM=4: codebook[idx*4 + sub_k] → 4 values per index (4D VQ)
 
-        Key insight: tl.dot fails with FP32 on CC 7.5 (map::at error), but
-        works with FP16 inputs. The FP16 precision loss is negligible
-        (rel_err < 3e-4, cosine = 1.000000).
+        The k-loop always iterates over IN (weight columns). Index addressing
+        is derived: idx_col = offs_k // VQ_DIM, sub_k = offs_k % VQ_DIM.
+        When VQ_DIM=1: idx_col = offs_k, sub_k = 0 → identical to original.
         """
         pid_m = tl.program_id(0)
         pid_n = tl.program_id(1)
@@ -289,25 +300,34 @@ if HAS_TRITON:
             offs_k = k_start + tl.arange(0, BLOCK_K)
             mask_k = offs_k < IN
 
-            # Load x tile: [BLOCK_M, BLOCK_K]
+            # Load x tile: [BLOCK_M, BLOCK_K] — always indexed by weight column
             x_tile = tl.load(
                 x_ptr + offs_m[:, None] * stride_xn + offs_k[None, :] * stride_xi,
                 mask=mask_m[:, None] & mask_k[None, :], other=0.0
             )
 
-            # Load indices tile: [BLOCK_N, BLOCK_K] uint8
+            # VQ_DIM-aware gather:
+            # idx_col = which index to load (offs_k // VQ_DIM)
+            # sub_k   = which element within the codebook entry (offs_k % VQ_DIM)
+            # When VQ_DIM=1: idx_col = offs_k, sub_k = 0 → codebook[idx]
+            # When VQ_DIM=2: idx_col = offs_k//2, sub_k = 0 or 1 → codebook[idx*2 + sub_k]
+            idx_col = offs_k // VQ_DIM
+            sub_k = offs_k % VQ_DIM
+
+            # Load indices tile: [BLOCK_N, BLOCK_K // VQ_DIM] (with duplicates when VQ_DIM > 1)
             idx_tile = tl.load(
-                indices_ptr + offs_n[:, None] * stride_idx_o + offs_k[None, :] * stride_idx_i,
+                indices_ptr + offs_n[:, None] * stride_idx_o + idx_col[None, :] * stride_idx_i,
                 mask=mask_n[:, None] & mask_k[None, :], other=0
             )
 
-            # Dequant: gather codebook → [BLOCK_N, BLOCK_K] float32
-            w_tile = tl.load(codebook_ptr + idx_tile.to(tl.int32))
+            # Gather from codebook: codebook[idx * VQ_DIM + sub_k] → [BLOCK_N, BLOCK_K]
+            w_tile = tl.load(codebook_ptr + idx_tile.to(tl.int32) * VQ_DIM + sub_k[None, :])
 
-            # Cast to FP16, tl.dot with FP32 accumulate
-            x_f16 = x_tile.to(tl.float16)
-            w_f16 = w_tile.to(tl.float16)
-            acc = tl.dot(x_f16, tl.trans(w_f16), acc=acc)
+            # Cast to BF16, tl.dot with FP32 accumulate
+            # BF16 matches model compute dtype; FP16 can overflow on large activations
+            x_bf = x_tile.to(tl.bfloat16)
+            w_bf = w_tile.to(tl.bfloat16)
+            acc = tl.dot(x_bf, tl.trans(w_bf), acc=acc)
 
         # Store output tile (always FP32)
         out_ptrs = output_ptr + offs_m[:, None] * stride_on + offs_n[None, :] * stride_oo
@@ -388,9 +408,9 @@ if HAS_TRITON:
             )
             w_tile = tl.load(codebook_ptr + idx_tile.to(tl.int32))
 
-            x_f16 = x_tile.to(tl.float16)
-            w_f16 = w_tile.to(tl.float16)
-            acc = tl.dot(x_f16, tl.trans(w_f16), acc=acc)
+            x_bf = x_tile.to(tl.bfloat16)
+            w_bf = w_tile.to(tl.bfloat16)
+            acc = tl.dot(x_bf, tl.trans(w_bf), acc=acc)
 
         out_ptrs = output_ptr + offs_m[:, None] * stride_on + offs_n[None, :] * stride_oo
         tl.store(out_ptrs, acc, mask=mask_m[:, None] & mask_n[None, :])
@@ -439,6 +459,7 @@ def fused_vq_matmul(
     codebook_f16: Optional[torch.Tensor] = None,
     _dispatch_log: Optional[dict] = None,
     sidecar_phase: Optional[str] = None,
+    vq_dim: int = 1,
 ) -> torch.Tensor:
     """
     Compute output = x @ W^T where W = codebook[indices] + sidecar + SVD,
@@ -451,8 +472,10 @@ def fused_vq_matmul(
 
     Args:
         x: [N, IN] input activations (float32 or float16)
-        codebook: [256] float32 cluster centers
-        indices: [OUT, IN] uint8 cluster assignments
+        codebook: [k * vq_dim] float32 cluster centers (flattened).
+                  Scalar VQ: [k]. 2D VQ: [k*2] interleaved pairs. 4D VQ: [k*4].
+        indices: [OUT, IN // vq_dim] uint8 cluster assignments.
+                 Scalar VQ: [OUT, IN]. 2D VQ: [OUT, IN//2]. 4D VQ: [OUT, IN//4].
         sidecar_positions: [nnz] int64 flat positions of outliers (legacy API)
         sidecar_values: [nnz] float32 exact outlier values (legacy API)
         codebook_values_at_sidecar: [nnz] float32 VQ values at outliers (legacy API)
@@ -463,7 +486,8 @@ def fused_vq_matmul(
         svd_s: [rank] float32 singular values
         svd_Vt: [rank, IN] float32 right singular vectors (transposed)
         bias: [OUT] float32 bias
-        codebook_f16: [256] float16 codebook for FP16 compute path
+        codebook_f16: [k * vq_dim] float16 codebook for FP16 compute path
+        vq_dim: VQ dimensionality. 1=scalar (default), 2=pairs, 4=quads.
 
     Returns:
         [N, OUT] float32 output
@@ -482,6 +506,12 @@ def fused_vq_matmul(
     assert indices.dtype in (torch.uint8, torch.int16), (
         f"Expected uint8 or int16 indices, got {indices.dtype}"
     )
+    assert vq_dim in (1, 2, 4), f"vq_dim must be 1, 2, or 4, got {vq_dim}"
+    assert IN % vq_dim == 0, f"IN ({IN}) must be divisible by vq_dim ({vq_dim})"
+    assert indices.shape[1] == IN // vq_dim, (
+        f"indices shape {indices.shape} inconsistent with IN={IN}, vq_dim={vq_dim}: "
+        f"expected indices.shape[1] = {IN // vq_dim}"
+    )
 
     output = torch.empty(N, OUT, device=x.device, dtype=torch.float32)
 
@@ -495,11 +525,16 @@ def fused_vq_matmul(
     BLOCK_N = 64  # consistently best for decode
     BLOCK_K, num_warps, num_stages = _get_config(OUT, IN)
 
+    # BLOCK_K must be divisible by vq_dim for clean tile boundaries
+    while BLOCK_K % vq_dim != 0:
+        BLOCK_K *= 2
+
     grid = (triton.cdiv(N, BLOCK_M), triton.cdiv(OUT, BLOCK_N))
 
     if _dispatch_log is not None:
         _dispatch_log["dispatch_selected"] = KERNEL_VERSION
         _dispatch_log["block_config"] = f"M{BLOCK_M}_N{BLOCK_N}_K{BLOCK_K}_w{num_warps}_s{num_stages}"
+        _dispatch_log["vq_dim"] = vq_dim
 
     try:
         _vq_gather_matmul_tiled_kernel[grid](
@@ -509,12 +544,14 @@ def fused_vq_matmul(
             indices.stride(0), indices.stride(1),
             output.stride(0), output.stride(1),
             BLOCK_M=BLOCK_M, BLOCK_N=BLOCK_N, BLOCK_K=BLOCK_K,
+            VQ_DIM=vq_dim,
             num_warps=num_warps, num_stages=num_stages,
         )
     except Exception as e:
         raise RuntimeError(
             f"Triton kernel launch failed ({KERNEL_VERSION}): {e}. "
-            f"N={N}, IN={IN}, OUT={OUT}, config=K{BLOCK_K}_w{num_warps}_s{num_stages}. "
+            f"N={N}, IN={IN}, OUT={OUT}, vq_dim={vq_dim}, "
+            f"config=K{BLOCK_K}_w{num_warps}_s{num_stages}. "
             f"No silent fallback."
         ) from e
 

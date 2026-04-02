@@ -47,6 +47,43 @@ SVD_SUFFIXES = (".svd_U", ".svd_s", ".svd_Vt")
 HELIX_SUFFIXES = (".codebook", ".indices", ".sidecar_positions", ".sidecar_values") + SVD_SUFFIXES
 
 
+def downcast_exact_fp16(helix_dir: Path):
+    """Downcast FP32 exact tensors to FP16 in a helix safetensors file.
+
+    Compressed tensors (codebook, indices, sidecars) are left untouched.
+    Only exact tensors (.weight, .bias, etc.) are downcast from FP32 to FP16.
+    """
+    helix_path = helix_dir / "model.safetensors"
+    if not helix_path.exists():
+        print(f"ERROR: {helix_path} not found", file=sys.stderr)
+        sys.exit(1)
+
+    helix_tensors = load_file(str(helix_path))
+    VQ_SUFFIXES = {".codebook", ".indices", ".sidecar_positions", ".sidecar_values"}
+
+    downcast_count = 0
+    saved_bytes = 0
+    for k in list(helix_tensors.keys()):
+        # Skip compressed tensors — codebooks need FP32 precision, indices are uint8
+        if any(k.endswith(s) for s in VQ_SUFFIXES):
+            continue
+        t = helix_tensors[k]
+        if t.dtype == torch.float32:
+            helix_tensors[k] = t.half()  # FP32 → FP16
+            saved_bytes += t.numel() * 2  # saved 2 bytes per element
+            downcast_count += 1
+
+    if downcast_count == 0:
+        print(f"  No FP32 exact tensors in {helix_dir.name} — already optimal.")
+        return
+
+    old_mb = helix_path.stat().st_size / 1024**2
+    save_file(helix_tensors, str(helix_path))
+    new_mb = helix_path.stat().st_size / 1024**2
+    print(f"  Downcast {downcast_count} exact tensors FP32 → FP16 in {helix_dir.name}")
+    print(f"  Resaved: {new_mb:.1f} MB (was {old_mb:.1f} MB, saved {old_mb - new_mb:.1f} MB)")
+
+
 def strip_svd(helix_dir: Path):
     """Remove dead SVD artifact keys from a helix safetensors file."""
     helix_path = helix_dir / "model.safetensors"
@@ -132,8 +169,8 @@ def fixup(model_dir: Path, helix_dir: Path, do_strip_svd: bool = False,
                 vq_key = module + suffix
                 if vq_key in helix_tensors:
                     del helix_tensors[vq_key]
-            # Insert exact embedding
-            helix_tensors[weight_key] = orig_tensors[weight_key].float()
+            # Insert exact embedding (preserve source dtype — don't inflate to FP32)
+            helix_tensors[weight_key] = orig_tensors[weight_key]
             print(f"  Fixed embedding: {module} (VQ → exact, {list(orig_tensors[weight_key].shape)})")
             modified = True
 
@@ -191,7 +228,7 @@ def fixup(model_dir: Path, helix_dir: Path, do_strip_svd: bool = False,
     # Merge and resave
     merged = {**helix_tensors}
     for k, v in missing.items():
-        merged[k] = v.float()  # ensure float32 for compatibility
+        merged[k] = v  # preserve source dtype (BF16/FP16/FP32)
 
     save_file(merged, str(helix_path))
     total_mb = helix_path.stat().st_size / 1024**2
@@ -208,9 +245,15 @@ def main():
                         help="Remove dead SVD keys (svd_U, svd_s, svd_Vt) from checkpoint")
     parser.add_argument("--fix-embeddings", action="store_true",
                         help="Replace VQ'd embeddings with exact from original model")
+    parser.add_argument("--downcast-fp16", action="store_true",
+                        help="Downcast FP32 exact tensors to FP16 (no --model-dir needed)")
     parser.add_argument("--strip-svd-only", action="store_true",
                         help="Only strip SVD keys, don't fix missing tensors (no --model-dir needed)")
     args = parser.parse_args()
+
+    if args.downcast_fp16:
+        downcast_exact_fp16(args.helix_dir)
+        return
 
     if args.strip_svd_only:
         strip_svd(args.helix_dir)

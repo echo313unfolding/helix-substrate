@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Universal CDNA v3 compressor.
+Universal HXQ compressor.
 
 Point at any model directory. It reads config.json, discovers all weight
 tensors from safetensors, classifies each one, routes by kurtosis, and
@@ -91,6 +91,47 @@ def read_model_config(model_dir: Path) -> dict:
         "tie_word_embeddings": raw.get("tie_word_embeddings", False),
         "raw": raw,
     }
+
+
+# Architecture patterns that benefit from 2D VQ (proven via PPL receipts).
+# Key insight: SSM recurrence low-pass filters quantization error, so
+# 2D VQ's correlated-pair error pattern aligns with the smoothing.
+# Transformers compound correlated error across attention heads.
+# Receipt: receipts/vq2d_ppl/ (Mamba -9.4%, Zamba -2.4%, TinyLlama +0.15%, Qwen +1.06%)
+_SSM_ARCH_PATTERNS = {
+    "mamba", "mamba2", "rwkv", "retnet", "s4", "hyena",
+}
+_HYBRID_ARCH_PATTERNS = {
+    "zamba", "zamba2", "jamba",
+}
+
+
+def detect_codec_mode(config: dict) -> str:
+    """Auto-detect optimal codec mode from model config.json.
+
+    Returns:
+        "2d"     — pure SSM: all tensors use 2D VQ k=4096
+        "mixed"  — hybrid: Mamba→2D VQ, transformer→scalar
+        "scalar" — pure transformer: all tensors use scalar k=256
+    """
+    model_type = config.get("model_type", "").lower()
+    architectures = [a.lower() for a in config.get("architectures", [])]
+    model_name = config.get("model_name", "").lower()
+    # Combine all signals for pattern matching
+    arch_str = " ".join(architectures) + " " + model_type + " " + model_name
+
+    # Check hybrid first (contains both SSM and transformer components)
+    for pattern in _HYBRID_ARCH_PATTERNS:
+        if pattern in arch_str:
+            return "mixed"
+
+    # Check pure SSM
+    for pattern in _SSM_ARCH_PATTERNS:
+        if pattern in arch_str:
+            return "2d"
+
+    # Default: scalar (transformers, BERT, etc.)
+    return "scalar"
 
 
 # ---------------------------------------------------------------------------
@@ -314,9 +355,12 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                    force_svd_layers: set = None,
                    force_svd_rank: int = 8,
                    force_k_layers: dict = None,
-                   k_map_file: Path = None):
+                   k_map_file: Path = None,
+                   vector_dim: int = 1,
+                   mixed_codec: bool = False,
+                   auto_codec: bool = False):
     """
-    Compress a model to CDNA v3 format.
+    Compress a model to HXQ format.
 
     Modes:
       --k N:        Fixed codebook size (output: cdnav3_k{N}/)
@@ -345,17 +389,36 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     model_type = config.get("model_type", "unknown")
     tied = config.get("tie_word_embeddings", False)
 
+    # Auto-codec: detect optimal codec from architecture
+    if auto_codec:
+        codec_mode = detect_codec_mode(config)
+        if codec_mode == "2d":
+            vector_dim = 2
+            mixed_codec = False
+        elif codec_mode == "mixed":
+            mixed_codec = True
+            vector_dim = 1  # mixed_codec handles per-tensor routing
+        else:  # "scalar"
+            vector_dim = 1
+            mixed_codec = False
+
     # Adaptive k escalation ladder
     K_LADDER = [64, 128, 256, 512]
 
     print("=" * 70)
-    print(f"  CDNA v3 Universal Compressor")
+    print(f"  HXQ Universal Compressor")
     print("=" * 70)
     print(f"  Model:       {model_name}")
     print(f"  Type:        {model_type}")
     print(f"  Directory:   {model_dir}")
     print(f"  Layers:      {n_layers or '(not in config)'}")
     print(f"  Tied embeds: {tied}")
+    if auto_codec:
+        print(f"  Auto-codec:  {codec_mode} (detected from config.json)")
+    if mixed_codec:
+        print(f"  Codec:       mixed (Mamba→2D VQ k=4096, transformer→scalar k=256)")
+    elif vector_dim > 1:
+        print(f"  Codec:       {vector_dim}D VQ (all compressible tensors)")
     # Load activation scale factors if provided
     act_scales = {}
     if scale_file is not None:
@@ -393,6 +456,10 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         print(f"  Mode:        FIXED k={k_override} (info-theoretic {32.0 / np.log2(k_override):.1f}x)")
     else:
         print(f"  Mode:        STANDARD k=256")
+    if mixed_codec:
+        print(f"  Mixed codec: Mamba→2D VQ k=4096, Transformer→scalar k=256")
+    elif vector_dim > 1:
+        print(f"  Vector dim:  {vector_dim}D VQ (each index covers {vector_dim} weights)")
     if force_svd_layers:
         print(f"  Force SVD:   layers {sorted(force_svd_layers)} → rank={force_svd_rank}")
     if force_k_layers:
@@ -439,7 +506,9 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
         return
 
     # ── Phase 2: Encode ──
-    if adaptive:
+    if mixed_codec:
+        cdna_dir = model_dir / "cdnav3_mixed"
+    elif adaptive:
         cdna_dir = model_dir / "cdnav3_adaptive"
     elif k_override and k_override != 256:
         cdna_dir = model_dir / f"cdnav3_k{k_override}"
@@ -686,6 +755,22 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             elif layer_k_override is None and k_override and dp_entry is None:
                 policy = dc_replace(policy, n_clusters=k_override)
 
+            # Multi-dimensional VQ override
+            if mixed_codec:
+                # Mixed-codec: route by architecture type within the model.
+                # Mamba/SSM tensors → 2D VQ k=4096 (proven 9.4% better on SSM)
+                # Transformer tensors → scalar k=256 (2D VQ penalty scales with size)
+                is_ssm = ("mamba" in name.lower() and
+                          "shared_transformer" not in name.lower())
+                if is_ssm and tensor_np.shape[1] % 2 == 0:
+                    policy = dc_replace(policy, vector_dim=2, n_clusters=4096)
+                # else: keep scalar k=256 (default)
+            elif vector_dim > 1:
+                if tensor_np.shape[1] % vector_dim == 0:
+                    # Auto-codec "2d" mode: use k=4096 (proven on SSM/Mamba)
+                    vq_k = 4096 if auto_codec else policy.n_clusters
+                    policy = dc_replace(policy, vector_dim=vector_dim, n_clusters=vq_k)
+
             stats = writer.write_tensor(tensor_np, name, policy=policy)
 
             # Hessian sidecar post-processing (replaces percentile sidecar)
@@ -783,7 +868,7 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
     # Receipt
     receipt = {
         "work_order": f"compress-{model_name}" + ("-adaptive" if adaptive else ""),
-        "question": f"Does {model_name} compress through CDNA v3"
+        "question": f"Does {model_name} compress through HXQ"
                     + (f" with adaptive k (target cos>={quality_target})?" if adaptive
                        else "?"),
         "verdict": "PASS" if n_done > 0 else "EMPTY",
@@ -864,7 +949,7 @@ def _replace_sidecar_hessian(tensor_dir: Path, original: np.ndarray,
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Universal CDNA v3 compressor. Point at any model directory.",
+        description="Universal HXQ compressor. Point at any model directory.",
         epilog="Examples:\n"
                "  python3 tools/compress.py ~/models/tinyllama_fp32\n"
                "  python3 tools/compress.py ~/models/qwen2.5-7b-instruct --adaptive\n"
@@ -905,6 +990,18 @@ def main():
                         help="Path to k_map.json from k_allocator.py. "
                              "Per-tensor codebook size assignments (supports k>256 via uint16 indices). "
                              "Format: {\"overrides\": {\"tensor.name.weight\": 512, ...}, \"k_default\": 256}")
+    parser.add_argument("--vector-dim", type=int, default=1, choices=[1, 2, 4],
+                        help="Vector quantization dimension. 1=scalar (default), "
+                             "2=2D pairs (4x from BF16), 4=4D quads (8x from BF16). "
+                             "Each index covers d weights. Requires in_features %% d == 0.")
+    parser.add_argument("--mixed-codec", action="store_true",
+                        help="Mixed-codec compression for hybrid models (e.g., Zamba2). "
+                             "Routes Mamba/SSM tensors to 2D VQ k=4096, transformer tensors "
+                             "to scalar VQ k=256. Each HelixLinear carries its own codec.")
+    parser.add_argument("--auto-codec", action="store_true", default=False,
+                        help="Auto-detect codec from model architecture. "
+                             "Reads config.json, routes: SSM→2D VQ, hybrid→mixed, "
+                             "transformer→scalar. Overrides --vector-dim and --mixed-codec.")
     args = parser.parse_args()
 
     if args.adaptive and args.k:
@@ -943,7 +1040,10 @@ def main():
                    force_svd_layers=force_svd_layers,
                    force_svd_rank=args.force_svd_rank,
                    force_k_layers=force_k_layers,
-                   k_map_file=args.k_map)
+                   k_map_file=args.k_map,
+                   vector_dim=args.vector_dim,
+                   mixed_codec=args.mixed_codec,
+                   auto_codec=args.auto_codec)
 
 
 if __name__ == "__main__":
