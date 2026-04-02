@@ -139,6 +139,10 @@ class HelixLinear(nn.Module):
         # Original index matrix dimensions for unpacking
         self._idx_rows: int = out_features
         self._idx_cols: int = in_features // vector_dim if vector_dim > 1 else in_features
+        # Buffered forward: materialize W into reusable buffer, then cuBLAS.
+        # "buffered" (default on CUDA) | "fused" (Triton, VRAM-constrained) | "naive" (CPU)
+        self._forward_mode: str = "buffered"
+        self._weight_buffer: Optional[torch.Tensor] = None
 
         # VQ components (read-only buffers, not parameters)
         self.register_buffer("codebook", codebook.contiguous())  # [k] (256 or 512+)
@@ -290,20 +294,18 @@ class HelixLinear(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Compute output = x @ W^T + bias without persistent full-size W.
+        Compute output = x @ W^T + bias.
 
-        Two paths:
-        - CUDA + Triton: Fused VQ gather-matmul (W never exists in global memory)
-        - CPU fallback:  Reconstruct W as temporary, then matmul
+        Dispatch order (CUDA):
+        1. "buffered" (default): Materialize W into reusable buffer → cuBLAS matmul.
+           Near-dense speed, costs one layer buffer in VRAM (~50-100 MB).
+        2. "fused": Triton VQ gather-matmul (W never in global memory). VRAM-minimal
+           but memory-bound (~5x slower). Use for extreme VRAM constraints.
+        3. "naive": CPU tiled path (256-row tiles). Slowest.
 
-        Only the compressed buffers persist in GPU memory.
-        Sets _last_dispatch_path to "fused" or "naive" for instrumentation.
+        Set self._forward_mode = "fused" to force Triton kernel path.
         """
         # Kurtosis gate: Class 2 modules decide SVD enable/skip per forward call.
-        # Amortized: kurtosis computed every check_interval calls (~0.016ms/call
-        # at interval=8), cached decision reused between checks (zero cost).
-        # Zero overhead when _kurtosis_gate is None (Class 1 / non-SVD modules).
-        # In CUDA graph mode, step() returns cached decision (no GPU→CPU sync).
         if self._kurtosis_gate is not None and self.has_svd:
             with torch.no_grad():
                 enable_svd = self._kurtosis_gate.step(
@@ -312,24 +314,22 @@ class HelixLinear(nn.Module):
                 self._cell_skip_svd = not enable_svd
 
         input_dtype = x.dtype
+        mode = getattr(self, "_forward_mode", "buffered")
 
-        if self._fused_available and x.is_cuda:
+        if x.is_cuda and mode == "buffered":
+            self._last_dispatch_path = "buffered"
+            out = self._forward_buffered(x)
+        elif self._fused_available and x.is_cuda and mode == "fused":
             self._last_dispatch_path = "fused"
             out = self._forward_fused(x)
+        elif x.is_cuda:
+            # CUDA but mode is unknown or fused unavailable — use buffered
+            self._last_dispatch_path = "buffered"
+            out = self._forward_buffered(x)
         else:
             self._last_dispatch_path = "naive"
-            if x.is_cuda:
-                warnings.warn(
-                    f"HelixLinear({self.tensor_name}): CUDA input but Triton unavailable, "
-                    f"falling back to CPU-style naive path (41x slower). "
-                    f"Install triton or check CUDA availability.",
-                    RuntimeWarning,
-                    stacklevel=2,
-                )
             out = self._forward_naive(x)
 
-        # Match output dtype to input dtype so downstream nn.Linear modules
-        # (which keep their original precision) don't get a dtype mismatch.
         if out.dtype != input_dtype:
             out = out.to(input_dtype)
         return out
@@ -519,6 +519,74 @@ class HelixLinear(nn.Module):
             output += scaled @ self.svd_U.t()
 
         return output.reshape(*orig_shape[:-1], self.out_features)
+
+    # Class-level shared buffer: ONE buffer reused by ALL HelixLinear modules.
+    # Allocated lazily on first forward, sized to the largest layer's W matrix.
+    # VRAM cost: max(out_features * in_features) * 2 bytes ≈ 50-100 MB for 7B models.
+    _shared_buffer: Optional[torch.Tensor] = None
+    _shared_buffer_size: int = 0  # numel of current shared buffer
+
+    def _forward_buffered(self, x: torch.Tensor) -> torch.Tensor:
+        """Buffered forward: materialize full W into shared buffer, then cuBLAS.
+
+        Per-forward cost: one codebook gather (fast parallel GPU op) + one cuBLAS
+        matmul at full tensor core speed. Shared buffer reused across all layers.
+
+        VRAM cost: ONE buffer sized to the largest layer ≈ 50-100 MB total.
+        """
+        import torch.nn.functional as F
+
+        orig_shape = x.shape
+        x_2d = x.reshape(-1, self.in_features)
+
+        # AWQ channel scaling
+        if self.has_channel_scales:
+            x_2d = x_2d / self.channel_scales.unsqueeze(0)
+
+        # Determine compute dtype — use bfloat16 for tensor cores if input is bf16/f16
+        compute_dt = x.dtype if x.dtype in (torch.float16, torch.bfloat16) else torch.bfloat16
+
+        # Shared buffer: allocate/grow if needed, reused across ALL modules
+        needed = self.out_features * self.in_features
+        buf_ref = HelixLinear._shared_buffer
+        if (buf_ref is None or buf_ref.device != x.device
+                or buf_ref.dtype != compute_dt or HelixLinear._shared_buffer_size < needed):
+            HelixLinear._shared_buffer = torch.empty(
+                needed, dtype=compute_dt, device=x.device,
+            )
+            HelixLinear._shared_buffer_size = needed
+        buf = HelixLinear._shared_buffer[:needed].reshape(self.out_features, self.in_features)
+
+        # Step 1: Materialize W via codebook gather
+        if self.index_packing == "12bit":
+            from helix_substrate.index_packing import unpack_12bit
+            idx_2d = unpack_12bit(
+                self.indices, self._idx_rows * self._idx_cols
+            ).reshape(self._idx_rows, self._idx_cols).long()
+        else:
+            idx_2d = self.indices.long()
+
+        if self.vector_dim > 1:
+            # 2D VQ: codebook[idx] → [out, in/d, d] → reshape [out, in]
+            gathered = self.codebook[idx_2d]  # [out, in/d, d]
+            buf[:] = gathered.reshape(self.out_features, self.in_features).to(compute_dt)
+        else:
+            buf[:] = self.codebook[idx_2d].to(compute_dt)
+
+        # Step 2: Apply sidecar corrections in-place
+        if self._sidecar_rows is not None:
+            buf[self._sidecar_rows, self._sidecar_cols] += self._sidecar_deltas.to(compute_dt)
+
+        # Step 3: SVD residual correction
+        if self.has_svd and not self._cell_skip_svd:
+            scaled_U = self.svd_U * self.svd_s.unsqueeze(0)  # [out, rank]
+            buf += (scaled_U @ self.svd_Vt).to(compute_dt)   # [out, in]
+
+        # Step 4: cuBLAS matmul at full tensor core speed
+        x_compute = x_2d.to(compute_dt)
+        out = F.linear(x_compute, buf, self.bias)
+
+        return out.reshape(*orig_shape[:-1], self.out_features)
 
     def _dequant_tile(self, start_row: int, end_row: int) -> torch.Tensor:
         """
@@ -775,6 +843,8 @@ class HelixLinear(nn.Module):
         instance._cell_skip_svd = False
         instance._kurtosis_gate = None
         instance._sidecar_phase = None
+        instance._forward_mode = "buffered"
+        instance._weight_buffer = None
         instance._cuda_graph_mode = False
         instance.has_svd = False
         instance.rank = 0
