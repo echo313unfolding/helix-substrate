@@ -562,24 +562,36 @@ class HelixLinear(nn.Module):
             HelixLinear._shared_buffer_size = needed
         buf = HelixLinear._shared_buffer[:needed].reshape(self.out_features, self.in_features)
 
-        # Step 1: Unpack indices (inline, no caching — caching all 213 modules' int64 indices OOMs)
-        if self.index_packing == "12bit":
-            from helix_substrate.index_packing import unpack_12bit
-            idx_flat = unpack_12bit(
-                self.indices, self._idx_rows * self._idx_cols
-            ).long()
-        else:
-            idx_flat = self.indices.reshape(-1).long()
-
-        # Step 2: Materialize W via codebook gather
-        # Pre-cast codebook to compute dtype (cached, tiny: [4096, 2] * 2 bytes = 16 KB)
+        # Steps 1+2: Fused unpack + codebook gather into buffer
+        # Try Triton fused kernel first (one launch, zero intermediates).
+        # Falls back to PyTorch index_select if Triton unavailable.
         cb = self._get_codebook_for_dtype(compute_dt)
-        if self.vector_dim > 1:
-            # 2D VQ: codebook[flat_idx] → [out*in/d, d] → reshape [out, in]
-            gathered = torch.index_select(cb, 0, idx_flat)  # [out*in/d, d]
-            buf[:] = gathered.reshape(self.out_features, self.in_features)
+        n_idx = self._idx_rows * self._idx_cols
+
+        if self.vector_dim == 2 and self._triton_gather_available():
+            from helix_substrate.triton_gather_12bit import (
+                fused_gather_12bit_vq2d, fused_gather_unpacked_vq2d,
+            )
+            buf_flat = buf.reshape(-1)
+            if self.index_packing == "12bit":
+                fused_gather_12bit_vq2d(self.indices, cb, buf_flat, n_idx)
+            else:
+                fused_gather_unpacked_vq2d(
+                    self.indices.reshape(-1), cb, buf_flat, n_idx,
+                )
         else:
-            buf.reshape(-1)[:] = torch.index_select(cb, 0, idx_flat).reshape(-1)
+            # Fallback: PyTorch unpack + int32 index_select
+            if self.index_packing == "12bit":
+                from helix_substrate.index_packing import unpack_12bit
+                idx_flat = unpack_12bit(self.indices, n_idx).int()
+            else:
+                idx_flat = self.indices.reshape(-1).int()
+
+            if self.vector_dim > 1:
+                gathered = torch.index_select(cb, 0, idx_flat)
+                buf[:] = gathered.reshape(self.out_features, self.in_features)
+            else:
+                buf.reshape(-1)[:] = torch.index_select(cb, 0, idx_flat).reshape(-1)
 
         # Step 3: Apply sidecar corrections in-place
         if self._sidecar_rows is not None:
@@ -595,6 +607,19 @@ class HelixLinear(nn.Module):
         out = F.linear(x_compute, buf, self.bias)
 
         return out.reshape(*orig_shape[:-1], self.out_features)
+
+    def _triton_gather_available(self) -> bool:
+        """Check if the fused Triton gather kernel is available."""
+        cached = getattr(self, "_triton_gather_ok", None)
+        if cached is not None:
+            return cached
+        try:
+            from helix_substrate.triton_gather_12bit import is_available
+            ok = is_available()
+        except (ImportError, RuntimeError):
+            ok = False
+        self._triton_gather_ok = ok
+        return ok
 
     def _get_codebook_for_dtype(self, dt: torch.dtype) -> torch.Tensor:
         """Return codebook pre-cast to target dtype, cached."""
