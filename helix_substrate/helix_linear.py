@@ -258,6 +258,10 @@ class HelixLinear(nn.Module):
         """Override nn.Module._apply to refresh dispatch cache after .to()/.cuda()/.cpu()."""
         result = super()._apply(fn, recurse)
         self._refresh_dispatch_cache()
+        # Invalidate cached codebook dtype casts on device move
+        for attr in list(vars(self)):
+            if attr.startswith("_cb_"):
+                delattr(self, attr)
         return result
 
     def set_compute_dtype(self, dtype: torch.dtype) -> None:
@@ -533,6 +537,7 @@ class HelixLinear(nn.Module):
         matmul at full tensor core speed. Shared buffer reused across all layers.
 
         VRAM cost: ONE buffer sized to the largest layer ≈ 50-100 MB total.
+        Optimization: indices unpacked once and cached; codebook pre-cast to compute dtype.
         """
         import torch.nn.functional as F
 
@@ -557,36 +562,49 @@ class HelixLinear(nn.Module):
             HelixLinear._shared_buffer_size = needed
         buf = HelixLinear._shared_buffer[:needed].reshape(self.out_features, self.in_features)
 
-        # Step 1: Materialize W via codebook gather
+        # Step 1: Unpack indices (inline, no caching — caching all 213 modules' int64 indices OOMs)
         if self.index_packing == "12bit":
             from helix_substrate.index_packing import unpack_12bit
-            idx_2d = unpack_12bit(
+            idx_flat = unpack_12bit(
                 self.indices, self._idx_rows * self._idx_cols
-            ).reshape(self._idx_rows, self._idx_cols).long()
+            ).long()
         else:
-            idx_2d = self.indices.long()
+            idx_flat = self.indices.reshape(-1).long()
 
+        # Step 2: Materialize W via codebook gather
+        # Pre-cast codebook to compute dtype (cached, tiny: [4096, 2] * 2 bytes = 16 KB)
+        cb = self._get_codebook_for_dtype(compute_dt)
         if self.vector_dim > 1:
-            # 2D VQ: codebook[idx] → [out, in/d, d] → reshape [out, in]
-            gathered = self.codebook[idx_2d]  # [out, in/d, d]
-            buf[:] = gathered.reshape(self.out_features, self.in_features).to(compute_dt)
+            # 2D VQ: codebook[flat_idx] → [out*in/d, d] → reshape [out, in]
+            gathered = torch.index_select(cb, 0, idx_flat)  # [out*in/d, d]
+            buf[:] = gathered.reshape(self.out_features, self.in_features)
         else:
-            buf[:] = self.codebook[idx_2d].to(compute_dt)
+            buf.reshape(-1)[:] = torch.index_select(cb, 0, idx_flat).reshape(-1)
 
-        # Step 2: Apply sidecar corrections in-place
+        # Step 3: Apply sidecar corrections in-place
         if self._sidecar_rows is not None:
             buf[self._sidecar_rows, self._sidecar_cols] += self._sidecar_deltas.to(compute_dt)
 
-        # Step 3: SVD residual correction
+        # Step 4: SVD residual correction
         if self.has_svd and not self._cell_skip_svd:
             scaled_U = self.svd_U * self.svd_s.unsqueeze(0)  # [out, rank]
             buf += (scaled_U @ self.svd_Vt).to(compute_dt)   # [out, in]
 
-        # Step 4: cuBLAS matmul at full tensor core speed
+        # Step 5: cuBLAS matmul at full tensor core speed
         x_compute = x_2d.to(compute_dt)
         out = F.linear(x_compute, buf, self.bias)
 
         return out.reshape(*orig_shape[:-1], self.out_features)
+
+    def _get_codebook_for_dtype(self, dt: torch.dtype) -> torch.Tensor:
+        """Return codebook pre-cast to target dtype, cached."""
+        attr = f"_cb_{dt}".replace(".", "_")
+        cached = getattr(self, attr, None)
+        if cached is not None:
+            return cached
+        cb = self.codebook.to(dt)
+        setattr(self, attr, cb)
+        return cb
 
     def _dequant_tile(self, start_row: int, end_row: int) -> torch.Tensor:
         """
