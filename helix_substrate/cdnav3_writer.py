@@ -300,6 +300,12 @@ class CDNAv3Writer:
         codebook_bytes = codebook_path.stat().st_size
         compressed_bytes = indices_bytes + codebook_bytes + sidecar_bytes + svd_bytes
 
+        # Weight distribution stats (HXQ-Auto training features)
+        flat_f32 = flat.astype(np.float32)
+        mu = float(flat_f32.mean())
+        var = float(((flat_f32 - mu) ** 2).mean())
+        kurt_val = float(((flat_f32 - mu) ** 4).mean() / max(var ** 2, 1e-30) - 3.0) if var > 1e-30 else 0.0
+
         stats = {
             "tensor_name": tensor_name,
             "shape": [rows, cols],
@@ -314,6 +320,16 @@ class CDNAv3Writer:
             "sidecar_bytes": sidecar_bytes,
             "svd_residual_rank": svd_rank_actual,
             "svd_bytes": svd_bytes,
+            # HXQ-Auto: weight distribution features
+            "weight_mean": round(mu, 8),
+            "weight_std": round(float(var ** 0.5), 8),
+            "weight_min": round(float(flat_f32.min()), 8),
+            "weight_max": round(float(flat_f32.max()), 8),
+            "weight_kurtosis": round(kurt_val, 4),
+            "tensor_class": policy.tensor_class.value,
+            "n_clusters": policy.n_clusters,
+            "vector_dim": vector_dim,
+            "codec_decision": policy.storage_mode,
         }
         (out_dir / "stats.json").write_text(json.dumps(stats, indent=2))
 
