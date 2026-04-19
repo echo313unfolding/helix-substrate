@@ -34,6 +34,22 @@ try:
 except ImportError:
     pass
 
+# Layer-chain receipt (load-time SHAKE256 integrity gate). Kept separate from
+# helix_substrate.receipt (per-operation execution receipts) for semantic clarity.
+try:
+    from helix_substrate.layer_chain_receipt import (
+        LayerReceipt,
+        ReceiptManifest,
+        VerificationResult,
+        generate_receipt_manifest,
+        verify_receipt_manifest,
+        save_manifest,
+        load_manifest,
+        assert_receipt_valid,
+    )
+except ImportError:
+    pass
+
 __all__ = [
     "encode_tensor_to_cdna",
     "decode_cdna_to_tensor",
@@ -52,4 +68,13 @@ __all__ = [
     "CDNAv3Writer",
     "CDNAv3Reader",
     "MORPHO_FFT_POLICY",
+    # Layer-chain receipt (load-time integrity)
+    "LayerReceipt",
+    "ReceiptManifest",
+    "VerificationResult",
+    "generate_receipt_manifest",
+    "verify_receipt_manifest",
+    "save_manifest",
+    "load_manifest",
+    "assert_receipt_valid",
 ]

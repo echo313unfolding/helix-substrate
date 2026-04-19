@@ -24,7 +24,9 @@ Work Order: WO-HELIX-LINEAR-01
 from __future__ import annotations
 
 import json
+import os
 import warnings
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Tuple
@@ -118,6 +120,19 @@ class HelixLinear(nn.Module):
         self._kurtosis_gate = None
         # Sidecar phase: "fused" | "scatter" | None (auto). Frozen at request start.
         self._sidecar_phase: Optional[str] = None
+        # WO-SIDECAR-POLICY-01: routing-policy gate for sidecar application.
+        # Modes:
+        #   "default"    — existing behavior (always apply sidecar if present)
+        #   "always_on"  — always apply, increments _sidecar_apply_count
+        #   "always_off" — never apply, increments _sidecar_skip_count
+        #   "threshold"  — compute dynamic sidecar OUTPUT contribution norm
+        #                  (sparse: x[:, sidecar_cols] * deltas), apply iff > threshold
+        # Counters and norm log are zeroed by reset_sidecar_policy_stats().
+        self._sidecar_mode: str = "default"
+        self._sidecar_threshold: float = 0.0
+        self._sidecar_apply_count: int = 0
+        self._sidecar_skip_count: int = 0
+        self._sidecar_norms: list = []
         # CUDA graph mode: when True, forward() avoids GPU→CPU syncs (.item()).
         # Kurtosis gate returns cached decision; evaluation happens out-of-band
         # via pre_step_kurtosis(). Toggle with set_cuda_graph_mode().
@@ -143,6 +158,10 @@ class HelixLinear(nn.Module):
         # "buffered" (default on CUDA) | "fused" (Triton, VRAM-constrained) | "naive" (CPU)
         self._forward_mode: str = "buffered"
         self._weight_buffer: Optional[torch.Tensor] = None
+        # Wave tile scheduling: parallel CPU path with FibPi3D core pinning.
+        # Enable with HELIX_WAVE_TILES=1. Dispatches tiles to cores via
+        # ThreadPoolExecutor instead of sequential loop.
+        self._wave_enabled: bool = os.environ.get("HELIX_WAVE_TILES", "0") == "1"
 
         # VQ components (read-only buffers, not parameters)
         self.register_buffer("codebook", codebook.contiguous())  # [k] (256 or 512+)
@@ -330,6 +349,9 @@ class HelixLinear(nn.Module):
             # CUDA but mode is unknown or fused unavailable — use buffered
             self._last_dispatch_path = "buffered"
             out = self._forward_buffered(x)
+        elif self._wave_enabled:
+            self._last_dispatch_path = "wave"
+            out = self._forward_wave(x)
         else:
             self._last_dispatch_path = "naive"
             out = self._forward_naive(x)
@@ -440,6 +462,7 @@ class HelixLinear(nn.Module):
             "svd_active": self.has_svd and not self._cell_skip_svd,
             "kurtosis_gate": self._kurtosis_gate.summary() if self._kurtosis_gate else None,
             "cuda_graph_mode": self._cuda_graph_mode,
+            "wave_tiles": self._wave_enabled,
         }
 
     def _forward_fused(self, x: torch.Tensor) -> torch.Tensor:
@@ -593,9 +616,11 @@ class HelixLinear(nn.Module):
             else:
                 buf.reshape(-1)[:] = torch.index_select(cb, 0, idx_flat).reshape(-1)
 
-        # Step 3: Apply sidecar corrections in-place
+        # Step 3: Apply sidecar corrections in-place (policy-gated, WO-SIDECAR-POLICY-01)
         if self._sidecar_rows is not None:
-            buf[self._sidecar_rows, self._sidecar_cols] += self._sidecar_deltas.to(compute_dt)
+            apply_sidecar = self._policy_decide(x_2d)
+            if apply_sidecar:
+                buf[self._sidecar_rows, self._sidecar_cols] += self._sidecar_deltas.to(compute_dt)
 
         # Step 4: SVD residual correction
         if self.has_svd and not self._cell_skip_svd:
@@ -631,6 +656,82 @@ class HelixLinear(nn.Module):
         setattr(self, attr, cb)
         return cb
 
+    # ----- WO-SIDECAR-POLICY-01: routing-policy gate -----
+
+    def set_sidecar_policy(self, mode: str, threshold: float = 0.0) -> None:
+        """Set policy gate for sidecar application.
+
+        mode: "default" | "always_on" | "always_off" | "threshold"
+        threshold: only used when mode == "threshold"; sidecar applied iff
+                   the dynamic per-call sidecar OUTPUT contribution norm > threshold.
+        """
+        if mode not in ("default", "always_on", "always_off", "threshold"):
+            raise ValueError(f"unknown sidecar mode: {mode!r}")
+        self._sidecar_mode = mode
+        self._sidecar_threshold = float(threshold)
+
+    def reset_sidecar_policy_stats(self) -> None:
+        """Zero apply/skip counters and clear the per-call norm log."""
+        self._sidecar_apply_count = 0
+        self._sidecar_skip_count = 0
+        self._sidecar_norms = []
+
+    def get_sidecar_policy_stats(self) -> dict:
+        """Return current counters and norm summary."""
+        norms = self._sidecar_norms
+        if norms:
+            arr = np.asarray(norms, dtype=np.float64)
+            stats = {
+                "n": int(arr.size),
+                "mean": float(arr.mean()),
+                "p50": float(np.percentile(arr, 50)),
+                "p95": float(np.percentile(arr, 95)),
+                "min": float(arr.min()),
+                "max": float(arr.max()),
+            }
+        else:
+            stats = {"n": 0}
+        return {
+            "mode": self._sidecar_mode,
+            "threshold": self._sidecar_threshold,
+            "apply_count": self._sidecar_apply_count,
+            "skip_count": self._sidecar_skip_count,
+            "norm_stats": stats,
+        }
+
+    def _policy_decide(self, x_2d: torch.Tensor) -> bool:
+        """Decide whether to apply sidecar this call.
+
+        x_2d: [B, in_features] flattened input batch (no AWQ rescale needed —
+              the sidecar is applied AFTER the codebook gather in the same
+              scaled space, so the relevant 'x' is x_2d post-AWQ).
+
+        In threshold mode, computes the dynamic sparse OUTPUT contribution norm:
+            sidecar_out_contrib[b, r] = sum_{c in cols(r)} delta(r,c) * x_2d[b, c]
+        and gates application on its Frobenius norm.
+        """
+        mode = self._sidecar_mode
+        if mode == "default":
+            return True
+        if mode == "always_on":
+            self._sidecar_apply_count += 1
+            return True
+        if mode == "always_off":
+            self._sidecar_skip_count += 1
+            return False
+        # threshold mode — sparse contribution norm
+        # x_at_cols: [B, nnz], deltas: [nnz]
+        x_at_cols = x_2d.index_select(1, self._sidecar_cols)
+        contrib_per_nnz = x_at_cols * self._sidecar_deltas.to(x_at_cols.dtype).unsqueeze(0)
+        sc_norm = float(contrib_per_nnz.norm().item())
+        self._sidecar_norms.append(sc_norm)
+        if sc_norm > self._sidecar_threshold:
+            self._sidecar_apply_count += 1
+            return True
+        else:
+            self._sidecar_skip_count += 1
+            return False
+
     def _dequant_tile(self, start_row: int, end_row: int) -> torch.Tensor:
         """
         Dequantize a tile of weight rows from compressed representation.
@@ -662,7 +763,9 @@ class HelixLinear(nn.Module):
             tile = self.codebook[idx_slice]  # [rows, in]
 
         # Sidecar correction (precomputed rows/cols/deltas)
-        if self._sidecar_rows is not None:
+        # Policy gate is applied at the per-call level via _policy_decide_tile, set
+        # by _forward_naive before tiling so all tiles see the same decision.
+        if self._sidecar_rows is not None and getattr(self, "_apply_sidecar_this_call", True):
             mask = (self._sidecar_rows >= start_row) & (self._sidecar_rows < end_row)
             if mask.any():
                 tile = tile.clone()
@@ -690,6 +793,12 @@ class HelixLinear(nn.Module):
         # AWQ channel scaling: pre-divide input so codebook operates in scaled space
         if self.has_channel_scales:
             x_2d = x_2d / self.channel_scales.unsqueeze(0)
+
+        # WO-SIDECAR-POLICY-01: decide once per call, all tiles use same decision
+        if self._sidecar_rows is not None:
+            self._apply_sidecar_this_call = self._policy_decide(x_2d)
+        else:
+            self._apply_sidecar_this_call = True
         N = x_2d.shape[0]
         output = torch.zeros(N, self.out_features, device=x.device, dtype=torch.float32)
 
@@ -707,6 +816,63 @@ class HelixLinear(nn.Module):
                 output[:, i:end] = x_compute @ W_tile.float().t()
 
         # Bias
+        if self.bias is not None:
+            output += self.bias.unsqueeze(0)
+
+        return output.reshape(*orig_shape[:-1], self.out_features)
+
+    def _forward_wave(self, x: torch.Tensor) -> torch.Tensor:
+        """Parallel tiled CPU path with FibPi3D core scheduling.
+
+        Dispatches 256-row tiles to CPU cores via ThreadPoolExecutor.
+        Each tile: dequant → matmul on a pinned core. Torch ops release
+        the GIL, so threads achieve real parallelism.
+
+        Thread management:
+        - Intra-op threads set to 1 (prevents OMP sub-threading per tile)
+        - n_workers = min(n_cores, n_tiles) parallel tile workers
+        - Each worker pinned to its assigned core via os.sched_setaffinity
+        - Output slices are non-overlapping → no synchronization needed
+
+        Enable: HELIX_WAVE_TILES=1
+        """
+        from helix_substrate.tile_scheduler import tile_schedule, get_cpu_count
+
+        CHUNK = 256
+        orig_shape = x.shape
+        x_2d = x.reshape(-1, self.in_features).float()
+
+        if self.has_channel_scales:
+            x_2d = x_2d / self.channel_scales.unsqueeze(0)
+
+        N = x_2d.shape[0]
+        output = torch.zeros(N, self.out_features, device=x.device, dtype=torch.float32)
+        x_compute = x_2d  # already float32; FP16 not relevant on CPU
+
+        n_cores = get_cpu_count()
+        schedule = tile_schedule(self.out_features, CHUNK, n_cores)
+
+        # Suppress OMP intra-op threading so each tile worker owns its core
+        orig_threads = torch.get_num_threads()
+        torch.set_num_threads(1)
+
+        def _process_tile(tile_start: int, tile_end: int, core_id: int):
+            try:
+                os.sched_setaffinity(0, {core_id})
+            except (OSError, AttributeError):
+                pass  # non-Linux or insufficient permissions
+            W_tile = self._dequant_tile(tile_start, tile_end)
+            output[:, tile_start:tile_end] = x_compute @ W_tile.float().t()
+
+        try:
+            n_workers = min(n_cores, len(schedule))
+            with ThreadPoolExecutor(max_workers=n_workers) as pool:
+                futs = [pool.submit(_process_tile, s, e, c) for s, e, c in schedule]
+                for f in futs:
+                    f.result()  # propagate any exception
+        finally:
+            torch.set_num_threads(orig_threads)
+
         if self.bias is not None:
             output += self.bias.unsqueeze(0)
 
@@ -889,6 +1055,13 @@ class HelixLinear(nn.Module):
         instance._forward_mode = "buffered"
         instance._weight_buffer = None
         instance._cuda_graph_mode = False
+        instance._wave_enabled = os.environ.get("HELIX_WAVE_TILES", "0") == "1"
+        # WO-SIDECAR-POLICY-01: routing-policy gate
+        instance._sidecar_mode = "default"
+        instance._sidecar_threshold = 0.0
+        instance._sidecar_apply_count = 0
+        instance._sidecar_skip_count = 0
+        instance._sidecar_norms = []
         instance.has_svd = False
         instance.rank = 0
         instance.has_channel_scales = False
