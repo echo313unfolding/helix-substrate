@@ -58,6 +58,31 @@ except ImportError:
         return decorator
 
 
+class _QuantMethodShim:
+    """Enum-like wrapper for quant_method string.
+
+    transformers >= 4.49.0 expects quantization_config.quant_method to have a
+    .value attribute (like an enum). Older versions treat it as a plain string.
+    This shim satisfies both: str() returns the name, .value returns it too,
+    and equality/hashing work against both strings and other shims.
+    """
+
+    def __init__(self, name: str):
+        self.value = name
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
+        return f"_QuantMethodShim({self.value!r})"
+
+    def __eq__(self, other: object) -> bool:
+        return self.value == getattr(other, "value", other)
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+
 @register_quantization_config("cdna_v3")
 class CDNAv3Config(QuantizationConfigMixin):
     """Configuration for CDNA v3 quantized models.
@@ -92,8 +117,9 @@ class CDNAv3Config(QuantizationConfigMixin):
         exact_patterns: Optional[List[str]] = None,
         **kwargs,
     ):
-        if HAS_HF_QUANTIZER_API:
-            self.quant_method = "cdna_v3"
+        # Use _QuantMethodShim so quant_method has .value (transformers >= 4.49.0)
+        # while still comparing equal to plain "cdna_v3" strings (older versions).
+        self.quant_method = _QuantMethodShim("cdna_v3")
         self.bits = bits
         # Accept codebook_size (old format) as n_clusters
         self.n_clusters = codebook_size if codebook_size is not None else n_clusters
@@ -128,6 +154,21 @@ class CDNAv3Config(QuantizationConfigMixin):
         if self.module_vector_dim_map:
             d["module_vector_dim_map"] = self.module_vector_dim_map
         return d
+
+    @classmethod
+    def from_dict(
+        cls, config_dict: Dict[str, Any], return_unused_kwargs: bool = False, **kwargs
+    ) -> Union["CDNAv3Config", tuple]:
+        """Deserialize from config.json dict.
+
+        Required by transformers >= 4.49.0 for quantization config loading.
+        Strips 'quant_method' (set in __init__) and passes remaining fields.
+        """
+        d = dict(config_dict)
+        d.pop("quant_method", None)
+        d.update(kwargs)
+        obj = cls(**d)
+        return (obj, {}) if return_unused_kwargs else obj
 
 
 # ---------------------------------------------------------------------------
@@ -255,7 +296,11 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
 
     requires_calibration = False
     required_packages = ["helix_substrate"]
-    requires_parameters_quantization = False
+    # Must be True so transformers calls check_quantized_param/create_quantized_param
+    # for HelixLinear's variable-shape buffers (codebook, indices, sidecar, SVD).
+    # Without this, set_module_tensor_to_device rejects shape mismatches between
+    # HelixLinear's empty placeholder buffers and actual safetensors data.
+    requires_parameters_quantization = True
 
     def __init__(self, quantization_config: CDNAv3Config, **kwargs):
         if HAS_HF_QUANTIZER_API:
@@ -277,6 +322,68 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
         if dtype is None:
             return torch.float32
         return dtype
+
+    # transformers >= 4.49.0 calls update_torch_dtype instead of update_dtype.
+    def update_torch_dtype(self, torch_dtype: torch.dtype) -> torch.dtype:
+        """Same as update_dtype — alias for transformers >= 4.49.0 compat."""
+        return self.update_dtype(torch_dtype)
+
+    def check_quantized_param(
+        self,
+        model: nn.Module,
+        param_value: torch.Tensor,
+        param_name: str,
+        state_dict: Dict[str, Any],
+        **kwargs,
+    ) -> bool:
+        """Return True for HelixLinear buffer parameters.
+
+        When requires_parameters_quantization is True, transformers calls this
+        for each parameter. Returning True routes the parameter through
+        create_quantized_param instead of set_module_tensor_to_device,
+        bypassing shape-mismatch errors for HelixLinear's variable-shape buffers.
+        """
+        HelixLinear = _get_helix_linear_cls()
+        _helix_suffixes = (
+            ".codebook", ".indices", ".sidecar_positions", ".sidecar_values",
+            ".svd_U", ".svd_s", ".svd_Vt", ".channel_scales",
+            ".codebook_f16", ".weight", ".bias",
+        )
+        if any(param_name.endswith(s) for s in _helix_suffixes):
+            parts = param_name.rsplit(".", 1)
+            if len(parts) == 2:
+                try:
+                    mod = model.get_submodule(parts[0])
+                    if isinstance(mod, HelixLinear):
+                        return True
+                except (AttributeError, ValueError):
+                    pass
+        return False
+
+    def create_quantized_param(
+        self,
+        model: nn.Module,
+        param_value: torch.Tensor,
+        param_name: str,
+        target_device: torch.device,
+        *args,
+        **kwargs,
+    ) -> None:
+        """Register a HelixLinear buffer with the correct shape from safetensors.
+
+        Called instead of set_module_tensor_to_device when check_quantized_param
+        returns True. Deletes the old placeholder buffer and registers the actual
+        tensor with its real shape.
+        """
+        parts = param_name.rsplit(".", 1)
+        if len(parts) != 2:
+            return
+        mod = model.get_submodule(parts[0])
+        buf_name = parts[1]
+        new_val = param_value.to(device=target_device)
+        if hasattr(mod, buf_name):
+            delattr(mod, buf_name)
+        mod.register_buffer(buf_name, new_val)
 
     def _process_model_before_weight_loading(
         self, model: nn.Module, **kwargs
@@ -535,6 +642,10 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
 # ---------------------------------------------------------------------------
 # Aliases: register under all known quant_method names for backward compat.
 # Models on HF may have "helix", "cdna_v3", or "hxq" in their config.json.
+#
+# Two paths:
+#   1. Decorator API (transformers < 4.49.0): register_quantization_config/register_quantizer
+#   2. Direct mapping (transformers >= 4.49.0): AUTO_QUANTIZER_MAPPING / AUTO_QUANTIZATION_CONFIG_MAPPING
 # ---------------------------------------------------------------------------
 if HAS_HF_QUANTIZER_API:
     for _alias in ("helix", "hxq"):
@@ -543,3 +654,16 @@ if HAS_HF_QUANTIZER_API:
             register_quantizer(_alias)(HelixHfQuantizer)
         except Exception:
             pass  # Already registered or API changed
+
+# Direct mapping fallback for transformers >= 4.49.0 where decorator API may not exist
+# but AUTO_QUANTIZER_MAPPING is available.
+try:
+    from transformers.quantizers.auto import (
+        AUTO_QUANTIZER_MAPPING,
+        AUTO_QUANTIZATION_CONFIG_MAPPING,
+    )
+    for _alias in ("cdna_v3", "helix", "hxq"):
+        AUTO_QUANTIZATION_CONFIG_MAPPING[_alias] = CDNAv3Config
+        AUTO_QUANTIZER_MAPPING[_alias] = HelixHfQuantizer
+except ImportError:
+    pass  # Older transformers without these dicts
