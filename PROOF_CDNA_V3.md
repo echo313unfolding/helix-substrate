@@ -1,5 +1,7 @@
 # CDNA v3 Compression Proof — TinyLlama 1.1B
 
+> **Historical note (2026-04-30):** This document records early CDNA v3 experiments on TinyLlama 1.1B, including SVD-routed codec paths. Subsequent scale tests at 1.5B, 3B, and 7B showed SVD adds zero value at scale and actively hurts at 7B (+4% PPL). **Current HXQ production disables SVD — plain VQ-256 is the production path.** See README.md "Key findings" for details.
+
 **Date:** 2026-03-10
 **Model:** TinyLlama 1.1B FP32 (4.40 GB, 201 tensors, 22 layers)
 **Eval:** WikiText-2 validation (4096 tokens)

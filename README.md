@@ -10,16 +10,16 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0%2B-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License](https://img.shields.io/badge/license-Echo%20Labs-green)](LICENSE)
 [![~2x from BF16](https://img.shields.io/badge/compression-~2x%20from%20BF16-brightgreen)]()
-[![Beats GPTQ](https://img.shields.io/badge/quality-beats%20GPTQ-blue)]()
+[![15 architectures](https://img.shields.io/badge/models-15%20architectures-blue)]()
 
-**Calibration-free VQ compression. Beats GPTQ quality at 7B and AWQ at 14B.**
-**No training data. No fine-tuning. Transformers, SSMs, CNNs, vision — same command.**
+**Calibration-free HXQ compression for Transformers, SSMs, hybrids, MoEs, and vision models.**
+**No training data. No fine-tuning. Same codec, same command across architectures.**
 
 </div>
 
 # helix-substrate
 
-Calibration-free neural network compression. Beats GPTQ quality at 7B (+6.3% vs +8.2% PPL) and AWQ at 14B by 15.4%. No training data needed. Works on transformers, SSMs, CNNs, vision encoders, and embedding models without code changes.
+Calibration-free neural network compression via HXQ (scalar k-means VQ, 256-entry codebook, uint8 indices, sparse sidecar). No training data needed. Works on transformers, SSMs, hybrids, MoEs, CNNs, vision encoders, and embedding models without code changes. ~2x file-level from BF16, ~4x per-tensor from FP32.
 
 ```bash
 pip install helix-substrate
@@ -45,27 +45,36 @@ Pre-compressed models on HuggingFace. One import, one line to load:
 import helix_substrate  # registers HXQ quantizer with HuggingFace
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
-tokenizer = AutoTokenizer.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
+model = AutoModelForCausalLM.from_pretrained("EchoLabs33/qwen2.5-3b-instruct-hxq")
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
 ```
 
-| Model | Architecture | Ratio (from BF16) | PPL Delta | Size | Link |
-|-------|-------------|-------------------|-----------|------|------|
-| Qwen2.5-14B | Transformer | 3.4x | pending | 8.4 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-14b-instruct-helix) |
-| Qwen2.5-7B | Transformer | 2.2x | +6.34% | 6.5 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-7b-instruct-helix) |
-| Zamba2-7B | Hybrid (Mamba2+Transformer) | 2.0x | pending | 7.5 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-7b-instruct-hxq) |
-| Qwen2.5-3B | Transformer | 1.6x | +0.69% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-helix) |
-| Qwen2.5-Coder-3B | Transformer (code) | 1.6x | +1.92% | 3.8 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-helix) |
-| Qwen2.5-Coder-1.5B | Transformer (code) | 1.5x | +1.73% | 2.1 GB | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-1.5b-helix) |
-| Zamba2-2.7B | Hybrid (Mamba2+Transformer) | 1.8x | +6.59% | 2.8 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-2.7b-instruct-helix) |
-| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 1.7x | +2.90% | 1.35 GB | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-helix) |
-| TinyLlama-1.1B | Transformer | 4.0x* | +0.78% | 1.03 GB | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-helix) |
-| Mamba2-1.3B | Pure SSM (Mamba2) | 2.1x | +8.0% | 1.4 GB | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-helix) |
-| Mamba-130M | Pure SSM | 3.8x* | +18.4% | 128 MB | [HF](https://huggingface.co/EchoLabs33/mamba-130m-helix) |
+| Model | Architecture | Ratio (from BF16) | PPL Delta | Link |
+|-------|-------------|-------------------|-----------|------|
+| **Transformers** | | | | |
+| Qwen2.5-14B | Transformer | 3.4x | pending | [HF](https://huggingface.co/EchoLabs33/qwen2.5-14b-instruct-hxq) |
+| Qwen2.5-7B | Transformer | 2.2x | +6.34% | [HF](https://huggingface.co/EchoLabs33/qwen2.5-7b-instruct-hxq) |
+| Qwen2.5-3B | Transformer | 1.6x | +0.69% | [HF](https://huggingface.co/EchoLabs33/qwen2.5-3b-instruct-hxq) |
+| Qwen2.5-Coder-3B | Transformer (code) | 1.6x | +1.92% | [HF](https://huggingface.co/EchoLabs33/qwen2.5-coder-3b-hxq) |
+| SmolLM3-3B | Transformer | -- | +1.28% | [HF](https://huggingface.co/EchoLabs33/smollm3-3b-hxq) |
+| TinyLlama-1.1B | Transformer | 4.0x* | +0.78% | [HF](https://huggingface.co/EchoLabs33/tinyllama-1.1b-hxq) |
+| **SSMs** | | | | |
+| Mamba2-1.3B | Pure SSM (Mamba2) | 2.1x | +8.0% | [HF](https://huggingface.co/EchoLabs33/mamba2-1.3b-hxq) |
+| Mamba-130M | Pure SSM | 3.8x* | +18.4% | [HF](https://huggingface.co/EchoLabs33/mamba-130m-hxq) |
+| **Hybrids** | | | | |
+| Zamba2-7B | Hybrid (Mamba2+Transformer) | 2.0x | pending | [HF](https://huggingface.co/EchoLabs33/zamba2-7b-instruct-hxq) |
+| Zamba2-2.7B | Hybrid (Mamba2+Transformer) | 1.8x | +6.59% | [HF](https://huggingface.co/EchoLabs33/zamba2-2.7b-instruct-hxq) |
+| Zamba2-1.2B | Hybrid (Mamba2+Transformer) | 1.7x | +2.90% | [HF](https://huggingface.co/EchoLabs33/zamba2-1.2b-hxq) |
+| Granite 4.0 H Micro | MoE Hybrid | -- | -- | [HF](https://huggingface.co/EchoLabs33/granite-4.0-h-micro-hxq) |
+| **MoE** | | | | |
+| OLMoE-1B-7B | Mixture of Experts | -- | -- | [HF](https://huggingface.co/EchoLabs33/olmoe-1b-7b-instruct-hxq) |
+| **Vision / Encoder** | | | | |
+| CLIP ViT-L/14 | Vision Transformer | -- | -- | [HF](https://huggingface.co/EchoLabs33/clip-vit-large-patch14-hxq) |
+| BERT-base | Encoder-only | -- | -- | [HF](https://huggingface.co/EchoLabs33/bert-base-uncased-hxq) |
 
 *TinyLlama and Mamba-130M ratios are from FP32 source weights. All other ratios are from BF16 source.
 
-**Four architectures, one codec.** HelixCode (HXQ) compresses any `nn.Linear` — transformer attention, Mamba projections, hybrid layers. Same `pip install`, same API, same codebook format.
+**Six architecture families, one codec.** HXQ compresses any `nn.Linear` — transformer attention, Mamba projections, MoE experts, vision encoders, BERT layers. Same `pip install`, same API, same codebook format.
 
 ## What it does
 
@@ -86,11 +95,11 @@ No calibration data. No fine-tuning. No architecture-specific code.
 | **Qwen2.5-14B** | **HelixLinear k=256** | **3.78** | -- | **None** |
 | | AWQ Int4 | 4.47 | -- | Activation stats |
 
-**Helix beats GPTQ by 23% less degradation at 7B, and beats AWQ by 15.4% at 14B. With zero calibration data.**
+**On these benchmarks, HXQ shows lower PPL degradation than the tested GPTQ/AWQ baselines, at lower compression ratio and with zero calibration data.**
 
-The remaining +6.34% PPL delta comes primarily from early down_proj layers (layers 3-4) at 0.964 cosine. These are the highest-kurtosis FFN tensors in the model. Rank-32 SVD on those specific layers is expected to push this below +4%.
+The remaining +6.34% PPL delta comes primarily from early down_proj layers (layers 3-4) at 0.964 cosine — the highest-kurtosis FFN tensors in the model.
 
-**Quality vs ratio tradeoff:** GPTQ/AWQ achieve 8x compression with worse quality. helix-substrate achieves ~2x from BF16 (~4x per-tensor from FP32) with the best quality of any post-training method tested, and requires zero calibration data. VQ degrades more gracefully than INT4 at scale — the quality gap widens as model size increases.
+**Quality vs ratio tradeoff:** GPTQ/AWQ achieve higher compression (INT4, ~8x from FP16) with calibration data. HXQ achieves ~2x from BF16 (~4x per-tensor from FP32) with better quality on these benchmarks and zero calibration. HXQ's advantage is quality and architecture breadth; GPTQ/AWQ's advantage is compression ratio and mature speed kernels. The right comparison depends on whether you are optimizing for memory, quality, or universality.
 
 ### Architecture Coverage (all k=256, same `compress.py`)
 
@@ -153,7 +162,7 @@ python tools/compress.py \
 import helix_substrate  # registers HXQ quantizer
 from transformers import AutoModelForCausalLM
 
-model = AutoModelForCausalLM.from_pretrained("EchoLabs33/zamba2-1.2b-helix")
+model = AutoModelForCausalLM.from_pretrained("EchoLabs33/qwen2.5-3b-instruct-hxq")
 output = model.generate(input_ids, max_new_tokens=128)
 ```
 
@@ -262,7 +271,9 @@ Input Tensor (2D float32)
 
 ## What's honest
 
-**We do not claim to have invented VQ for neural networks.** VQ weight compression dates to the 1980s, with DNN applications since 2015. Our differentiators are: calibration-free operation, architecture-agnostic coverage including SSMs (no prior work compresses Mamba through the same pipeline as LLaMA), kurtosis-based statistical routing that outperforms Hessian-based approaches, and the intelligence layer (adaptive routing, symbolic governance, semantic memory indexing).
+**We do not claim to have invented VQ for neural networks.** VQ weight compression dates to the 1980s, with DNN applications since 2015. Our differentiators are: calibration-free operation, architecture-agnostic coverage including SSMs and hybrids (no prior work compresses Mamba through the same pipeline as LLaMA), and kurtosis-based statistical routing that outperforms Hessian-based approaches.
+
+**SVD routing is historical, not current.** Earlier CDNA v3 proof docs (see `PROOF_CDNA_V3.md`) include SVD-routed experiments. Current HXQ disables SVD after scale tests showed it hurts quality at 7B. Plain VQ-256 is the production path.
 
 **~2x from BF16 is the honest file-level number. ~4x is the per-tensor codec ratio from FP32.** The codec compresses each weight tensor ~4x (FP32 → uint8 indices + codebook). But most source models are BF16, and exact tensors (norms, embeddings, biases) are stored at full precision. File-level ratios from BF16 range from 1.5x to 3.4x depending on the model's ratio of compressible to exact parameters. k=64 passes on TinyLlama (+1.44%) but fails on Qwen-1.5B (+2.78%). We do not claim universal 5.3x compression.
 
