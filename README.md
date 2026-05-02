@@ -19,7 +19,7 @@
 
 # helix-substrate
 
-Calibration-free neural network compression via HXQ (scalar k-means VQ, 256-entry codebook, uint8 indices, sparse sidecar). No training data needed. Works on transformers, SSMs, hybrids, MoEs, CNNs, vision encoders, and embedding models without code changes. ~2x file-level from BF16, ~4x per-tensor from FP32.
+Calibration-free tensor codec. Receipted across tested ML tensor families and raw tensor distributions. Deployed as HXQ compression (scalar k-means VQ, 256-entry codebook, uint8 indices, sparse sidecar). No training data needed. Works on transformers, SSMs, hybrids, MoEs, CNNs, vision encoders, and embedding models without code changes. ~2x file-level from BF16, ~4x per-tensor from FP32. See [`docs/HXQ_TENSOR_CODEC_EVIDENCE.md`](docs/HXQ_TENSOR_CODEC_EVIDENCE.md) for non-ML tensor distribution evidence.
 
 ```bash
 pip install helix-substrate

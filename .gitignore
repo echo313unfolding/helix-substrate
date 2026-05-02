@@ -191,6 +191,7 @@ tools/step11_dual_model_benchmark.py
 tools/targeted_correction_experiment.py
 tools/tensor_dna_prototype.py
 tools/test_*.py
+!tools/test_raw_distributions.py
 tools/train_compressed_hybrid.py
 tools/validate_*.py
 tools/viz_*.py
@@ -228,3 +229,5 @@ receipts/*
 !receipts/kv_kurtosis_probe/
 !receipts/hidden_state_probe/
 !receipts/drift_gated_probe/
+!receipts/raw_distribution_probe/
+!receipts/nonuniform_ceiling_probe/
