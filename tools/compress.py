@@ -794,6 +794,20 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
             scale_path = tensor_dir / "channel_scales.npy"
             np.save(scale_path, channel_scales.astype(np.float32))
 
+        # HXQ-Auto: routing-level metadata from compress.py
+        # (supplements per-tensor stats from cdnav3_writer)
+        stats["routing_kurtosis"] = round(kurt, 4)
+        stats["routing_tensor_class"] = tc.value
+        stats["routing_chosen_k"] = str(chosen_k)
+        stats["routing_channel_scaled"] = channel_scales is not None
+        stats["routing_block_idx"] = block_idx
+        if adaptive:
+            stats["routing_adaptive"] = True
+        # Write updated stats back to disk
+        stats_path = tensor_dir / "stats.json"
+        if stats_path.exists():
+            stats_path.write_text(json.dumps(stats, indent=2))
+
         stats_all.append(stats)
 
         n_done += 1

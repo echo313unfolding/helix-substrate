@@ -118,8 +118,8 @@ def _detect_architecture(model_dir: Path) -> dict:
     model_type = config.get("model_type", "unknown")
     return {
         "model_type": model_type,
-        "is_ssm": model_type in ("mamba", "mamba2", "zamba2"),
-        "is_hybrid": model_type == "zamba2",
+        "is_ssm": model_type in ("mamba", "mamba2", "zamba2", "falcon_mamba"),
+        "is_hybrid": model_type in ("zamba2", "granitemoehybrid", "nemotron"),
         "num_hidden_layers": config.get("num_hidden_layers", config.get("n_layer", "?")),
         "hidden_size": config.get("hidden_size", config.get("d_model", "?")),
     }

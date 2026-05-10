@@ -1,5 +1,5 @@
 """
-Tensor classification and default compression policies for CDNA v3.
+Tensor classification and default compression policies for HXQ.
 
 Classifies tensors by name and shape, then assigns per-class policies
 controlling quantization, sidecar generation, and block layout.
@@ -10,10 +10,12 @@ names (model.layers.N.self_attn.q_proj.weight).
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, replace
 from enum import Enum
-from typing import Optional
+from pathlib import Path
+from typing import Dict, Optional
 
 
 class TensorClass(Enum):
@@ -24,6 +26,19 @@ class TensorClass(Enum):
     NORM = "norm"
     LM_HEAD = "lm_head"
     UNKNOWN = "unknown"
+
+
+class LayerDecision(Enum):
+    """Per-tensor codec decision for compression and evaluation.
+
+    Produced by profile_decisions(). Consumed by compress.py and eval pipeline.
+    Captures the *what* (which codec) without the full TensorPolicy details,
+    making it easy to serialize, diff, and use as a routing key.
+    """
+    EXACT = "exact"           # Store as-is (norms, embeddings, 1D tensors)
+    SCALAR_VQ = "scalar_vq"   # Scalar VQ k=256 (default for transformers)
+    VQ2D = "vq2d"             # 2D VQ k=4096 (proven for SSM/Mamba)
+    SKIP = "skip"             # Don't compress (biases, tiny 1D tensors)
 
 
 @dataclass(frozen=True)
@@ -306,3 +321,175 @@ def get_policy(
     # from SVD does not predict model-level PPL improvement.
     # Receipts: receipts/scaling_analysis/ppl_eval_qwen2.5-*_20260327T*.json
     return base
+
+
+# ---------------------------------------------------------------------------
+# Architecture detection for codec routing (mirrors compress.py logic)
+# ---------------------------------------------------------------------------
+
+_SSM_ARCH_PATTERNS = {"mamba", "mamba2", "rwkv", "retnet", "s4", "hyena"}
+_HYBRID_ARCH_PATTERNS = {"zamba", "zamba2", "jamba"}
+
+
+def _detect_arch_mode(config: dict) -> str:
+    """Detect codec mode from model config.json.
+
+    Returns "2d" (pure SSM), "mixed" (hybrid), or "scalar" (transformer).
+    """
+    model_type = config.get("model_type", "").lower()
+    architectures = [a.lower() for a in config.get("architectures", [])]
+    arch_str = " ".join(architectures) + " " + model_type
+
+    for p in _HYBRID_ARCH_PATTERNS:
+        if p in arch_str:
+            return "mixed"
+    for p in _SSM_ARCH_PATTERNS:
+        if p in arch_str:
+            return "2d"
+    return "scalar"
+
+
+def _is_ssm_tensor(name: str) -> bool:
+    """Check if a tensor belongs to an SSM/Mamba block (not shared transformer)."""
+    lower = name.lower()
+    return "mamba" in lower and "shared_transformer" not in lower
+
+
+def decide_tensor(
+    name: str,
+    shape: tuple[int, ...],
+    arch_mode: str,
+) -> LayerDecision:
+    """Compute LayerDecision for a single tensor.
+
+    Args:
+        name: Tensor name (GGUF or HF format).
+        shape: Tensor shape.
+        arch_mode: "scalar", "2d", or "mixed" (from _detect_arch_mode).
+
+    Returns:
+        LayerDecision enum value.
+    """
+    # 1D tensors: norms, biases → skip
+    if len(shape) == 1:
+        return LayerDecision.SKIP
+
+    tc = classify_tensor(name, shape=shape)
+
+    # Exact storage classes
+    if tc in (TensorClass.NORM, TensorClass.EMBEDDING):
+        return LayerDecision.EXACT
+
+    # 2D weight tensors: route by architecture
+    if arch_mode == "2d":
+        # Pure SSM: all compressible tensors → 2D VQ
+        if shape[1] % 2 == 0:
+            return LayerDecision.VQ2D
+        return LayerDecision.SCALAR_VQ  # odd in_features: can't pair
+
+    if arch_mode == "mixed":
+        # Hybrid: SSM tensors → 2D VQ, transformer tensors → scalar
+        if _is_ssm_tensor(name) and shape[1] % 2 == 0:
+            return LayerDecision.VQ2D
+        return LayerDecision.SCALAR_VQ
+
+    # Scalar (transformers, BERT, etc.)
+    return LayerDecision.SCALAR_VQ
+
+
+def profile_decisions(
+    model_dir: str | Path,
+    codec_mode: str = "auto",
+) -> Dict[str, LayerDecision]:
+    """Profile a model and return per-tensor codec decisions.
+
+    Reads config.json and weight shapes to produce a machine-readable
+    decision manifest. No weights are loaded — only metadata.
+
+    Args:
+        model_dir: Path to HF model directory (with config.json + safetensors).
+        codec_mode: "auto" (detect from architecture), "scalar", "2d", or "mixed".
+
+    Returns:
+        {tensor_name: LayerDecision} for every tensor in the model.
+    """
+    model_dir = Path(model_dir)
+
+    # Read config.json
+    config_path = model_dir / "config.json"
+    if config_path.exists():
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    else:
+        config = {}
+
+    # Determine architecture mode
+    if codec_mode == "auto":
+        arch_mode = _detect_arch_mode(config)
+    else:
+        arch_mode = codec_mode
+
+    # Enumerate tensors from safetensors metadata (no weight loading)
+    decisions: Dict[str, LayerDecision] = {}
+    shapes = _read_tensor_shapes(model_dir)
+
+    for name, shape in shapes.items():
+        decisions[name] = decide_tensor(name, shape, arch_mode)
+
+    return decisions
+
+
+def _read_tensor_shapes(model_dir: Path) -> Dict[str, tuple]:
+    """Read tensor names and shapes from safetensors metadata (no weight loading)."""
+    shapes: Dict[str, tuple] = {}
+
+    # Try sharded index first
+    index_path = model_dir / "model.safetensors.index.json"
+    single_path = model_dir / "model.safetensors"
+
+    if index_path.exists():
+        weight_map = json.loads(index_path.read_text(encoding="utf-8"))["weight_map"]
+        shard_files = set(weight_map.values())
+        for shard_file in shard_files:
+            shard_path = model_dir / shard_file
+            if shard_path.exists():
+                shapes.update(_shapes_from_safetensors(shard_path))
+    elif single_path.exists():
+        shapes = _shapes_from_safetensors(single_path)
+
+    return shapes
+
+
+def _shapes_from_safetensors(path: Path) -> Dict[str, tuple]:
+    """Extract tensor shapes from a safetensors file header (no weight loading)."""
+    try:
+        from safetensors import safe_open
+        sf = safe_open(str(path), framework="pt")
+        return {name: tuple(sf.get_slice(name).get_shape()) for name in sf.keys()}
+    except ImportError:
+        # Fallback: parse the header directly (safetensors header is JSON at file start)
+        import struct
+        with open(path, "rb") as f:
+            header_size = struct.unpack("<Q", f.read(8))[0]
+            header = json.loads(f.read(header_size))
+        return {
+            name: tuple(meta["shape"])
+            for name, meta in header.items()
+            if name != "__metadata__" and "shape" in meta
+        }
+
+
+def save_decisions(decisions: Dict[str, LayerDecision], path: str | Path) -> None:
+    """Write decision manifest to JSON."""
+    Path(path).write_text(
+        json.dumps(
+            {name: d.value for name, d in sorted(decisions.items())},
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
+def load_decisions(path: str | Path) -> Dict[str, LayerDecision]:
+    """Read decision manifest from JSON."""
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    return {name: LayerDecision(v) for name, v in raw.items()}

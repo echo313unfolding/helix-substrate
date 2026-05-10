@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+import torch
 
 
 def quantize_tensor(
@@ -131,7 +132,7 @@ def convert_huggingface_model(
         if verbose:
             print(f"\nProcessing {sf_file.name}...")
 
-        with safe_open(sf_file, framework="numpy") as f:
+        with safe_open(sf_file, framework="pt") as f:
             for tensor_name in f.keys():
                 # Skip patterns
                 if skip_embeddings and "embed" in tensor_name.lower():
@@ -144,8 +145,11 @@ def convert_huggingface_model(
                         print(f"  Skipping lm_head: {tensor_name}")
                     continue
 
-                # Load tensor
-                tensor = f.get_tensor(tensor_name)
+                # Load tensor as PyTorch, cast bf16→fp32, then to numpy
+                t = f.get_tensor(tensor_name)
+                if t.dtype == torch.bfloat16:
+                    t = t.float()
+                tensor = t.numpy()
                 original_bytes = tensor.nbytes
                 total_original_bytes += original_bytes
 

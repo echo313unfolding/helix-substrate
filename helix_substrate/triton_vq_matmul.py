@@ -334,6 +334,82 @@ if HAS_TRITON:
         tl.store(out_ptrs, acc, mask=mask_m[:, None] & mask_n[None, :])
 
 
+    # ─── v5: Decode-optimized dot-product kernel (N=1) ─────────────────
+    # During autoregressive generation, N=1 per token. The tiled v3 kernel
+    # uses BLOCK_M=16 with tl.dot, padding 15 unused rows — pure waste.
+    # This kernel uses a 1D accumulator with element-wise multiply+reduce,
+    # eliminating the padding overhead and the BLOCK_M=16 tl.dot minimum.
+    #
+    # Grid: 1D over OUT dimension only. Each program handles BLOCK_OUT
+    # output features, accumulating over IN with BLOCK_K-wide steps.
+    # Codebook is tiny (256 * VQ_DIM floats = 1-4 KB) and stays in L1.
+    @triton.jit
+    def _vq_decode_dotprod_kernel(
+        # Pointers
+        x_ptr,          # [1, IN] float32 input activation vector
+        codebook_ptr,   # [k * VQ_DIM] float32 cluster centers (flattened)
+        indices_ptr,    # [OUT, IN // VQ_DIM] uint8 cluster indices
+        output_ptr,     # [1, OUT] float32 output
+        # Dimensions
+        IN,             # input features (weight columns)
+        OUT,            # output features
+        # Strides
+        stride_idx_o,   # indices stride along OUT
+        stride_idx_i,   # indices stride along IN // VQ_DIM
+        # Block sizes (constexpr for compilation)
+        BLOCK_OUT: tl.constexpr,   # output tile (64)
+        BLOCK_K: tl.constexpr,     # reduction tile (64) — must be divisible by VQ_DIM
+        VQ_DIM: tl.constexpr,      # 1=scalar, 2=pairs, 4=quads
+    ):
+        """
+        Decode-optimized VQ gather-matmul for N=1 (v5).
+
+        Instead of a 2D [BLOCK_M, BLOCK_N] accumulator with tl.dot (which
+        requires BLOCK_M >= 16 on CC 7.5, wasting 15 rows when N=1), this
+        kernel uses a 1D [BLOCK_OUT] accumulator with element-wise multiply
+        and tl.sum reduction.
+
+        For each output tile of BLOCK_OUT features:
+            acc[o] += sum_k( x[k] * codebook[indices[o, k // VQ_DIM] * VQ_DIM + k % VQ_DIM] )
+
+        Memory access pattern: x vector is broadcast across output tile (read
+        once per k-step, reused BLOCK_OUT times). Indices are loaded as
+        [BLOCK_OUT, BLOCK_K//VQ_DIM] tiles. Codebook gathers are register-local.
+        """
+        pid = tl.program_id(0)
+        offs_out = pid * BLOCK_OUT + tl.arange(0, BLOCK_OUT)
+        mask_out = offs_out < OUT
+
+        acc = tl.zeros((BLOCK_OUT,), dtype=tl.float32)
+
+        for k_start in range(0, IN, BLOCK_K):
+            offs_k = k_start + tl.arange(0, BLOCK_K)
+            mask_k = offs_k < IN
+
+            # Load x vector slice: [BLOCK_K]
+            x_vec = tl.load(x_ptr + offs_k, mask=mask_k, other=0.0)
+
+            # VQ_DIM-aware index addressing (same as v3)
+            idx_col = offs_k // VQ_DIM
+            sub_k = offs_k % VQ_DIM
+
+            # Load indices tile: [BLOCK_OUT, BLOCK_K // VQ_DIM]
+            # (with duplicates when VQ_DIM > 1, same pattern as v3)
+            idx_tile = tl.load(
+                indices_ptr + offs_out[:, None] * stride_idx_o + idx_col[None, :] * stride_idx_i,
+                mask=mask_out[:, None] & mask_k[None, :], other=0
+            )
+
+            # Gather weights: codebook[idx * VQ_DIM + sub_k] → [BLOCK_OUT, BLOCK_K]
+            w_tile = tl.load(codebook_ptr + idx_tile.to(tl.int32) * VQ_DIM + sub_k[None, :])
+
+            # Element-wise multiply and reduce: [BLOCK_OUT, BLOCK_K] → [BLOCK_OUT]
+            # x_vec broadcast: [BLOCK_K] → [1, BLOCK_K] * [BLOCK_OUT, BLOCK_K]
+            acc += tl.sum(x_vec[None, :] * w_tile, axis=1)
+
+        tl.store(output_ptr + offs_out, acc, mask=mask_out)
+
+
     # ─── v4: Autotuned kernel ──────────────────────────────────────────
     # Shape-keyed autotune: Triton explores configs per (N, IN, OUT) and
     # caches winners to ~/.triton/cache (persists across sessions).
@@ -518,42 +594,71 @@ def fused_vq_matmul(
     # Ensure x is FP32 for the kernel (kernel casts to FP16 internally)
     x_f32 = x.float() if x.dtype != torch.float32 else x
 
-    # v4 manifest dispatch: static shape-keyed config from sweep results.
-    # Zero Python overhead — just a dict lookup per call (vs @triton.autotune
-    # which adds ~0.5ms/call dispatch overhead, catastrophic at 154 calls/token).
-    BLOCK_M = 16  # minimum for tl.dot on CC 7.5
-    BLOCK_N = 64  # consistently best for decode
+    # Dispatch: decode kernel (N=1) vs tiled kernel (N>1).
+    # At N=1 the tiled v3 kernel wastes 15/16 rows in its BLOCK_M=16 tile.
+    # The decode kernel uses a 1D accumulator with element-wise dot product,
+    # eliminating that waste entirely.
+    BLOCK_N = 64  # output tile — consistently best for decode
     BLOCK_K, num_warps, num_stages = _get_config(OUT, IN)
 
     # BLOCK_K must be divisible by vq_dim for clean tile boundaries
     while BLOCK_K % vq_dim != 0:
         BLOCK_K *= 2
 
-    grid = (triton.cdiv(N, BLOCK_M), triton.cdiv(OUT, BLOCK_N))
+    if N == 1:
+        # ─── Decode path: 1D dot-product kernel (v5) ────────────────
+        grid_decode = (triton.cdiv(OUT, BLOCK_N),)
 
-    if _dispatch_log is not None:
-        _dispatch_log["dispatch_selected"] = KERNEL_VERSION
-        _dispatch_log["block_config"] = f"M{BLOCK_M}_N{BLOCK_N}_K{BLOCK_K}_w{num_warps}_s{num_stages}"
-        _dispatch_log["vq_dim"] = vq_dim
+        if _dispatch_log is not None:
+            _dispatch_log["dispatch_selected"] = "v5_decode_dotprod"
+            _dispatch_log["block_config"] = f"OUT{BLOCK_N}_K{BLOCK_K}_w{num_warps}_s{num_stages}"
+            _dispatch_log["vq_dim"] = vq_dim
 
-    try:
-        _vq_gather_matmul_tiled_kernel[grid](
-            x_f32, codebook, indices, output,
-            N, IN, OUT,
-            x_f32.stride(0), x_f32.stride(1),
-            indices.stride(0), indices.stride(1),
-            output.stride(0), output.stride(1),
-            BLOCK_M=BLOCK_M, BLOCK_N=BLOCK_N, BLOCK_K=BLOCK_K,
-            VQ_DIM=vq_dim,
-            num_warps=num_warps, num_stages=num_stages,
-        )
-    except Exception as e:
-        raise RuntimeError(
-            f"Triton kernel launch failed ({KERNEL_VERSION}): {e}. "
-            f"N={N}, IN={IN}, OUT={OUT}, vq_dim={vq_dim}, "
-            f"config=K{BLOCK_K}_w{num_warps}_s{num_stages}. "
-            f"No silent fallback."
-        ) from e
+        try:
+            _vq_decode_dotprod_kernel[grid_decode](
+                x_f32.reshape(-1),  # flatten [1, IN] → [IN] for 1D loads
+                codebook, indices, output.reshape(-1),  # [OUT]
+                IN, OUT,
+                indices.stride(0), indices.stride(1),
+                BLOCK_OUT=BLOCK_N, BLOCK_K=BLOCK_K,
+                VQ_DIM=vq_dim,
+                num_warps=num_warps, num_stages=num_stages,
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Triton decode kernel launch failed (v5_decode_dotprod): {e}. "
+                f"IN={IN}, OUT={OUT}, vq_dim={vq_dim}, "
+                f"config=OUT{BLOCK_N}_K{BLOCK_K}_w{num_warps}_s{num_stages}. "
+                f"No silent fallback."
+            ) from e
+    else:
+        # ─── Prefill/batch path: tiled v3 kernel with tl.dot ────────
+        BLOCK_M = 16  # minimum for tl.dot on CC 7.5
+        grid = (triton.cdiv(N, BLOCK_M), triton.cdiv(OUT, BLOCK_N))
+
+        if _dispatch_log is not None:
+            _dispatch_log["dispatch_selected"] = KERNEL_VERSION
+            _dispatch_log["block_config"] = f"M{BLOCK_M}_N{BLOCK_N}_K{BLOCK_K}_w{num_warps}_s{num_stages}"
+            _dispatch_log["vq_dim"] = vq_dim
+
+        try:
+            _vq_gather_matmul_tiled_kernel[grid](
+                x_f32, codebook, indices, output,
+                N, IN, OUT,
+                x_f32.stride(0), x_f32.stride(1),
+                indices.stride(0), indices.stride(1),
+                output.stride(0), output.stride(1),
+                BLOCK_M=BLOCK_M, BLOCK_N=BLOCK_N, BLOCK_K=BLOCK_K,
+                VQ_DIM=vq_dim,
+                num_warps=num_warps, num_stages=num_stages,
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Triton kernel launch failed ({KERNEL_VERSION}): {e}. "
+                f"N={N}, IN={IN}, OUT={OUT}, vq_dim={vq_dim}, "
+                f"config=K{BLOCK_K}_w{num_warps}_s{num_stages}. "
+                f"No silent fallback."
+            ) from e
 
     # Phase 2: Sidecar correction (sparse, typically <1K elements)
     # Phase-aware routing: fused Triton sidecar wins at small N (decode),

@@ -1,0 +1,71 @@
+{
+  "receipt_id": "hxq_nonuniform_ceiling_20260502T131054Z",
+  "experiment": "nonuniform_quantization_ceiling_test",
+  "description": "Compare affine (uniform) vs quantile-optimal vs mu-law companding on heavy-tailed Cauchy tensor. Tests whether non-uniform quantization improves fidelity over per-group affine.",
+  "input": {
+    "distribution": "standard_cauchy_clipped_pm100",
+    "shape": [
+      4096,
+      4096
+    ],
+    "seed": 42,
+    "kurtosis": 53.0,
+    "group_size": 128,
+    "n_levels": 64,
+    "bits_per_value": 6
+  },
+  "methods": [
+    {
+      "method": "affine_uniform",
+      "global_cosine": 0.998513,
+      "global_rms": 0.6147,
+      "per_group_worst": 0.996398,
+      "per_group_mean": 0.998568,
+      "per_group_p1": 0.997232,
+      "per_group_std": 0.000483,
+      "n_groups_below_099": 0
+    },
+    {
+      "method": "quantile_optimal",
+      "global_cosine": 0.991079,
+      "global_rms": 1.5032,
+      "per_group_worst": 0.915013,
+      "per_group_mean": 0.992132,
+      "per_group_p1": 0.957502,
+      "per_group_std": 0.009012,
+      "n_groups_below_099": 34706
+    },
+    {
+      "method": "mulaw_companded",
+      "global_cosine": 0.090599,
+      "global_rms": 24.1633,
+      "per_group_worst": -0.129618,
+      "per_group_mean": 0.218237,
+      "per_group_p1": -0.028053,
+      "per_group_std": 0.279277,
+      "n_groups_below_099": 131072
+    }
+  ],
+  "conclusion": {
+    "winner": "affine_uniform",
+    "finding": "Affine (uniform) outperforms quantile-optimal and mu-law on heavy-tailed Cauchy. Cosine similarity is dominated by tail magnitude; non-uniform schemes starve tails of resolution by allocating levels to the dense center.",
+    "affine_vs_quantile_delta": 0.007434,
+    "mulaw_catastrophic": true
+  },
+  "per_group_analysis": {
+    "affine_worst_group_cosine": 0.996398,
+    "affine_mean_group_cosine": 0.998568,
+    "affine_groups_below_099": 0,
+    "range_cosine_correlation": -0.5996,
+    "note": "Wider groups (more outliers) have lower cosine (r=-0.60), but no group falls below 0.99."
+  },
+  "cost": {
+    "wall_time_s": 24.044,
+    "cpu_time_s": 26.878,
+    "peak_memory_mb": 758.4,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-05-02T17:10:30.794004+00:00",
+    "timestamp_end": "2026-05-02T17:10:54.838054+00:00"
+  }
+}

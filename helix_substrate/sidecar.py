@@ -6,21 +6,31 @@ Stores outlier positions and values from hybrid CDNA quantization.
 Outliers are weights that fall outside the percentile threshold and
 need exact fp16 representation to maintain fidelity.
 
-File Format (HXZO v1):
+File Format (HXZO v1/v2):
   [0:4]   Magic: b"HXZO"
-  [4:6]   Version: uint16 BE (1)
+  [4:6]   Version: uint16 BE (1 or 2)
   [6:8]   Header length: uint16 BE
   [8:N]   Header JSON with threshold_policy, tensor_name, shape, num_outliers
   [N:...] zlib-compressed payload:
           - delta-varint encoded positions
           - fp16 values (raw bytes)
 
+  v2 adds optional "routing_context" block to header JSON:
+    - Identity: tensor_class, block_type, role, block_idx, arch
+    - Live signal snapshot: eff_rank, kurtosis, se, weight_rms
+    - Routing decision: route, composite_score, confidence
+    - Sidecar quality: pre_sidecar_norm, post_sidecar_norm
+    - Drift: compression_step, drift_ratio, recomp_count
+
+  v1 readers ignore unknown JSON fields; v2 readers accept v1 files
+  (routing_context will be None on read).
+
 Delta-varint encoding:
   Positions are sorted, then delta-encoded (store difference from previous).
   Each delta is encoded as variable-length integer (7 bits per byte, high bit = continuation).
   This typically achieves 2-3x compression on sparse outlier positions.
 
-Work Order: WO-HYBRID-CDNA-SIDECAR
+Work Order: WO-HYBRID-CDNA-SIDECAR, WO-HXZO-V2-ROUTING-CONTEXT
 """
 
 from __future__ import annotations
@@ -37,7 +47,8 @@ import numpy as np
 
 # HXZO format constants
 HXZO_MAGIC = b"HXZO"
-HXZO_VERSION = 1
+HXZO_VERSION = 2                   # Current write version (v2: routing_context)
+HXZO_VERSIONS_SUPPORTED = {1, 2}   # Accepted on read (backward compatible)
 
 
 # --- Sidecar Cache (WO-CDNA2-KERNEL-01) ---
@@ -247,6 +258,7 @@ def write_outlier_sidecar(
     shape: Tuple[int, ...],
     output_path: str,
     extra_meta: Optional[Dict[str, Any]] = None,
+    routing_context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Write outlier sidecar file in HXZO format.
@@ -259,6 +271,8 @@ def write_outlier_sidecar(
         shape: Original tensor shape
         output_path: Where to write the .hxzo file
         extra_meta: Optional additional metadata
+        routing_context: Optional v2 routing context (16-field dict with
+            signal snapshot, routing decision, sidecar quality, drift info)
 
     Returns:
         Receipt with creation stats
@@ -275,8 +289,9 @@ def write_outlier_sidecar(
     values = values[sort_idx]
 
     # Build header
+    schema_version = "hxzo_outlier_sidecar_v2" if routing_context else "hxzo_outlier_sidecar_v1"
     header = {
-        "schema": "hxzo_outlier_sidecar_v1",
+        "schema": schema_version,
         "tensor_name": tensor_name,
         "shape": list(shape),
         "num_outliers": int(len(positions)),
@@ -285,6 +300,8 @@ def write_outlier_sidecar(
         "position_encoding": "delta_varint",
         "created_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     }
+    if routing_context is not None:
+        header["routing_context"] = routing_context
     if extra_meta:
         header.update(extra_meta)
 
@@ -371,8 +388,8 @@ def read_outlier_sidecar(
         raise ValueError(f"Not an HXZO file (magic: {data[:4]!r})")
 
     version = struct.unpack(">H", data[4:6])[0]
-    if version != HXZO_VERSION:
-        raise ValueError(f"Unsupported HXZO version: {version}")
+    if version not in HXZO_VERSIONS_SUPPORTED:
+        raise ValueError(f"Unsupported HXZO version: {version} (supported: {HXZO_VERSIONS_SUPPORTED})")
 
     header_len = struct.unpack(">H", data[6:8])[0]
     header = json.loads(data[8:8 + header_len].decode("utf-8"))
@@ -402,6 +419,7 @@ def read_outlier_sidecar(
         "shape": tuple(header.get("shape", [])),
         "num_outliers": num_outliers,
         "threshold_policy": header.get("threshold_policy", {}),
+        "routing_context": header.get("routing_context"),
         "header": header,
     }
 
@@ -431,6 +449,8 @@ def inspect_hxzo_header(sidecar_path: str) -> Dict[str, Any]:
             return {"valid": False, "error": f"Invalid magic: {magic!r}"}
 
         version = struct.unpack(">H", f.read(2))[0]
+        if version not in HXZO_VERSIONS_SUPPORTED:
+            return {"valid": False, "error": f"Unsupported version: {version}"}
         header_len = struct.unpack(">H", f.read(2))[0]
         header = json.loads(f.read(header_len).decode("utf-8"))
 
@@ -440,6 +460,61 @@ def inspect_hxzo_header(sidecar_path: str) -> Dict[str, Any]:
         "file_size_bytes": file_size,
         "compressed_payload_bytes": file_size - 8 - header_len,
         **header,
+    }
+
+
+def build_routing_context(
+    *,
+    tensor_class: str,
+    block_type: str,
+    role: str,
+    block_idx: int,
+    arch: str,
+    eff_rank: float,
+    kurtosis: float,
+    se: float,
+    weight_rms: float,
+    route: str,
+    composite_score: float,
+    confidence: float,
+    pre_sidecar_norm: float,
+    post_sidecar_norm: float,
+    compression_step: int = 0,
+    drift_ratio: Optional[float] = None,
+    recomp_count: int = 0,
+) -> Dict[str, Any]:
+    """Build a routing_context dict for the HXZO v2 header.
+
+    All fields are required except drift fields (compression_step,
+    drift_ratio, recomp_count) which default to initial-compression values.
+
+    Field sources at compression time:
+      - tensor_class, route, composite_score: from RouteScore
+      - block_idx, role, block_type: from tensor name parsing + model config
+      - eff_rank, se, kurtosis, weight_rms: measured from weight tensor
+      - confidence: 1 - mean(sidecar_norms), proven rho=0.574
+      - pre_sidecar_norm, post_sidecar_norm: measured after VQ
+      - arch: from model config
+      - compression_step, drift_ratio, recomp_count: for born-compressed / recomp
+    """
+    return {
+        "tensor_class": tensor_class,
+        "block_type": block_type,
+        "role": role,
+        "block_idx": block_idx,
+        "arch": arch,
+        "eff_rank": round(float(eff_rank), 6),
+        "kurtosis": round(float(kurtosis), 4),
+        "se": round(float(se), 6),
+        "weight_rms": round(float(weight_rms), 6),
+        "route": route,
+        "composite_score": round(float(composite_score), 4),
+        "confidence": round(float(confidence), 4),
+        "pre_sidecar_norm": round(float(pre_sidecar_norm), 6),
+        "post_sidecar_norm": round(float(post_sidecar_norm), 6),
+        "compression_step": int(compression_step),
+        "drift_ratio": round(float(drift_ratio), 6) if drift_ratio is not None else None,
+        "recomp_count": int(recomp_count),
     }
 
 

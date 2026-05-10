@@ -1,0 +1,129 @@
+{
+  "receipt_id": "hxq_raw_distribution_test_20260502T103120Z",
+  "experiment": "hxq_affine6_raw_distribution_test",
+  "description": "HXQ affine g128 6-bit on raw tensor distributions (non-ML)",
+  "method": "per-group affine quantization, group_size=128, 6-bit (64 levels)",
+  "tensor_size": [
+    4096,
+    4096
+  ],
+  "seed": 42,
+  "results": [
+    {
+      "distribution": "mixed_gaussian",
+      "shape": [
+        4096,
+        4096
+      ],
+      "numel": 16777216,
+      "input_stats": {
+        "mean": 2.7566424250835553e-05,
+        "std": 0.7842671871185303,
+        "min": -3.729971170425415,
+        "max": 4.671741008758545,
+        "kurtosis": 3.27
+      },
+      "cosine_similarity": 0.999751,
+      "rms_error": 0.017522,
+      "max_abs_error": 0.051121,
+      "gate": "PASS",
+      "time_ms": 243.0
+    },
+    {
+      "distribution": "uniform",
+      "shape": [
+        4096,
+        4096
+      ],
+      "numel": 16777216,
+      "input_stats": {
+        "mean": -0.00011191218072781339,
+        "std": 0.5773331522941589,
+        "min": -0.9999994039535522,
+        "max": 0.9999995827674866,
+        "kurtosis": 1.8
+      },
+      "cosine_similarity": 0.99988,
+      "rms_error": 0.008952,
+      "max_abs_error": 0.015868,
+      "gate": "PASS",
+      "time_ms": 241.0
+    },
+    {
+      "distribution": "heavy_tailed_cauchy",
+      "shape": [
+        4096,
+        4096
+      ],
+      "numel": 16777216,
+      "input_stats": {
+        "mean": -0.004161726217716932,
+        "std": 11.238356590270996,
+        "min": -100.0,
+        "max": 100.0,
+        "kurtosis": 53.19
+      },
+      "cosine_similarity": 0.998516,
+      "rms_error": 0.613077,
+      "max_abs_error": 1.587307,
+      "gate": "PASS",
+      "time_ms": 237.9
+    },
+    {
+      "distribution": "lognormal",
+      "shape": [
+        4096,
+        4096
+      ],
+      "numel": 16777216,
+      "input_stats": {
+        "mean": 1.6485811471939087,
+        "std": 2.1610326766967773,
+        "min": 0.005211031995713711,
+        "max": 218.43020629882812,
+        "kurtosis": 106.2
+      },
+      "cosine_similarity": 0.999608,
+      "rms_error": 0.07612,
+      "max_abs_error": 1.72794,
+      "gate": "PASS",
+      "time_ms": 236.8
+    },
+    {
+      "distribution": "sparse_90pct",
+      "shape": [
+        4096,
+        4096
+      ],
+      "numel": 16777216,
+      "input_stats": {
+        "mean": -0.00011153485684189945,
+        "std": 0.31629008054733276,
+        "min": -4.781980514526367,
+        "max": 4.636566638946533,
+        "kurtosis": 30.03
+      },
+      "cosine_similarity": 0.998818,
+      "rms_error": 0.01539,
+      "max_abs_error": 0.057717,
+      "gate": "PASS",
+      "time_ms": 246.3
+    }
+  ],
+  "summary": {
+    "n_distributions": 5,
+    "n_pass": 5,
+    "n_fail": 0,
+    "all_pass": true,
+    "gate_threshold": 0.998
+  },
+  "cost": {
+    "wall_time_s": 7.645,
+    "cpu_time_s": 12.838,
+    "peak_memory_mb": 914.9,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-05-02T14:31:12.361530+00:00",
+    "timestamp_end": "2026-05-02T14:31:20.006695+00:00"
+  }
+}
