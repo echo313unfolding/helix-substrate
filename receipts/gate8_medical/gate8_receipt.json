@@ -1,0 +1,273 @@
+{
+  "all_pass": true,
+  "architecture": {
+    "base_lifecycle": "3-state artifact (Candidate/Active/Quarantined)",
+    "codec_families": {
+      "numeric_arrays": "VQ/HXQ (DICOM-like imaging)",
+      "structured_text": "gzip (FHIR JSON)"
+    },
+    "consent_gate": "ConsentReceipt with scope/expiry/revocation",
+    "phi_boundary": "Only SHA-256 hashes of identifiers; no PHI in receipts or on-chain",
+    "preflight_decisions": "ALLOW / HOLD / REJECT with MPF-* reason codes",
+    "state_machine": "14-state claim lifecycle (medical_state_machine.py)"
+  },
+  "cost": {
+    "cpu_time_s": 2.807,
+    "hostname": "Echo",
+    "peak_memory_mb": 1189.0,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-05-25T18:54:18",
+    "timestamp_start": "2026-05-25T18:54:15",
+    "wall_time_s": 2.789
+  },
+  "gate": "Gate 8: Medical/Insurance Artifact Lifecycle",
+  "gate_count": 5,
+  "limitations": [
+    "All data is synthetic \u2014 no real PHI used",
+    "FHIR structure is representative, not fully R4-compliant",
+    "Imaging is structured noise, not real DICOM pixel data",
+    "HIPAA compliance is a legal question, not proven here",
+    "14-state model is a simplification of real payer workflows"
+  ],
+  "pass_count": 5,
+  "status": "PASS",
+  "sub_gates": {
+    "8A_fhir_prior_auth": {
+      "artifact_type": "StructuredRecord",
+      "codec": "gzip",
+      "compressed_bytes": 666,
+      "compression_ratio": 2.67,
+      "content_hash_gz": "90459ac2f58b2a625df72b949d08ba006230a035c92473bb3c29ac26bfa8331c",
+      "content_hash_raw": "ad24eb7df5644852bcb8b08f0816e8af7b771087fdf8d502542f944df8357fc8",
+      "fhir_resource_type": "Claim",
+      "fhir_use": "preauthorization",
+      "pass": true,
+      "phi_boundary": "All patient/provider refs are SHA-256 hashes",
+      "raw_bytes": 1776,
+      "roundtrip_hash_match": true
+    },
+    "8B_dicom_like_imaging": {
+      "artifact_type": "MedicalImaging",
+      "codec": "VQ_k256_sidecar",
+      "compressed_hash": "def664276ffc840e358e174735e11a44c744f97d08d1972c5701513395361576",
+      "compression_ratio": 3.95,
+      "cosine": 0.999991,
+      "cosine_gate": 0.998,
+      "note": "Structured noise proxy, NOT real DICOM",
+      "pass": true,
+      "raw_hash": "29092c19bcbbadb6cddc17f988e9d86826277ab43211794af4123c3e28a33e73",
+      "shape": [
+        512,
+        512
+      ],
+      "synthetic": true
+    },
+    "8C_mixed_bundle": {
+      "artifact_count": 2,
+      "bundle_id": "gate8-mixed-bundle-001",
+      "bundle_state": {
+        "artifact_state": "Candidate",
+        "artifacts": {
+          "fhir-prior-auth-001": {
+            "artifact_type": "StructuredRecord",
+            "codec": "gzip",
+            "content_hash": "90459ac2f58b2a625df72b949d08ba006230a035c92473bb3c29ac26bfa8331c",
+            "phi_fields_hashed": true,
+            "registered_utc": "2026-05-25T22:54:18Z"
+          },
+          "mri-knee-001": {
+            "artifact_type": "MedicalImaging",
+            "codec": "VQ_k256_sidecar",
+            "content_hash": "def664276ffc840e358e174735e11a44c744f97d08d1972c5701513395361576",
+            "phi_fields_hashed": true,
+            "registered_utc": "2026-05-25T22:54:18Z"
+          }
+        },
+        "bundle_hash": "986a8ae143f5952cd06e5badbede4c74efd7fb2fd383b59175f221dddde3888e",
+        "bundle_id": "gate8-mixed-bundle-001",
+        "claim_state": "Draft",
+        "consent": {
+          "consent_id": "consent-001",
+          "expires_utc": "2027-05-25T00:00:00Z",
+          "granted_utc": "2026-05-25T00:00:00Z",
+          "patient_hash": "af38ddacbc1847dac40ad6f6e8e7efeb4b1c97b03bd275b87080dd1b4f349527",
+          "revoked": false,
+          "revoked_utc": null,
+          "scope": "prior_auth_imaging"
+        },
+        "transition_count": 0,
+        "transition_log": []
+      },
+      "codecs": [
+        "VQ_k256_sidecar",
+        "gzip"
+      ],
+      "composite_hash": "986a8ae143f5952cd06e5badbede4c74efd7fb2fd383b59175f221dddde3888e",
+      "consent_valid": true,
+      "mixed_codec": true,
+      "pass": true
+    },
+    "8D_claim_state_machine": {
+      "conditions": {
+        "all_states_reachable": {
+          "pass": true,
+          "reachable_count": 14,
+          "total_states": 14,
+          "unreachable": []
+        },
+        "appeal_path": {
+          "final_artifact_state": "Active",
+          "final_claim_state": "Appeal_Decided",
+          "pass": true,
+          "transition_count": 7
+        },
+        "happy_path": {
+          "final_artifact_state": "Active",
+          "final_claim_state": "Approved",
+          "pass": true,
+          "transition_count": 4,
+          "transitions": [
+            {
+              "allowed": true,
+              "artifact_state": "Candidate",
+              "details": {
+                "actor": "test",
+                "reason": "Provider submitted"
+              },
+              "from_state": "Draft",
+              "reason_codes": [
+                "MS-TRANSITION-OK"
+              ],
+              "to_state": "Submitted"
+            },
+            {
+              "allowed": true,
+              "artifact_state": "Candidate",
+              "details": {
+                "actor": "test",
+                "reason": "Payer acknowledged"
+              },
+              "from_state": "Submitted",
+              "reason_codes": [
+                "MS-TRANSITION-OK"
+              ],
+              "to_state": "Acknowledged"
+            },
+            {
+              "allowed": true,
+              "artifact_state": "Candidate",
+              "details": {
+                "actor": "test",
+                "reason": "Clinical review started"
+              },
+              "from_state": "Acknowledged",
+              "reason_codes": [
+                "MS-TRANSITION-OK"
+              ],
+              "to_state": "In_Review"
+            },
+            {
+              "allowed": true,
+              "artifact_state": "Active",
+              "details": {
+                "actor": "test",
+                "reason": "Claim approved"
+              },
+              "from_state": "In_Review",
+              "reason_codes": [
+                "MS-TRANSITION-OK"
+              ],
+              "to_state": "Approved"
+            }
+          ]
+        },
+        "info_request_loop": {
+          "final_artifact_state": "Active",
+          "final_claim_state": "Approved",
+          "pass": true,
+          "transition_count": 8
+        },
+        "invalid_transition_rejected": {
+          "from_state": "Draft",
+          "pass": true,
+          "reason_codes": [
+            "MS-INVALID-TRANSITION"
+          ],
+          "to_state": "Approved"
+        },
+        "quarantine_absorbing": {
+          "artifact_state": "Quarantined",
+          "claim_state": "Quarantined",
+          "pass": true,
+          "reason_codes": [
+            "MS-INVALID-TRANSITION"
+          ]
+        }
+      },
+      "pass": true
+    },
+    "8E_medical_preflight": {
+      "conditions": {
+        "active_consent_allow": {
+          "decision": "ALLOW",
+          "pass": true,
+          "reason_codes": [
+            "MPF-CLEAN"
+          ]
+        },
+        "candidate_hold": {
+          "decision": "HOLD",
+          "pass": true,
+          "reason_codes": [
+            "MPF-NOT-ACTIVE"
+          ]
+        },
+        "consent_blocks_transition": {
+          "allowed": false,
+          "pass": true,
+          "reason_codes": [
+            "MS-CONSENT-REVOKED"
+          ]
+        },
+        "empty_bundle_reject": {
+          "decision": "REJECT",
+          "pass": true,
+          "reason_codes": [
+            "MPF-EMPTY-BUNDLE"
+          ]
+        },
+        "no_consent_reject": {
+          "decision": "REJECT",
+          "pass": true,
+          "reason_codes": [
+            "MPF-NO-CONSENT"
+          ]
+        },
+        "phi_boundary_reject": {
+          "decision": "REJECT",
+          "pass": true,
+          "reason_codes": [
+            "MPF-PHI-BOUNDARY"
+          ]
+        },
+        "quarantined_reject": {
+          "decision": "REJECT",
+          "pass": true,
+          "reason_codes": [
+            "MPF-QUARANTINED"
+          ]
+        },
+        "revoked_consent_reject": {
+          "decision": "REJECT",
+          "pass": true,
+          "reason_codes": [
+            "MPF-CONSENT-INVALID"
+          ]
+        }
+      },
+      "pass": true
+    }
+  },
+  "timestamp_utc": "2026-05-25T22:54:18Z",
+  "tool": "gate8_medical_probe.py"
+}

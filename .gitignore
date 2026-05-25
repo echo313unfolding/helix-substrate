@@ -234,3 +234,4 @@ receipts/*
 !receipts/tensor_infra/
 !receipts/dicom_twofamily/
 !receipts/receipt_uplift/
+!receipts/gate8_medical/
