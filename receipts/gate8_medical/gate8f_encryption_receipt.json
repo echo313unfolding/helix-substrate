@@ -1,0 +1,94 @@
+{
+  "all_pass": true,
+  "condition_count": 8,
+  "conditions": {
+    "f1_fhir_encrypt": {
+      "cipher": "AES-256-GCM",
+      "ciphertext_bytes": 425,
+      "codec": "gzip",
+      "compressed_bytes": 409,
+      "content_hash": "dfb30c123d958140c2419d11b286bbe212448fd93d067ed1c3862799b7a8e8b3",
+      "pass": true,
+      "raw_bytes": 875,
+      "roundtrip": true
+    },
+    "f2_image_encrypt": {
+      "cipher": "AES-256-GCM",
+      "ciphertext_bytes": 262160,
+      "codec": "VQ_k256_sidecar",
+      "content_hash": "7752cbe7eca23ec9a4f43d7f9aa1f8e7f54ac045ede236b4b75fbd12b8200c11",
+      "encrypt_roundtrip": true,
+      "pass": true,
+      "raw_bytes": 262144,
+      "vq_bytes": 262144,
+      "vq_cosine": 0.999994
+    },
+    "f3_ciphertext_hash": {
+      "fhir_hash_is_ciphertext": true,
+      "fhir_hash_not_plaintext": true,
+      "image_hash_is_ciphertext": true,
+      "image_hash_not_plaintext": true,
+      "pass": true
+    },
+    "f4_active_decrypt": {
+      "decrypted_matches": true,
+      "pass": true
+    },
+    "f5_revoked_blocks_key": {
+      "key_available_after_revoke": false,
+      "key_available_before_revoke": true,
+      "key_destroyed": true,
+      "pass": true
+    },
+    "f6_destroyed_key_fails": {
+      "key_release_returns_none": true,
+      "pass": true,
+      "zeroed_key_gcm_auth_fails": true
+    },
+    "f7_no_phi_in_receipt": {
+      "pass": true,
+      "phi_violations_fhir": [],
+      "phi_violations_image": [],
+      "plaintext_hash_leaked_fhir": false,
+      "plaintext_hash_leaked_image": false
+    },
+    "f8_audit_receipt": {
+      "artifact_count": 2,
+      "bundle_hash": "ad0b2f0e51ed8b83a6bf98eae55eeedf697c9106a48625f7451723226d219336",
+      "pass": true,
+      "preflight_decision": "ALLOW",
+      "reason_codes": [
+        "MPF-CLEAN"
+      ]
+    }
+  },
+  "cost": {
+    "cpu_time_s": 0.746,
+    "hostname": "Echo",
+    "peak_memory_mb": 615.6,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-05-25T19:06:56",
+    "timestamp_start": "2026-05-25T19:06:56",
+    "wall_time_s": 0.739
+  },
+  "gate": "Gate 8F: Encrypted Medical Artifact Lifecycle",
+  "label": "HIPAA-aligned technical safeguard prototype",
+  "not_claimed": [
+    "HIPAA compliance (requires administrative + physical + legal safeguards)",
+    "HIPAA certification (no such certification exists)",
+    "Production key management (prototype uses in-memory vault)",
+    "Real PHI handling (all data is synthetic)"
+  ],
+  "pass_count": 8,
+  "status": "PASS",
+  "technical_safeguards_demonstrated": [
+    "Encryption at rest (AES-256-GCM)",
+    "Integrity controls (SHA-256 content hash of ciphertext)",
+    "Audit controls (receipt for every encrypt/decrypt/preflight decision)",
+    "Access controls (consent-gated key release)",
+    "Key destruction on consent revocation",
+    "PHI boundary (no PHI in receipts, plaintext hash excluded)"
+  ],
+  "timestamp_utc": "2026-05-25T23:06:56Z",
+  "tool": "gate8f_medical_encryption_probe.py"
+}
