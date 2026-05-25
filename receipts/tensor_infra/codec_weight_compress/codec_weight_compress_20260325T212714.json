@@ -1,0 +1,43 @@
+{
+  "experiment": "tensor_infra_domain_5",
+  "domain": "codec_weight_compress",
+  "results": {
+    "clip": {
+      "model": "CLIP ViT-B/32 text encoder (transformers)",
+      "n_compressed": 72,
+      "overall_ratio": 3.87,
+      "dense_mb": 151.0,
+      "compressed_mb": 39.0,
+      "embedding_cosines": [
+        0.99984,
+        0.999866,
+        0.999847,
+        0.999759,
+        0.999805
+      ],
+      "avg_cosine": 0.999823,
+      "min_cosine": 0.999759
+    },
+    "resnet": {
+      "model": "ResNet-18 (torchvision)",
+      "fc_shape": [
+        1000,
+        512
+      ],
+      "output_cosine": 0.999888,
+      "prediction_match": 1.0,
+      "compression_ratio": 3.97
+    },
+    "verdict": "STRONG PASS",
+    "data_source": "REAL \u2014 CLIP ViT-B/32 + ResNet-18 pre-trained weights"
+  },
+  "cost": {
+    "wall_time_s": 582.456,
+    "cpu_time_s": 194.395,
+    "peak_memory_mb": 3178.7,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:17:32",
+    "timestamp_end": "2026-03-25T21:27:14"
+  }
+}

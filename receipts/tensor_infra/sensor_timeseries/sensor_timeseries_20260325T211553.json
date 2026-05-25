@@ -1,0 +1,46 @@
+{
+  "experiment": "tensor_infra_domain_10",
+  "domain": "sensor_timeseries",
+  "results": {
+    "scrna_seq": {
+      "dataset": "PBMC3K",
+      "shape": [
+        2638,
+        1838
+      ],
+      "sparsity": 0.0,
+      "per_k": {
+        "256": {
+          "cosine": 0.998782,
+          "pca_max_var_diff": 0.000324,
+          "ari": 0.7477,
+          "compression_ratio": 4.0
+        },
+        "64": {
+          "cosine": 0.992799,
+          "pca_max_var_diff": 0.00087,
+          "ari": 0.9202,
+          "compression_ratio": 4.0
+        }
+      }
+    },
+    "protein": {
+      "n_proteins": 10,
+      "total_atoms": 6440,
+      "cosine": 0.998967,
+      "rmsd_angstrom": 0.8172,
+      "compression_ratio": 3.81,
+      "reshape_note": "Grouped 10 residues -> (N/10, 30) for VQ"
+    },
+    "data_source": "REAL \u2014 PBMC3K scRNA-seq + PDB protein coordinates"
+  },
+  "cost": {
+    "wall_time_s": 24.514,
+    "cpu_time_s": 13.316,
+    "peak_memory_mb": 3693.9,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:15:28",
+    "timestamp_end": "2026-03-25T21:15:53"
+  }
+}

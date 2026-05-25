@@ -1,0 +1,78 @@
+{
+  "experiment": "tensor_infra_domain_2",
+  "domain": "embedding_table",
+  "results": {
+    "per_tensor": [
+      {
+        "tensor": "embed_tokens",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 256,
+        "full_cosine": 0.999823,
+        "row_cosine_min": -0.057593,
+        "row_cosine_mean": 0.99637,
+        "row_cosine_p5": 0.999654,
+        "recall_at_10_mean": 0.24,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "embed_tokens",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 64,
+        "full_cosine": 0.999055,
+        "row_cosine_min": -0.057593,
+        "row_cosine_mean": 0.995641,
+        "row_cosine_p5": 0.998524,
+        "recall_at_10_mean": 0.27,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "lm_head",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 256,
+        "full_cosine": 0.999288,
+        "row_cosine_min": 0.983224,
+        "row_cosine_mean": 0.999364,
+        "row_cosine_p5": 0.998382,
+        "recall_at_10_mean": 0.376,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "lm_head",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 64,
+        "full_cosine": 0.997809,
+        "row_cosine_min": 0.970187,
+        "row_cosine_mean": 0.998008,
+        "row_cosine_p5": 0.995603,
+        "recall_at_10_mean": 0.325,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      }
+    ],
+    "data_source": "REAL \u2014 TinyLlama embed_tokens + lm_head"
+  },
+  "cost": {
+    "wall_time_s": 240.223,
+    "cpu_time_s": 240.19,
+    "peak_memory_mb": 8450.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:05:32",
+    "timestamp_end": "2026-03-25T21:09:32"
+  }
+}

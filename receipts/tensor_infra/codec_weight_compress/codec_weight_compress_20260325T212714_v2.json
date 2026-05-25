@@ -1,0 +1,40 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "6286bef0a48b4b19e4ac849df8c0fbaf18cbe22927f732ae14feb3e7651db3b6",
+  "cost": {
+    "cpu_time_s": 194.395,
+    "hostname": "Echo",
+    "peak_memory_mb": 3178.7,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:27:14",
+    "timestamp_start": "2026-03-25T21:17:32",
+    "wall_time_s": 582.456
+  },
+  "data_source": "REAL \u2014 CLIP ViT-B/32 + ResNet-18 pre-trained weights",
+  "gate": "Domain Proof: Codec Weight Compression",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/codec_weight_compress/codec_weight_compress_20260325T212714.json",
+  "results_summary": {
+    "clip": {
+      "avg_cosine": 0.999823,
+      "compressed_mb": 39.0,
+      "dense_mb": 151.0,
+      "min_cosine": 0.999759,
+      "model": "CLIP ViT-B/32 text encoder (transformers)",
+      "n_compressed": 72,
+      "overall_ratio": 3.87
+    },
+    "data_source": "REAL \u2014 CLIP ViT-B/32 + ResNet-18 pre-trained weights",
+    "resnet": {
+      "compression_ratio": 3.97,
+      "model": "ResNet-18 (torchvision)",
+      "output_cosine": 0.999888,
+      "prediction_match": 1.0
+    },
+    "verdict": "STRONG PASS"
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:17:32Z",
+  "tool": "bench_codec_weight_compress.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

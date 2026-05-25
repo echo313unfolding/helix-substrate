@@ -1,0 +1,24 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "967ab5b930643cd53afc6e667123b8893e1d14f4b03737420143e78138257f3f",
+  "cost": {
+    "cpu_time_s": 225.844,
+    "hostname": "Echo",
+    "peak_memory_mb": 8450.4,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:17:14",
+    "timestamp_start": "2026-03-25T21:13:28",
+    "wall_time_s": 225.851
+  },
+  "data_source": "REAL \u2014 TinyLlama embed_tokens + lm_head",
+  "gate": "Domain Proof: Embedding Table Compression",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260325T211714.json",
+  "results_summary": {
+    "data_source": "REAL \u2014 TinyLlama embed_tokens + lm_head"
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "FAIL",
+  "timestamp_utc": "2026-03-25T21:13:28Z",
+  "tool": "bench_embedding_table.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

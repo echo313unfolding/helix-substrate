@@ -1,0 +1,968 @@
+{
+  "experiment": "tensor_infra_domain_8",
+  "domain": "moe_tiered",
+  "results": {
+    "n_tensors": 66,
+    "n_experts": 4,
+    "tiers": {
+      "hot": {
+        "k": 256,
+        "svd_rank": 8
+      },
+      "warm": {
+        "k": 256,
+        "svd_rank": 0
+      },
+      "cool": {
+        "k": 128,
+        "svd_rank": 0
+      },
+      "cold": {
+        "k": 64,
+        "svd_rank": 0
+      }
+    },
+    "original_mb": 3045.1,
+    "uniform_mb": 761.5,
+    "tiered_mb": 771.4,
+    "tiered_savings_pct": -1.3,
+    "hot_cosine_min": 0.999517,
+    "cold_cosine_min": 0.997505,
+    "per_tensor": [
+      {
+        "tensor": "model.layers.0.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999667,
+        "warm_cosine": 0.999649,
+        "cool_cosine": 0.999104,
+        "cold_cosine": 0.998336,
+        "uniform_cosine": 0.99943,
+        "tiered_bytes": 11744669,
+        "uniform_bytes": 11537995
+      },
+      {
+        "tensor": "model.layers.0.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999615,
+        "warm_cosine": 0.999487,
+        "cool_cosine": 0.999244,
+        "cold_cosine": 0.998361,
+        "uniform_cosine": 0.999476,
+        "tiered_bytes": 11658611,
+        "uniform_bytes": 11537922
+      },
+      {
+        "tensor": "model.layers.0.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999818,
+        "warm_cosine": 0.999786,
+        "cool_cosine": 0.999609,
+        "cold_cosine": 0.999153,
+        "uniform_cosine": 0.999791,
+        "tiered_bytes": 11659465,
+        "uniform_bytes": 11538312
+      },
+      {
+        "tensor": "model.layers.1.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999739,
+        "warm_cosine": 0.999755,
+        "cool_cosine": 0.999397,
+        "cold_cosine": 0.998813,
+        "uniform_cosine": 0.999565,
+        "tiered_bytes": 11744827,
+        "uniform_bytes": 11538115
+      },
+      {
+        "tensor": "model.layers.1.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999781,
+        "warm_cosine": 0.999795,
+        "cool_cosine": 0.999646,
+        "cold_cosine": 0.99875,
+        "uniform_cosine": 0.999746,
+        "tiered_bytes": 11659202,
+        "uniform_bytes": 11538133
+      },
+      {
+        "tensor": "model.layers.1.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999819,
+        "warm_cosine": 0.999827,
+        "cool_cosine": 0.999598,
+        "cold_cosine": 0.99904,
+        "uniform_cosine": 0.999775,
+        "tiered_bytes": 11659443,
+        "uniform_bytes": 11538256
+      },
+      {
+        "tensor": "model.layers.10.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999773,
+        "warm_cosine": 0.999818,
+        "cool_cosine": 0.999616,
+        "cold_cosine": 0.999219,
+        "uniform_cosine": 0.999761,
+        "tiered_bytes": 11745143,
+        "uniform_bytes": 11537978
+      },
+      {
+        "tensor": "model.layers.10.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999761,
+        "warm_cosine": 0.999738,
+        "cool_cosine": 0.999542,
+        "cold_cosine": 0.998718,
+        "uniform_cosine": 0.999666,
+        "tiered_bytes": 11658954,
+        "uniform_bytes": 11538155
+      },
+      {
+        "tensor": "model.layers.10.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999838,
+        "warm_cosine": 0.999842,
+        "cool_cosine": 0.999685,
+        "cold_cosine": 0.999014,
+        "uniform_cosine": 0.999769,
+        "tiered_bytes": 11659478,
+        "uniform_bytes": 11538297
+      },
+      {
+        "tensor": "model.layers.11.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999793,
+        "warm_cosine": 0.999863,
+        "cool_cosine": 0.99953,
+        "cold_cosine": 0.999004,
+        "uniform_cosine": 0.999725,
+        "tiered_bytes": 11745163,
+        "uniform_bytes": 11538036
+      },
+      {
+        "tensor": "model.layers.11.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.99973,
+        "warm_cosine": 0.999712,
+        "cool_cosine": 0.999453,
+        "cold_cosine": 0.998761,
+        "uniform_cosine": 0.999632,
+        "tiered_bytes": 11658838,
+        "uniform_bytes": 11538095
+      },
+      {
+        "tensor": "model.layers.11.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.99984,
+        "warm_cosine": 0.999827,
+        "cool_cosine": 0.999539,
+        "cold_cosine": 0.999,
+        "uniform_cosine": 0.999805,
+        "tiered_bytes": 11659457,
+        "uniform_bytes": 11538277
+      },
+      {
+        "tensor": "model.layers.12.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.99975,
+        "warm_cosine": 0.999828,
+        "cool_cosine": 0.999584,
+        "cold_cosine": 0.998996,
+        "uniform_cosine": 0.999696,
+        "tiered_bytes": 11745195,
+        "uniform_bytes": 11538055
+      },
+      {
+        "tensor": "model.layers.12.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999713,
+        "warm_cosine": 0.999525,
+        "cool_cosine": 0.999245,
+        "cold_cosine": 0.998498,
+        "uniform_cosine": 0.99962,
+        "tiered_bytes": 11658822,
+        "uniform_bytes": 11538094
+      },
+      {
+        "tensor": "model.layers.12.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999814,
+        "warm_cosine": 0.99981,
+        "cool_cosine": 0.999572,
+        "cold_cosine": 0.998747,
+        "uniform_cosine": 0.999783,
+        "tiered_bytes": 11659454,
+        "uniform_bytes": 11538275
+      },
+      {
+        "tensor": "model.layers.13.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999752,
+        "warm_cosine": 0.999796,
+        "cool_cosine": 0.999501,
+        "cold_cosine": 0.999176,
+        "uniform_cosine": 0.99969,
+        "tiered_bytes": 11745291,
+        "uniform_bytes": 11538127
+      },
+      {
+        "tensor": "model.layers.13.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999687,
+        "warm_cosine": 0.999688,
+        "cool_cosine": 0.998994,
+        "cold_cosine": 0.99844,
+        "uniform_cosine": 0.999484,
+        "tiered_bytes": 11658634,
+        "uniform_bytes": 11538112
+      },
+      {
+        "tensor": "model.layers.13.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999798,
+        "warm_cosine": 0.999784,
+        "cool_cosine": 0.999499,
+        "cold_cosine": 0.99897,
+        "uniform_cosine": 0.999726,
+        "tiered_bytes": 11659468,
+        "uniform_bytes": 11538263
+      },
+      {
+        "tensor": "model.layers.14.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999737,
+        "warm_cosine": 0.999784,
+        "cool_cosine": 0.999425,
+        "cold_cosine": 0.998984,
+        "uniform_cosine": 0.999718,
+        "tiered_bytes": 11745270,
+        "uniform_bytes": 11538113
+      },
+      {
+        "tensor": "model.layers.14.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999696,
+        "warm_cosine": 0.999571,
+        "cool_cosine": 0.99934,
+        "cold_cosine": 0.998366,
+        "uniform_cosine": 0.999509,
+        "tiered_bytes": 11658703,
+        "uniform_bytes": 11538114
+      },
+      {
+        "tensor": "model.layers.14.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999785,
+        "warm_cosine": 0.999787,
+        "cool_cosine": 0.999511,
+        "cold_cosine": 0.998711,
+        "uniform_cosine": 0.999739,
+        "tiered_bytes": 11659484,
+        "uniform_bytes": 11538306
+      },
+      {
+        "tensor": "model.layers.15.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999733,
+        "warm_cosine": 0.999797,
+        "cool_cosine": 0.999468,
+        "cold_cosine": 0.999134,
+        "uniform_cosine": 0.999738,
+        "tiered_bytes": 11745225,
+        "uniform_bytes": 11538123
+      },
+      {
+        "tensor": "model.layers.15.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999724,
+        "warm_cosine": 0.999604,
+        "cool_cosine": 0.999476,
+        "cold_cosine": 0.998675,
+        "uniform_cosine": 0.999615,
+        "tiered_bytes": 11658703,
+        "uniform_bytes": 11538131
+      },
+      {
+        "tensor": "model.layers.15.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.9998,
+        "warm_cosine": 0.999803,
+        "cool_cosine": 0.999639,
+        "cold_cosine": 0.999164,
+        "uniform_cosine": 0.999782,
+        "tiered_bytes": 11659559,
+        "uniform_bytes": 11538341
+      },
+      {
+        "tensor": "model.layers.16.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999773,
+        "warm_cosine": 0.999794,
+        "cool_cosine": 0.999495,
+        "cold_cosine": 0.99867,
+        "uniform_cosine": 0.999644,
+        "tiered_bytes": 11745234,
+        "uniform_bytes": 11538152
+      },
+      {
+        "tensor": "model.layers.16.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999717,
+        "warm_cosine": 0.999708,
+        "cool_cosine": 0.999387,
+        "cold_cosine": 0.998735,
+        "uniform_cosine": 0.999613,
+        "tiered_bytes": 11658694,
+        "uniform_bytes": 11538180
+      },
+      {
+        "tensor": "model.layers.16.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999859,
+        "warm_cosine": 0.99983,
+        "cool_cosine": 0.999653,
+        "cold_cosine": 0.998985,
+        "uniform_cosine": 0.999834,
+        "tiered_bytes": 11659543,
+        "uniform_bytes": 11538334
+      },
+      {
+        "tensor": "model.layers.17.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999801,
+        "warm_cosine": 0.999811,
+        "cool_cosine": 0.999531,
+        "cold_cosine": 0.99878,
+        "uniform_cosine": 0.999747,
+        "tiered_bytes": 11745427,
+        "uniform_bytes": 11538173
+      },
+      {
+        "tensor": "model.layers.17.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999772,
+        "warm_cosine": 0.999637,
+        "cool_cosine": 0.999386,
+        "cold_cosine": 0.998865,
+        "uniform_cosine": 0.999628,
+        "tiered_bytes": 11658700,
+        "uniform_bytes": 11538169
+      },
+      {
+        "tensor": "model.layers.17.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999821,
+        "warm_cosine": 0.99982,
+        "cool_cosine": 0.999541,
+        "cold_cosine": 0.998967,
+        "uniform_cosine": 0.999801,
+        "tiered_bytes": 11659541,
+        "uniform_bytes": 11538293
+      },
+      {
+        "tensor": "model.layers.18.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999816,
+        "warm_cosine": 0.999783,
+        "cool_cosine": 0.999626,
+        "cold_cosine": 0.999022,
+        "uniform_cosine": 0.999789,
+        "tiered_bytes": 11745454,
+        "uniform_bytes": 11538250
+      },
+      {
+        "tensor": "model.layers.18.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999759,
+        "warm_cosine": 0.999699,
+        "cool_cosine": 0.999364,
+        "cold_cosine": 0.998719,
+        "uniform_cosine": 0.99968,
+        "tiered_bytes": 11658667,
+        "uniform_bytes": 11538115
+      },
+      {
+        "tensor": "model.layers.18.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999872,
+        "warm_cosine": 0.999824,
+        "cool_cosine": 0.999625,
+        "cold_cosine": 0.999242,
+        "uniform_cosine": 0.999857,
+        "tiered_bytes": 11659484,
+        "uniform_bytes": 11538323
+      },
+      {
+        "tensor": "model.layers.19.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999828,
+        "warm_cosine": 0.999845,
+        "cool_cosine": 0.999694,
+        "cold_cosine": 0.998536,
+        "uniform_cosine": 0.999777,
+        "tiered_bytes": 11745497,
+        "uniform_bytes": 11538280
+      },
+      {
+        "tensor": "model.layers.19.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999771,
+        "warm_cosine": 0.999738,
+        "cool_cosine": 0.999437,
+        "cold_cosine": 0.998617,
+        "uniform_cosine": 0.999661,
+        "tiered_bytes": 11658827,
+        "uniform_bytes": 11538173
+      },
+      {
+        "tensor": "model.layers.19.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999878,
+        "warm_cosine": 0.999875,
+        "cool_cosine": 0.999689,
+        "cold_cosine": 0.999243,
+        "uniform_cosine": 0.999825,
+        "tiered_bytes": 11659523,
+        "uniform_bytes": 11538319
+      },
+      {
+        "tensor": "model.layers.2.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999794,
+        "warm_cosine": 0.999788,
+        "cool_cosine": 0.999531,
+        "cold_cosine": 0.998876,
+        "uniform_cosine": 0.999733,
+        "tiered_bytes": 11745266,
+        "uniform_bytes": 11538119
+      },
+      {
+        "tensor": "model.layers.2.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999822,
+        "warm_cosine": 0.999848,
+        "cool_cosine": 0.999603,
+        "cold_cosine": 0.997505,
+        "uniform_cosine": 0.999402,
+        "tiered_bytes": 11658895,
+        "uniform_bytes": 11537714
+      },
+      {
+        "tensor": "model.layers.2.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.99983,
+        "warm_cosine": 0.999829,
+        "cool_cosine": 0.999561,
+        "cold_cosine": 0.998727,
+        "uniform_cosine": 0.999781,
+        "tiered_bytes": 11659359,
+        "uniform_bytes": 11538176
+      },
+      {
+        "tensor": "model.layers.20.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999826,
+        "warm_cosine": 0.999819,
+        "cool_cosine": 0.999544,
+        "cold_cosine": 0.998818,
+        "uniform_cosine": 0.999757,
+        "tiered_bytes": 11745487,
+        "uniform_bytes": 11538186
+      },
+      {
+        "tensor": "model.layers.20.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999708,
+        "warm_cosine": 0.999742,
+        "cool_cosine": 0.999511,
+        "cold_cosine": 0.998898,
+        "uniform_cosine": 0.999713,
+        "tiered_bytes": 11658997,
+        "uniform_bytes": 11538229
+      },
+      {
+        "tensor": "model.layers.20.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999831,
+        "warm_cosine": 0.99984,
+        "cool_cosine": 0.999648,
+        "cold_cosine": 0.999233,
+        "uniform_cosine": 0.999846,
+        "tiered_bytes": 11659488,
+        "uniform_bytes": 11538297
+      },
+      {
+        "tensor": "model.layers.21.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999792,
+        "warm_cosine": 0.999736,
+        "cool_cosine": 0.999461,
+        "cold_cosine": 0.998293,
+        "uniform_cosine": 0.999622,
+        "tiered_bytes": 11745250,
+        "uniform_bytes": 11538128
+      },
+      {
+        "tensor": "model.layers.21.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999517,
+        "warm_cosine": 0.999705,
+        "cool_cosine": 0.999352,
+        "cold_cosine": 0.99846,
+        "uniform_cosine": 0.999327,
+        "tiered_bytes": 11658948,
+        "uniform_bytes": 11537872
+      },
+      {
+        "tensor": "model.layers.21.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999608,
+        "warm_cosine": 0.999784,
+        "cool_cosine": 0.999519,
+        "cold_cosine": 0.998712,
+        "uniform_cosine": 0.999091,
+        "tiered_bytes": 11658704,
+        "uniform_bytes": 11537756
+      },
+      {
+        "tensor": "model.layers.3.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999743,
+        "warm_cosine": 0.999818,
+        "cool_cosine": 0.999543,
+        "cold_cosine": 0.999085,
+        "uniform_cosine": 0.99971,
+        "tiered_bytes": 11745195,
+        "uniform_bytes": 11538142
+      },
+      {
+        "tensor": "model.layers.3.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999853,
+        "warm_cosine": 0.999809,
+        "cool_cosine": 0.999601,
+        "cold_cosine": 0.998741,
+        "uniform_cosine": 0.999743,
+        "tiered_bytes": 11659195,
+        "uniform_bytes": 11538143
+      },
+      {
+        "tensor": "model.layers.3.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.99985,
+        "warm_cosine": 0.999816,
+        "cool_cosine": 0.999619,
+        "cold_cosine": 0.999214,
+        "uniform_cosine": 0.999824,
+        "tiered_bytes": 11659456,
+        "uniform_bytes": 11538239
+      },
+      {
+        "tensor": "model.layers.4.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999805,
+        "warm_cosine": 0.99982,
+        "cool_cosine": 0.999681,
+        "cold_cosine": 0.999056,
+        "uniform_cosine": 0.99976,
+        "tiered_bytes": 11745243,
+        "uniform_bytes": 11538129
+      },
+      {
+        "tensor": "model.layers.4.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999829,
+        "warm_cosine": 0.999767,
+        "cool_cosine": 0.999537,
+        "cold_cosine": 0.999011,
+        "uniform_cosine": 0.999759,
+        "tiered_bytes": 11658975,
+        "uniform_bytes": 11538050
+      },
+      {
+        "tensor": "model.layers.4.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999841,
+        "warm_cosine": 0.999822,
+        "cool_cosine": 0.999626,
+        "cold_cosine": 0.998992,
+        "uniform_cosine": 0.999784,
+        "tiered_bytes": 11659470,
+        "uniform_bytes": 11538278
+      },
+      {
+        "tensor": "model.layers.5.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999799,
+        "warm_cosine": 0.999814,
+        "cool_cosine": 0.999555,
+        "cold_cosine": 0.99921,
+        "uniform_cosine": 0.999759,
+        "tiered_bytes": 11745317,
+        "uniform_bytes": 11538183
+      },
+      {
+        "tensor": "model.layers.5.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.9998,
+        "warm_cosine": 0.999773,
+        "cool_cosine": 0.999521,
+        "cold_cosine": 0.998933,
+        "uniform_cosine": 0.999691,
+        "tiered_bytes": 11659089,
+        "uniform_bytes": 11538122
+      },
+      {
+        "tensor": "model.layers.5.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999839,
+        "warm_cosine": 0.999816,
+        "cool_cosine": 0.999537,
+        "cold_cosine": 0.998987,
+        "uniform_cosine": 0.999763,
+        "tiered_bytes": 11659458,
+        "uniform_bytes": 11538228
+      },
+      {
+        "tensor": "model.layers.6.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.99972,
+        "warm_cosine": 0.999794,
+        "cool_cosine": 0.999555,
+        "cold_cosine": 0.998951,
+        "uniform_cosine": 0.999614,
+        "tiered_bytes": 11745186,
+        "uniform_bytes": 11538134
+      },
+      {
+        "tensor": "model.layers.6.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999788,
+        "warm_cosine": 0.999747,
+        "cool_cosine": 0.999478,
+        "cold_cosine": 0.998817,
+        "uniform_cosine": 0.999719,
+        "tiered_bytes": 11659030,
+        "uniform_bytes": 11538133
+      },
+      {
+        "tensor": "model.layers.6.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999832,
+        "warm_cosine": 0.999802,
+        "cool_cosine": 0.999526,
+        "cold_cosine": 0.999218,
+        "uniform_cosine": 0.999788,
+        "tiered_bytes": 11659469,
+        "uniform_bytes": 11538278
+      },
+      {
+        "tensor": "model.layers.7.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.99969,
+        "warm_cosine": 0.999786,
+        "cool_cosine": 0.999494,
+        "cold_cosine": 0.99886,
+        "uniform_cosine": 0.999624,
+        "tiered_bytes": 11745311,
+        "uniform_bytes": 11538193
+      },
+      {
+        "tensor": "model.layers.7.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999688,
+        "warm_cosine": 0.999649,
+        "cool_cosine": 0.999333,
+        "cold_cosine": 0.998601,
+        "uniform_cosine": 0.999611,
+        "tiered_bytes": 11658555,
+        "uniform_bytes": 11538078
+      },
+      {
+        "tensor": "model.layers.7.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999793,
+        "warm_cosine": 0.999789,
+        "cool_cosine": 0.999494,
+        "cold_cosine": 0.998898,
+        "uniform_cosine": 0.99968,
+        "tiered_bytes": 11659264,
+        "uniform_bytes": 11538227
+      },
+      {
+        "tensor": "model.layers.8.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999747,
+        "warm_cosine": 0.999815,
+        "cool_cosine": 0.999541,
+        "cold_cosine": 0.998708,
+        "uniform_cosine": 0.999734,
+        "tiered_bytes": 11745340,
+        "uniform_bytes": 11538165
+      },
+      {
+        "tensor": "model.layers.8.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999768,
+        "warm_cosine": 0.999755,
+        "cool_cosine": 0.999425,
+        "cold_cosine": 0.999077,
+        "uniform_cosine": 0.999683,
+        "tiered_bytes": 11659099,
+        "uniform_bytes": 11538151
+      },
+      {
+        "tensor": "model.layers.8.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999808,
+        "warm_cosine": 0.999809,
+        "cool_cosine": 0.999537,
+        "cold_cosine": 0.999045,
+        "uniform_cosine": 0.999779,
+        "tiered_bytes": 11659390,
+        "uniform_bytes": 11538209
+      },
+      {
+        "tensor": "model.layers.9.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "hot_cosine": 0.999759,
+        "warm_cosine": 0.999816,
+        "cool_cosine": 0.999535,
+        "cold_cosine": 0.999163,
+        "uniform_cosine": 0.999711,
+        "tiered_bytes": 11745279,
+        "uniform_bytes": 11538143
+      },
+      {
+        "tensor": "model.layers.9.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.999751,
+        "warm_cosine": 0.999725,
+        "cool_cosine": 0.999529,
+        "cold_cosine": 0.999042,
+        "uniform_cosine": 0.999676,
+        "tiered_bytes": 11659005,
+        "uniform_bytes": 11538133
+      },
+      {
+        "tensor": "model.layers.9.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "hot_cosine": 0.99981,
+        "warm_cosine": 0.999831,
+        "cool_cosine": 0.999635,
+        "cold_cosine": 0.999025,
+        "uniform_cosine": 0.999753,
+        "tiered_bytes": 11659439,
+        "uniform_bytes": 11538257
+      }
+    ],
+    "data_source": "PARTIAL \u2014 real TinyLlama FFN weights, simulated expert splitting"
+  },
+  "cost": {
+    "wall_time_s": 1747.659,
+    "cpu_time_s": 1747.112,
+    "peak_memory_mb": 8450.7,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:17:27",
+    "timestamp_end": "2026-03-25T21:46:34"
+  }
+}

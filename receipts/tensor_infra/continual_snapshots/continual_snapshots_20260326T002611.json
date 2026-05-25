@@ -1,0 +1,82 @@
+{
+  "experiment": "tensor_infra_domain_9",
+  "domain": "continual_snapshots",
+  "results": {
+    "n_snapshots": 4,
+    "full_compression": [
+      {
+        "snapshot": 0,
+        "n_tensors": 156,
+        "original_mb": 4399.8,
+        "compressed_mb": 1100.5,
+        "ratio": 4.0,
+        "cosine_min": 0.994589,
+        "cosine_mean": 0.999588
+      },
+      {
+        "snapshot": 1,
+        "n_tensors": 156,
+        "original_mb": 4399.8,
+        "compressed_mb": 1100.5,
+        "ratio": 4.0,
+        "cosine_min": 0.994589,
+        "cosine_mean": 0.999588
+      },
+      {
+        "snapshot": 2,
+        "n_tensors": 156,
+        "original_mb": 4399.8,
+        "compressed_mb": 1100.5,
+        "ratio": 4.0,
+        "cosine_min": 0.994589,
+        "cosine_mean": 0.999588
+      },
+      {
+        "snapshot": 3,
+        "n_tensors": 156,
+        "original_mb": 4399.8,
+        "compressed_mb": 1100.5,
+        "ratio": 4.0,
+        "cosine_min": 0.994589,
+        "cosine_mean": 0.999588
+      }
+    ],
+    "delta_compression": [
+      {
+        "snapshot": 1,
+        "delta_original_mb": 4399.8,
+        "delta_compressed_mb": 1100.4,
+        "delta_ratio": 4.0,
+        "restored_cosine_min": 1.0
+      },
+      {
+        "snapshot": 2,
+        "delta_original_mb": 4399.8,
+        "delta_compressed_mb": 1100.4,
+        "delta_ratio": 4.0,
+        "restored_cosine_min": 1.0
+      },
+      {
+        "snapshot": 3,
+        "delta_original_mb": 4399.8,
+        "delta_compressed_mb": 1100.4,
+        "delta_ratio": 4.0,
+        "restored_cosine_min": 1.0
+      }
+    ],
+    "total_uncompressed_mb": 17599.2,
+    "total_full_compressed_mb": 4402.0,
+    "total_delta_compressed_mb": 4401.7,
+    "data_source": "PARTIAL \u2014 TinyLlama base + 3 SGD-step snapshots",
+    "flag": "Single SGD steps, not full training epochs"
+  },
+  "cost": {
+    "wall_time_s": 6305.226,
+    "cpu_time_s": 5247.629,
+    "peak_memory_mb": 26812.7,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T22:41:05",
+    "timestamp_end": "2026-03-26T00:26:11"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "bf73bc477a48325326dae9c6eec7c4885eed4eacd6dba59c63930713b777629f",
+  "cost": {
+    "cpu_time_s": 217.009,
+    "hostname": "Echo",
+    "peak_memory_mb": 3194.9,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:13:21",
+    "timestamp_start": "2026-03-25T21:09:43",
+    "wall_time_s": 217.122
+  },
+  "data_source": "REAL \u2014 TinyLlama calibration activations from WikiText-2",
+  "gate": "Domain Proof: Activation Checkpointing",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/activation_checkpoint/activation_checkpoint_20260325T211321.json",
+  "results_summary": {
+    "cosine_mean": 0.998684,
+    "cosine_min": 0.995823,
+    "data_source": "REAL \u2014 TinyLlama calibration activations from WikiText-2",
+    "n_tensors": 44,
+    "overall_ratio": 3.9,
+    "total_compressed_mb": 94.7,
+    "total_original_mb": 369.1,
+    "verdict": "PASS"
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:09:43Z",
+  "tool": "bench_activation_checkpoint.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

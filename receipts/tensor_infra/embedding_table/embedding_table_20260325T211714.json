@@ -1,0 +1,94 @@
+{
+  "experiment": "tensor_infra_domain_2",
+  "domain": "embedding_table",
+  "results": {
+    "per_tensor": [
+      {
+        "tensor": "embed_tokens",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 256,
+        "full_cosine": 0.999823,
+        "active_row_cosine_min": 0.998678,
+        "active_row_cosine_mean": 0.999841,
+        "active_row_cosine_p5": 0.999663,
+        "n_active_rows": 31680,
+        "n_total_rows": 32000,
+        "row_mse_mean": 7.88e-08,
+        "row_mse_max": 1.1115e-06,
+        "recall_at_10_mean": 0.24,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "embed_tokens",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 64,
+        "full_cosine": 0.999055,
+        "active_row_cosine_min": 0.996205,
+        "active_row_cosine_mean": 0.999114,
+        "active_row_cosine_p5": 0.998547,
+        "n_active_rows": 31680,
+        "n_total_rows": 32000,
+        "row_mse_mean": 4.22e-07,
+        "row_mse_max": 3.901e-06,
+        "recall_at_10_mean": 0.27,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "lm_head",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 256,
+        "full_cosine": 0.999288,
+        "active_row_cosine_min": 0.983224,
+        "active_row_cosine_mean": 0.99937,
+        "active_row_cosine_p5": 0.998388,
+        "n_active_rows": 31678,
+        "n_total_rows": 32000,
+        "row_mse_mean": 8.746e-07,
+        "row_mse_max": 3.08195e-05,
+        "recall_at_10_mean": 0.376,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      },
+      {
+        "tensor": "lm_head",
+        "shape": [
+          32000,
+          2048
+        ],
+        "k": 64,
+        "full_cosine": 0.997809,
+        "active_row_cosine_min": 0.970187,
+        "active_row_cosine_mean": 0.998014,
+        "active_row_cosine_p5": 0.995618,
+        "n_active_rows": 31678,
+        "n_total_rows": 32000,
+        "row_mse_mean": 2.6971e-06,
+        "row_mse_max": 4.94268e-05,
+        "recall_at_10_mean": 0.325,
+        "recall_at_10_min": 0.0,
+        "compression_ratio": 4.0
+      }
+    ],
+    "data_source": "REAL \u2014 TinyLlama embed_tokens + lm_head"
+  },
+  "cost": {
+    "wall_time_s": 225.851,
+    "cpu_time_s": 225.844,
+    "peak_memory_mb": 8450.4,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:13:28",
+    "timestamp_end": "2026-03-25T21:17:14"
+  }
+}

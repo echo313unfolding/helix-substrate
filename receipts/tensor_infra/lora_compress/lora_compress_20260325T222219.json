@@ -1,0 +1,1607 @@
+{
+  "experiment": "tensor_infra_domain_7",
+  "domain": "lora_compress",
+  "results": {
+    "n_lora_matrices": 88,
+    "per_matrix": [
+      {
+        "name": "base_model.model.model.layers.0.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.0.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999801,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.0.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.0.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999759,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.1.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.1.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.99979,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.1.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.1.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999808,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.2.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.2.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.2.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.2.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999785,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.3.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.3.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999799,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.3.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.3.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999759,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.4.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.4.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.9998,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.4.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.4.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999778,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.5.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.5.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999797,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.5.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999877,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.5.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999804,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.6.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.6.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999805,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.6.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.6.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.94,
+        "k": 64,
+        "cosine": 0.999824,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.7.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.7.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.9998,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.7.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.7.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999751,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.8.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.21,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.8.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999814,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.8.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.8.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.99978,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.9.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.9.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999812,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.9.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.9.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999837,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.10.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.10.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999805,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.10.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.21,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.10.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999763,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.11.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.21,
+        "k": 64,
+        "cosine": 0.999877,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.11.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.95,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.11.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.11.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999794,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.12.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.12.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999806,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.12.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.12.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999819,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.13.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.13.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999816,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.13.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.13.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999795,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.14.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.14.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999793,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.14.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.14.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.15.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999877,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.15.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.15.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.15.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999789,
+        "compression_ratio": 3.34,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.16.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.16.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999804,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.16.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.16.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.17.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999877,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.17.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999808,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.17.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.21,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.17.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999817,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.18.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.18,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.18.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999811,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.18.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.18.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999814,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.19.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.19.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.96,
+        "k": 64,
+        "cosine": 0.999807,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.19.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.19.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999821,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.20.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.20.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999803,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.20.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999874,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.20.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999834,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.21.self_attn.q_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.19,
+        "k": 64,
+        "cosine": 0.999875,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.21.self_attn.q_proj.lora_B.default.weight",
+        "shape": [
+          2048,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999814,
+        "compression_ratio": 3.88,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.21.self_attn.v_proj.lora_A.default.weight",
+        "shape": [
+          16,
+          2048
+        ],
+        "kurtosis": -1.2,
+        "k": 64,
+        "cosine": 0.999876,
+        "compression_ratio": 3.87,
+        "original_bytes": 131072,
+        "storage_mode": "codebook"
+      },
+      {
+        "name": "base_model.model.model.layers.21.self_attn.v_proj.lora_B.default.weight",
+        "shape": [
+          256,
+          16
+        ],
+        "kurtosis": -1.97,
+        "k": 64,
+        "cosine": 0.999801,
+        "compression_ratio": 3.33,
+        "original_bytes": 16384,
+        "storage_mode": "codebook"
+      }
+    ],
+    "merged_deltas": [
+      {
+        "pair": "base_model.model.model.layers.0.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.0.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999893,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.0.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.0.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999894,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.1.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.1.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 0.06,
+        "cosine": 0.99987,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.1.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.1.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 0.05,
+        "cosine": 0.999897,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.2.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.2.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999895,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.2.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.2.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999897,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.3.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.3.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999896,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.3.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.3.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999899,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.4.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.4.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999894,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.4.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.4.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.07,
+        "cosine": 0.999905,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.5.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.5.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999894,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.5.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.5.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.1,
+        "cosine": 0.999907,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.6.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.6.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.1,
+        "cosine": 0.9999,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.6.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.6.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.7.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.7.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999894,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.7.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.7.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.8.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.8.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999893,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.8.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.8.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999906,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.9.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.9.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999897,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.9.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.9.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.10.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.10.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.07,
+        "cosine": 0.999893,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.10.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.10.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999899,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.11.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.11.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999898,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.11.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.11.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.12.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.12.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.07,
+        "cosine": 0.999895,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.12.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.12.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.03,
+        "cosine": 0.9999,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.13.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.13.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999894,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.13.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.13.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999894,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.14.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.14.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.03,
+        "cosine": 0.999891,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.14.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.14.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.15.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.15.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999892,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.15.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.15.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.12,
+        "cosine": 0.999912,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.16.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.16.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999895,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.16.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.16.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999904,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.17.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.17.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999895,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.17.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.17.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.09,
+        "cosine": 0.999909,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.18.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.18.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999891,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.18.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.18.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.05,
+        "cosine": 0.999908,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.19.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.19.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.08,
+        "cosine": 0.999899,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.19.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.19.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.09,
+        "cosine": 0.999911,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.20.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.20.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999894,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.20.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.20.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.04,
+        "cosine": 0.999894,
+        "compression_ratio": 3.97
+      },
+      {
+        "pair": "base_model.model.model.layers.21.self_attn.q_proj.lora_A.default.weight + base_model.model.model.layers.21.self_attn.q_proj.lora_B.default.weight",
+        "merged_shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": -0.07,
+        "cosine": 0.999895,
+        "compression_ratio": 4.0
+      },
+      {
+        "pair": "base_model.model.model.layers.21.self_attn.v_proj.lora_A.default.weight + base_model.model.model.layers.21.self_attn.v_proj.lora_B.default.weight",
+        "merged_shape": [
+          256,
+          2048
+        ],
+        "kurtosis": -0.06,
+        "cosine": 0.999903,
+        "compression_ratio": 3.97
+      }
+    ],
+    "verdict": "STRONG PASS",
+    "data_source": "PARTIAL \u2014 PEFT LoRA on TinyLlama, 5 steps on WikiText-2",
+    "flag": "5-step training, not converged"
+  },
+  "cost": {
+    "wall_time_s": 443.334,
+    "cpu_time_s": 219.759,
+    "peak_memory_mb": 8986.2,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T22:14:56",
+    "timestamp_end": "2026-03-25T22:22:19"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "bb7ce8f7dda91cc9f76e96ca37ef1ac25acc8a0f0b46b568999540cb979a160f",
+  "cost": {
+    "cpu_time_s": 396.05,
+    "hostname": "Echo",
+    "peak_memory_mb": 5221.4,
+    "python_version": "3.10.12",
+    "sentence_transformer_rerun_wall_s": 63.9,
+    "timestamp_end": "2026-03-12T14:37:56.386832+00:00",
+    "timestamp_start": "2026-03-12T14:30:19.333559+00:00",
+    "wall_time_s": 457.053
+  },
+  "data_source": "",
+  "gate": "Domain Proof: Non-LLM Architecture",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/non_llm_proof/non_llm_proof_20260312T103756.json",
+  "results_summary": {
+    "clip_vit": {
+      "avg_image_cosine": 0.997285,
+      "avg_text_cosine": 0.999721,
+      "compress_time_s": 386.2,
+      "compressed_mb": 123.9,
+      "compression_ratio": 3.98,
+      "dense_mb": 493.4,
+      "logits_cosine": 0.999878,
+      "model": "clip-vit-base-patch32",
+      "n_compressed": 146,
+      "n_linear": 144,
+      "ranking_preserved": 1.0,
+      "type": "vision_language"
+    },
+    "resnet18": {
+      "compress_time_s": 3.1,
+      "compressed_mb": 0.5,
+      "compression_ratio": 3.97,
+      "dense_mb": 2.0,
+      "model": "ResNet-18",
+      "n_compressed": 1,
+      "n_linear": 1,
+      "output_cosine": 0.999852,
+      "prediction_match": 1.0,
+      "type": "cnn_classifier"
+    },
+    "sentence_transformer": {
+      "avg_cosine": 0.998944,
+      "compress_time_s": 57.3,
+      "compressed_mb": 10.9,
+      "compression_ratio": 3.94,
+      "dense_mb": 43.1,
+      "min_cosine": 0.998886,
+      "model": "all-MiniLM-L6-v2",
+      "n_compressed": 37,
+      "n_linear": 37,
+      "note": "Rerun after .cpu() fix \u2014 original run hit CUDA-to-numpy error",
+      "rank_preservation": 1.0,
+      "type": "sentence_embedding"
+    }
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-12T14:30:19.333559+00:00Z",
+  "tool": "non_llm_proof.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

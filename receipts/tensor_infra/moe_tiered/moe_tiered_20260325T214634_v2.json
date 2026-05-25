@@ -1,0 +1,32 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "f7afec5539764e1ddef6de472a20e3f6d46f8ebe08ef3ddc55fe2f4d35cd2ced",
+  "cost": {
+    "cpu_time_s": 1747.112,
+    "hostname": "Echo",
+    "peak_memory_mb": 8450.7,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:46:34",
+    "timestamp_start": "2026-03-25T21:17:27",
+    "wall_time_s": 1747.659
+  },
+  "data_source": "PARTIAL \u2014 real TinyLlama FFN weights, simulated expert splitting",
+  "gate": "Domain Proof: MoE Tiered Compression",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/moe_tiered/moe_tiered_20260325T214634.json",
+  "results_summary": {
+    "cold_cosine_min": 0.997505,
+    "data_source": "PARTIAL \u2014 real TinyLlama FFN weights, simulated expert splitting",
+    "hot_cosine_min": 0.999517,
+    "n_experts": 4,
+    "n_tensors": 66,
+    "original_mb": 3045.1,
+    "tiered_mb": 771.4,
+    "tiered_savings_pct": -1.3,
+    "uniform_mb": 761.5
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:17:27Z",
+  "tool": "bench_moe_tiered.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

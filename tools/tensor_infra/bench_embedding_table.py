@@ -52,7 +52,7 @@ def main():
         tensor = weights[key].astype(np.float32)
         print(f"\n  {label}: shape={tensor.shape}, kurtosis={kurtosis(tensor):.2f}")
 
-        for k_val in [256, 64]:
+        for k_val in [256, 128]:
             policy = policy_vq(k=k_val, sidecar=True)
             stats, recon = compress_tensor(tensor, f"{label}_k{k_val}", out_dir, policy)
 

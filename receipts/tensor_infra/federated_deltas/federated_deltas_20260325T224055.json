@@ -1,0 +1,4390 @@
+{
+  "experiment": "tensor_infra_domain_4",
+  "domain": "federated_deltas",
+  "results": {
+    "per_tensor": [
+      {
+        "tensor": "model.embed_tokens.weight",
+        "shape": [
+          32000,
+          2048
+        ],
+        "kurtosis": 740303.24,
+        "sparsity": 0.9979,
+        "codec": "k256",
+        "delta_cosine": 0.977688,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00696
+      },
+      {
+        "tensor": "model.embed_tokens.weight",
+        "shape": [
+          32000,
+          2048
+        ],
+        "kurtosis": 740303.24,
+        "sparsity": 0.9979,
+        "codec": "k64",
+        "delta_cosine": 0.977688,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00696
+      },
+      {
+        "tensor": "model.layers.0.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 20235.78,
+        "sparsity": 0.942,
+        "codec": "k256",
+        "delta_cosine": 0.983182,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00017
+      },
+      {
+        "tensor": "model.layers.0.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 20235.78,
+        "sparsity": 0.942,
+        "codec": "k64",
+        "delta_cosine": 0.976357,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00017
+      },
+      {
+        "tensor": "model.layers.0.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 6843.24,
+        "sparsity": 0.9374,
+        "codec": "k256",
+        "delta_cosine": 0.995426,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 6.8e-05
+      },
+      {
+        "tensor": "model.layers.0.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 6843.24,
+        "sparsity": 0.9374,
+        "codec": "k64",
+        "delta_cosine": 0.991259,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 6.8e-05
+      },
+      {
+        "tensor": "model.layers.0.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 9553.29,
+        "sparsity": 0.0819,
+        "codec": "k256",
+        "delta_cosine": 0.99523,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.006754
+      },
+      {
+        "tensor": "model.layers.0.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 9553.29,
+        "sparsity": 0.0819,
+        "codec": "k64",
+        "delta_cosine": 0.993022,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.006754
+      },
+      {
+        "tensor": "model.layers.0.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 57.59,
+        "sparsity": 0.052,
+        "codec": "k256",
+        "delta_cosine": 0.995095,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001425
+      },
+      {
+        "tensor": "model.layers.0.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 57.59,
+        "sparsity": 0.052,
+        "codec": "k64",
+        "delta_cosine": 0.989322,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001425
+      },
+      {
+        "tensor": "model.layers.0.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 729.51,
+        "sparsity": 0.1098,
+        "codec": "k256",
+        "delta_cosine": 0.982912,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000639
+      },
+      {
+        "tensor": "model.layers.0.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 729.51,
+        "sparsity": 0.1098,
+        "codec": "k64",
+        "delta_cosine": 0.975847,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000639
+      },
+      {
+        "tensor": "model.layers.0.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 15015.07,
+        "sparsity": 0.0844,
+        "codec": "k256",
+        "delta_cosine": 0.985323,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001138
+      },
+      {
+        "tensor": "model.layers.0.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 15015.07,
+        "sparsity": 0.0844,
+        "codec": "k64",
+        "delta_cosine": 0.972895,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001138
+      },
+      {
+        "tensor": "model.layers.0.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 640.96,
+        "sparsity": 0.0571,
+        "codec": "k256",
+        "delta_cosine": 0.983218,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001283
+      },
+      {
+        "tensor": "model.layers.0.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 640.96,
+        "sparsity": 0.0571,
+        "codec": "k64",
+        "delta_cosine": 0.973273,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001283
+      },
+      {
+        "tensor": "model.layers.1.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 24185.85,
+        "sparsity": 0.7739,
+        "codec": "k256",
+        "delta_cosine": 0.987105,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00026
+      },
+      {
+        "tensor": "model.layers.1.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 24185.85,
+        "sparsity": 0.7739,
+        "codec": "k64",
+        "delta_cosine": 0.977621,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00026
+      },
+      {
+        "tensor": "model.layers.1.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1314.16,
+        "sparsity": 0.5008,
+        "codec": "k256",
+        "delta_cosine": 0.992171,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000139
+      },
+      {
+        "tensor": "model.layers.1.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1314.16,
+        "sparsity": 0.5008,
+        "codec": "k64",
+        "delta_cosine": 0.984916,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000139
+      },
+      {
+        "tensor": "model.layers.1.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 4928.94,
+        "sparsity": 0.046,
+        "codec": "k256",
+        "delta_cosine": 0.996908,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.010619
+      },
+      {
+        "tensor": "model.layers.1.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 4928.94,
+        "sparsity": 0.046,
+        "codec": "k64",
+        "delta_cosine": 0.99116,
+        "weight_cosine": 0.99999999,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.010619
+      },
+      {
+        "tensor": "model.layers.1.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.12,
+        "sparsity": 0.0159,
+        "codec": "k256",
+        "delta_cosine": 0.998137,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00201
+      },
+      {
+        "tensor": "model.layers.1.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.12,
+        "sparsity": 0.0159,
+        "codec": "k64",
+        "delta_cosine": 0.994483,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00201
+      },
+      {
+        "tensor": "model.layers.1.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 42.94,
+        "sparsity": 0.0481,
+        "codec": "k256",
+        "delta_cosine": 0.996877,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000887
+      },
+      {
+        "tensor": "model.layers.1.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 42.94,
+        "sparsity": 0.0481,
+        "codec": "k64",
+        "delta_cosine": 0.991411,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000887
+      },
+      {
+        "tensor": "model.layers.1.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 32.91,
+        "sparsity": 0.0389,
+        "codec": "k256",
+        "delta_cosine": 0.996475,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001154
+      },
+      {
+        "tensor": "model.layers.1.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 32.91,
+        "sparsity": 0.0389,
+        "codec": "k64",
+        "delta_cosine": 0.991162,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001154
+      },
+      {
+        "tensor": "model.layers.1.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 128.25,
+        "sparsity": 0.0286,
+        "codec": "k256",
+        "delta_cosine": 0.993479,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001544
+      },
+      {
+        "tensor": "model.layers.1.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 128.25,
+        "sparsity": 0.0286,
+        "codec": "k64",
+        "delta_cosine": 0.988546,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001544
+      },
+      {
+        "tensor": "model.layers.2.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1883.7,
+        "sparsity": 0.403,
+        "codec": "k256",
+        "delta_cosine": 0.981995,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000324
+      },
+      {
+        "tensor": "model.layers.2.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1883.7,
+        "sparsity": 0.403,
+        "codec": "k64",
+        "delta_cosine": 0.968112,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000324
+      },
+      {
+        "tensor": "model.layers.2.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 807.11,
+        "sparsity": 0.2179,
+        "codec": "k256",
+        "delta_cosine": 0.992285,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000142
+      },
+      {
+        "tensor": "model.layers.2.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 807.11,
+        "sparsity": 0.2179,
+        "codec": "k64",
+        "delta_cosine": 0.981686,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000142
+      },
+      {
+        "tensor": "model.layers.2.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 2447.6,
+        "sparsity": 0.0063,
+        "codec": "k256",
+        "delta_cosine": 0.993963,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.00622
+      },
+      {
+        "tensor": "model.layers.2.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 2447.6,
+        "sparsity": 0.0063,
+        "codec": "k64",
+        "delta_cosine": 0.989907,
+        "weight_cosine": 0.99999999,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.00622
+      },
+      {
+        "tensor": "model.layers.2.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.01,
+        "sparsity": 0.0142,
+        "codec": "k256",
+        "delta_cosine": 0.998199,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001947
+      },
+      {
+        "tensor": "model.layers.2.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.01,
+        "sparsity": 0.0142,
+        "codec": "k64",
+        "delta_cosine": 0.99487,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001947
+      },
+      {
+        "tensor": "model.layers.2.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 9.28,
+        "sparsity": 0.0317,
+        "codec": "k256",
+        "delta_cosine": 0.998079,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001214
+      },
+      {
+        "tensor": "model.layers.2.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 9.28,
+        "sparsity": 0.0317,
+        "codec": "k64",
+        "delta_cosine": 0.99477,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001214
+      },
+      {
+        "tensor": "model.layers.2.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 49.49,
+        "sparsity": 0.0288,
+        "codec": "k256",
+        "delta_cosine": 0.99649,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001397
+      },
+      {
+        "tensor": "model.layers.2.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 49.49,
+        "sparsity": 0.0288,
+        "codec": "k64",
+        "delta_cosine": 0.990336,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001397
+      },
+      {
+        "tensor": "model.layers.2.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 33350.74,
+        "sparsity": 0.0242,
+        "codec": "k256",
+        "delta_cosine": 0.985091,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.01685
+      },
+      {
+        "tensor": "model.layers.2.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 33350.74,
+        "sparsity": 0.0242,
+        "codec": "k64",
+        "delta_cosine": 0.983443,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.01685
+      },
+      {
+        "tensor": "model.layers.3.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 607.17,
+        "sparsity": 0.1729,
+        "codec": "k256",
+        "delta_cosine": 0.987546,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000403
+      },
+      {
+        "tensor": "model.layers.3.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 607.17,
+        "sparsity": 0.1729,
+        "codec": "k64",
+        "delta_cosine": 0.973983,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000403
+      },
+      {
+        "tensor": "model.layers.3.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 165.74,
+        "sparsity": 0.0874,
+        "codec": "k256",
+        "delta_cosine": 0.995968,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000189
+      },
+      {
+        "tensor": "model.layers.3.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 165.74,
+        "sparsity": 0.0874,
+        "codec": "k64",
+        "delta_cosine": 0.98969,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000189
+      },
+      {
+        "tensor": "model.layers.3.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 433.59,
+        "sparsity": 0.007,
+        "codec": "k256",
+        "delta_cosine": 0.993282,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.002568
+      },
+      {
+        "tensor": "model.layers.3.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 433.59,
+        "sparsity": 0.007,
+        "codec": "k64",
+        "delta_cosine": 0.988342,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.002568
+      },
+      {
+        "tensor": "model.layers.3.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.62,
+        "sparsity": 0.0256,
+        "codec": "k256",
+        "delta_cosine": 0.998113,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001237
+      },
+      {
+        "tensor": "model.layers.3.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.62,
+        "sparsity": 0.0256,
+        "codec": "k64",
+        "delta_cosine": 0.994363,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001237
+      },
+      {
+        "tensor": "model.layers.3.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 18.5,
+        "sparsity": 0.0318,
+        "codec": "k256",
+        "delta_cosine": 0.997694,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001226
+      },
+      {
+        "tensor": "model.layers.3.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 18.5,
+        "sparsity": 0.0318,
+        "codec": "k64",
+        "delta_cosine": 0.994726,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001226
+      },
+      {
+        "tensor": "model.layers.3.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 20.57,
+        "sparsity": 0.0281,
+        "codec": "k256",
+        "delta_cosine": 0.997587,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001378
+      },
+      {
+        "tensor": "model.layers.3.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 20.57,
+        "sparsity": 0.0281,
+        "codec": "k64",
+        "delta_cosine": 0.993681,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001378
+      },
+      {
+        "tensor": "model.layers.3.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 34.0,
+        "sparsity": 0.0247,
+        "codec": "k256",
+        "delta_cosine": 0.996154,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001536
+      },
+      {
+        "tensor": "model.layers.3.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 34.0,
+        "sparsity": 0.0247,
+        "codec": "k64",
+        "delta_cosine": 0.992125,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001536
+      },
+      {
+        "tensor": "model.layers.4.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1855.79,
+        "sparsity": 0.1482,
+        "codec": "k256",
+        "delta_cosine": 0.987452,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00049
+      },
+      {
+        "tensor": "model.layers.4.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1855.79,
+        "sparsity": 0.1482,
+        "codec": "k64",
+        "delta_cosine": 0.973929,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00049
+      },
+      {
+        "tensor": "model.layers.4.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 313.27,
+        "sparsity": 0.0849,
+        "codec": "k256",
+        "delta_cosine": 0.995008,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000199
+      },
+      {
+        "tensor": "model.layers.4.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 313.27,
+        "sparsity": 0.0849,
+        "codec": "k64",
+        "delta_cosine": 0.98959,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000199
+      },
+      {
+        "tensor": "model.layers.4.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1005.9,
+        "sparsity": 0.0083,
+        "codec": "k256",
+        "delta_cosine": 0.993466,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.002469
+      },
+      {
+        "tensor": "model.layers.4.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1005.9,
+        "sparsity": 0.0083,
+        "codec": "k64",
+        "delta_cosine": 0.988803,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.002469
+      },
+      {
+        "tensor": "model.layers.4.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 21.71,
+        "sparsity": 0.0335,
+        "codec": "k256",
+        "delta_cosine": 0.997395,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001037
+      },
+      {
+        "tensor": "model.layers.4.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 21.71,
+        "sparsity": 0.0335,
+        "codec": "k64",
+        "delta_cosine": 0.992654,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001037
+      },
+      {
+        "tensor": "model.layers.4.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 6.74,
+        "sparsity": 0.034,
+        "codec": "k256",
+        "delta_cosine": 0.99875,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001104
+      },
+      {
+        "tensor": "model.layers.4.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 6.74,
+        "sparsity": 0.034,
+        "codec": "k64",
+        "delta_cosine": 0.996396,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001104
+      },
+      {
+        "tensor": "model.layers.4.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 8.59,
+        "sparsity": 0.0296,
+        "codec": "k256",
+        "delta_cosine": 0.998358,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001276
+      },
+      {
+        "tensor": "model.layers.4.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 8.59,
+        "sparsity": 0.0296,
+        "codec": "k64",
+        "delta_cosine": 0.995731,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001276
+      },
+      {
+        "tensor": "model.layers.4.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 108.14,
+        "sparsity": 0.0265,
+        "codec": "k256",
+        "delta_cosine": 0.994611,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001387
+      },
+      {
+        "tensor": "model.layers.4.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 108.14,
+        "sparsity": 0.0265,
+        "codec": "k64",
+        "delta_cosine": 0.989144,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001387
+      },
+      {
+        "tensor": "model.layers.5.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1719.28,
+        "sparsity": 0.1905,
+        "codec": "k256",
+        "delta_cosine": 0.987617,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000431
+      },
+      {
+        "tensor": "model.layers.5.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1719.28,
+        "sparsity": 0.1905,
+        "codec": "k64",
+        "delta_cosine": 0.972519,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000431
+      },
+      {
+        "tensor": "model.layers.5.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 235.21,
+        "sparsity": 0.1171,
+        "codec": "k256",
+        "delta_cosine": 0.99476,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000173
+      },
+      {
+        "tensor": "model.layers.5.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 235.21,
+        "sparsity": 0.1171,
+        "codec": "k64",
+        "delta_cosine": 0.988699,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000173
+      },
+      {
+        "tensor": "model.layers.5.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1570.89,
+        "sparsity": 0.0106,
+        "codec": "k256",
+        "delta_cosine": 0.994238,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001849
+      },
+      {
+        "tensor": "model.layers.5.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1570.89,
+        "sparsity": 0.0106,
+        "codec": "k64",
+        "delta_cosine": 0.990015,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001849
+      },
+      {
+        "tensor": "model.layers.5.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.87,
+        "sparsity": 0.0363,
+        "codec": "k256",
+        "delta_cosine": 0.997993,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000897
+      },
+      {
+        "tensor": "model.layers.5.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 13.87,
+        "sparsity": 0.0363,
+        "codec": "k64",
+        "delta_cosine": 0.994206,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000897
+      },
+      {
+        "tensor": "model.layers.5.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 8.14,
+        "sparsity": 0.034,
+        "codec": "k256",
+        "delta_cosine": 0.998312,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.0011
+      },
+      {
+        "tensor": "model.layers.5.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 8.14,
+        "sparsity": 0.034,
+        "codec": "k64",
+        "delta_cosine": 0.995645,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.0011
+      },
+      {
+        "tensor": "model.layers.5.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 7.9,
+        "sparsity": 0.0288,
+        "codec": "k256",
+        "delta_cosine": 0.99872,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00125
+      },
+      {
+        "tensor": "model.layers.5.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 7.9,
+        "sparsity": 0.0288,
+        "codec": "k64",
+        "delta_cosine": 0.996126,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00125
+      },
+      {
+        "tensor": "model.layers.5.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 17.28,
+        "sparsity": 0.0267,
+        "codec": "k256",
+        "delta_cosine": 0.997633,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001358
+      },
+      {
+        "tensor": "model.layers.5.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 17.28,
+        "sparsity": 0.0267,
+        "codec": "k64",
+        "delta_cosine": 0.99375,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001358
+      },
+      {
+        "tensor": "model.layers.6.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 707.97,
+        "sparsity": 0.1392,
+        "codec": "k256",
+        "delta_cosine": 0.98569,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000663
+      },
+      {
+        "tensor": "model.layers.6.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 707.97,
+        "sparsity": 0.1392,
+        "codec": "k64",
+        "delta_cosine": 0.974153,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000663
+      },
+      {
+        "tensor": "model.layers.6.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 971.83,
+        "sparsity": 0.0811,
+        "codec": "k256",
+        "delta_cosine": 0.993801,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000322
+      },
+      {
+        "tensor": "model.layers.6.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 971.83,
+        "sparsity": 0.0811,
+        "codec": "k64",
+        "delta_cosine": 0.987497,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000322
+      },
+      {
+        "tensor": "model.layers.6.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 511.93,
+        "sparsity": 0.0087,
+        "codec": "k256",
+        "delta_cosine": 0.993524,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.002157
+      },
+      {
+        "tensor": "model.layers.6.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 511.93,
+        "sparsity": 0.0087,
+        "codec": "k64",
+        "delta_cosine": 0.988862,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.002157
+      },
+      {
+        "tensor": "model.layers.6.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 18.3,
+        "sparsity": 0.026,
+        "codec": "k256",
+        "delta_cosine": 0.997665,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001128
+      },
+      {
+        "tensor": "model.layers.6.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 18.3,
+        "sparsity": 0.026,
+        "codec": "k64",
+        "delta_cosine": 0.993498,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001128
+      },
+      {
+        "tensor": "model.layers.6.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 90.29,
+        "sparsity": 0.0382,
+        "codec": "k256",
+        "delta_cosine": 0.996831,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001026
+      },
+      {
+        "tensor": "model.layers.6.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 90.29,
+        "sparsity": 0.0382,
+        "codec": "k64",
+        "delta_cosine": 0.992313,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001026
+      },
+      {
+        "tensor": "model.layers.6.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 23.7,
+        "sparsity": 0.0302,
+        "codec": "k256",
+        "delta_cosine": 0.997592,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001269
+      },
+      {
+        "tensor": "model.layers.6.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 23.7,
+        "sparsity": 0.0302,
+        "codec": "k64",
+        "delta_cosine": 0.993757,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001269
+      },
+      {
+        "tensor": "model.layers.6.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 69.74,
+        "sparsity": 0.029,
+        "codec": "k256",
+        "delta_cosine": 0.994907,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001356
+      },
+      {
+        "tensor": "model.layers.6.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 69.74,
+        "sparsity": 0.029,
+        "codec": "k64",
+        "delta_cosine": 0.989292,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001356
+      },
+      {
+        "tensor": "model.layers.7.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 818.16,
+        "sparsity": 0.128,
+        "codec": "k256",
+        "delta_cosine": 0.987573,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000512
+      },
+      {
+        "tensor": "model.layers.7.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 818.16,
+        "sparsity": 0.128,
+        "codec": "k64",
+        "delta_cosine": 0.975716,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000512
+      },
+      {
+        "tensor": "model.layers.7.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 229.98,
+        "sparsity": 0.0621,
+        "codec": "k256",
+        "delta_cosine": 0.995192,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000301
+      },
+      {
+        "tensor": "model.layers.7.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 229.98,
+        "sparsity": 0.0621,
+        "codec": "k64",
+        "delta_cosine": 0.989921,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000301
+      },
+      {
+        "tensor": "model.layers.7.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 929.55,
+        "sparsity": 0.0073,
+        "codec": "k256",
+        "delta_cosine": 0.992651,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.002637
+      },
+      {
+        "tensor": "model.layers.7.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 929.55,
+        "sparsity": 0.0073,
+        "codec": "k64",
+        "delta_cosine": 0.989165,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.002637
+      },
+      {
+        "tensor": "model.layers.7.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 7.51,
+        "sparsity": 0.0251,
+        "codec": "k256",
+        "delta_cosine": 0.998879,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001161
+      },
+      {
+        "tensor": "model.layers.7.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 7.51,
+        "sparsity": 0.0251,
+        "codec": "k64",
+        "delta_cosine": 0.995974,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001161
+      },
+      {
+        "tensor": "model.layers.7.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 44.63,
+        "sparsity": 0.0465,
+        "codec": "k256",
+        "delta_cosine": 0.996677,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000912
+      },
+      {
+        "tensor": "model.layers.7.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 44.63,
+        "sparsity": 0.0465,
+        "codec": "k64",
+        "delta_cosine": 0.991867,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000912
+      },
+      {
+        "tensor": "model.layers.7.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 144.3,
+        "sparsity": 0.032,
+        "codec": "k256",
+        "delta_cosine": 0.994566,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00131
+      },
+      {
+        "tensor": "model.layers.7.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 144.3,
+        "sparsity": 0.032,
+        "codec": "k64",
+        "delta_cosine": 0.988656,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00131
+      },
+      {
+        "tensor": "model.layers.7.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 47986.4,
+        "sparsity": 0.0299,
+        "codec": "k256",
+        "delta_cosine": 0.988633,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.004829
+      },
+      {
+        "tensor": "model.layers.7.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 47986.4,
+        "sparsity": 0.0299,
+        "codec": "k64",
+        "delta_cosine": 0.980741,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.004829
+      },
+      {
+        "tensor": "model.layers.8.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 3703.03,
+        "sparsity": 0.1762,
+        "codec": "k256",
+        "delta_cosine": 0.981041,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000859
+      },
+      {
+        "tensor": "model.layers.8.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 3703.03,
+        "sparsity": 0.1762,
+        "codec": "k64",
+        "delta_cosine": 0.970604,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000859
+      },
+      {
+        "tensor": "model.layers.8.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 690.08,
+        "sparsity": 0.059,
+        "codec": "k256",
+        "delta_cosine": 0.99329,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000368
+      },
+      {
+        "tensor": "model.layers.8.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 690.08,
+        "sparsity": 0.059,
+        "codec": "k64",
+        "delta_cosine": 0.988429,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000368
+      },
+      {
+        "tensor": "model.layers.8.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 334.45,
+        "sparsity": 0.0101,
+        "codec": "k256",
+        "delta_cosine": 0.993776,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001765
+      },
+      {
+        "tensor": "model.layers.8.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 334.45,
+        "sparsity": 0.0101,
+        "codec": "k64",
+        "delta_cosine": 0.987877,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001765
+      },
+      {
+        "tensor": "model.layers.8.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 67.81,
+        "sparsity": 0.045,
+        "codec": "k256",
+        "delta_cosine": 0.994917,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001004
+      },
+      {
+        "tensor": "model.layers.8.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 67.81,
+        "sparsity": 0.045,
+        "codec": "k64",
+        "delta_cosine": 0.988535,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001004
+      },
+      {
+        "tensor": "model.layers.8.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 30.82,
+        "sparsity": 0.0448,
+        "codec": "k256",
+        "delta_cosine": 0.997403,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000861
+      },
+      {
+        "tensor": "model.layers.8.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 30.82,
+        "sparsity": 0.0448,
+        "codec": "k64",
+        "delta_cosine": 0.993165,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000861
+      },
+      {
+        "tensor": "model.layers.8.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 56.2,
+        "sparsity": 0.0329,
+        "codec": "k256",
+        "delta_cosine": 0.995856,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001179
+      },
+      {
+        "tensor": "model.layers.8.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 56.2,
+        "sparsity": 0.0329,
+        "codec": "k64",
+        "delta_cosine": 0.991248,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001179
+      },
+      {
+        "tensor": "model.layers.8.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 69.14,
+        "sparsity": 0.0324,
+        "codec": "k256",
+        "delta_cosine": 0.994844,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001216
+      },
+      {
+        "tensor": "model.layers.8.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 69.14,
+        "sparsity": 0.0324,
+        "codec": "k64",
+        "delta_cosine": 0.989255,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001216
+      },
+      {
+        "tensor": "model.layers.9.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2468.95,
+        "sparsity": 0.1443,
+        "codec": "k256",
+        "delta_cosine": 0.987909,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000474
+      },
+      {
+        "tensor": "model.layers.9.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2468.95,
+        "sparsity": 0.1443,
+        "codec": "k64",
+        "delta_cosine": 0.973832,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000474
+      },
+      {
+        "tensor": "model.layers.9.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 685.86,
+        "sparsity": 0.0854,
+        "codec": "k256",
+        "delta_cosine": 0.994262,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000225
+      },
+      {
+        "tensor": "model.layers.9.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 685.86,
+        "sparsity": 0.0854,
+        "codec": "k64",
+        "delta_cosine": 0.989801,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000225
+      },
+      {
+        "tensor": "model.layers.9.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 345.81,
+        "sparsity": 0.0093,
+        "codec": "k256",
+        "delta_cosine": 0.994171,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001613
+      },
+      {
+        "tensor": "model.layers.9.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 345.81,
+        "sparsity": 0.0093,
+        "codec": "k64",
+        "delta_cosine": 0.989238,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001613
+      },
+      {
+        "tensor": "model.layers.9.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 19.56,
+        "sparsity": 0.0297,
+        "codec": "k256",
+        "delta_cosine": 0.997354,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001037
+      },
+      {
+        "tensor": "model.layers.9.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 19.56,
+        "sparsity": 0.0297,
+        "codec": "k64",
+        "delta_cosine": 0.99334,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001037
+      },
+      {
+        "tensor": "model.layers.9.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 145.38,
+        "sparsity": 0.0529,
+        "codec": "k256",
+        "delta_cosine": 0.994613,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000799
+      },
+      {
+        "tensor": "model.layers.9.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 145.38,
+        "sparsity": 0.0529,
+        "codec": "k64",
+        "delta_cosine": 0.988817,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000799
+      },
+      {
+        "tensor": "model.layers.9.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 27.97,
+        "sparsity": 0.0344,
+        "codec": "k256",
+        "delta_cosine": 0.997411,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001084
+      },
+      {
+        "tensor": "model.layers.9.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 27.97,
+        "sparsity": 0.0344,
+        "codec": "k64",
+        "delta_cosine": 0.993594,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001084
+      },
+      {
+        "tensor": "model.layers.9.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 34.83,
+        "sparsity": 0.0314,
+        "codec": "k256",
+        "delta_cosine": 0.996552,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001192
+      },
+      {
+        "tensor": "model.layers.9.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 34.83,
+        "sparsity": 0.0314,
+        "codec": "k64",
+        "delta_cosine": 0.992466,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001192
+      },
+      {
+        "tensor": "model.layers.10.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1786.61,
+        "sparsity": 0.1758,
+        "codec": "k256",
+        "delta_cosine": 0.983461,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000384
+      },
+      {
+        "tensor": "model.layers.10.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1786.61,
+        "sparsity": 0.1758,
+        "codec": "k64",
+        "delta_cosine": 0.971621,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000384
+      },
+      {
+        "tensor": "model.layers.10.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 369.87,
+        "sparsity": 0.1141,
+        "codec": "k256",
+        "delta_cosine": 0.994914,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000162
+      },
+      {
+        "tensor": "model.layers.10.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 369.87,
+        "sparsity": 0.1141,
+        "codec": "k64",
+        "delta_cosine": 0.990003,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000162
+      },
+      {
+        "tensor": "model.layers.10.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 906.94,
+        "sparsity": 0.012,
+        "codec": "k256",
+        "delta_cosine": 0.99304,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.00147
+      },
+      {
+        "tensor": "model.layers.10.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 906.94,
+        "sparsity": 0.012,
+        "codec": "k64",
+        "delta_cosine": 0.988672,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.00147
+      },
+      {
+        "tensor": "model.layers.10.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.58,
+        "sparsity": 0.0375,
+        "codec": "k256",
+        "delta_cosine": 0.998135,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000867
+      },
+      {
+        "tensor": "model.layers.10.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.58,
+        "sparsity": 0.0375,
+        "codec": "k64",
+        "delta_cosine": 0.994063,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000867
+      },
+      {
+        "tensor": "model.layers.10.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 16.33,
+        "sparsity": 0.054,
+        "codec": "k256",
+        "delta_cosine": 0.997779,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000741
+      },
+      {
+        "tensor": "model.layers.10.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 16.33,
+        "sparsity": 0.054,
+        "codec": "k64",
+        "delta_cosine": 0.993999,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000741
+      },
+      {
+        "tensor": "model.layers.10.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 15.47,
+        "sparsity": 0.0368,
+        "codec": "k256",
+        "delta_cosine": 0.997487,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000988
+      },
+      {
+        "tensor": "model.layers.10.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 15.47,
+        "sparsity": 0.0368,
+        "codec": "k64",
+        "delta_cosine": 0.994572,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000988
+      },
+      {
+        "tensor": "model.layers.10.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 58.61,
+        "sparsity": 0.0336,
+        "codec": "k256",
+        "delta_cosine": 0.996147,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00109
+      },
+      {
+        "tensor": "model.layers.10.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 58.61,
+        "sparsity": 0.0336,
+        "codec": "k64",
+        "delta_cosine": 0.991157,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00109
+      },
+      {
+        "tensor": "model.layers.11.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1593.31,
+        "sparsity": 0.1772,
+        "codec": "k256",
+        "delta_cosine": 0.986262,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000515
+      },
+      {
+        "tensor": "model.layers.11.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1593.31,
+        "sparsity": 0.1772,
+        "codec": "k64",
+        "delta_cosine": 0.971248,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000515
+      },
+      {
+        "tensor": "model.layers.11.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1903.84,
+        "sparsity": 0.0794,
+        "codec": "k256",
+        "delta_cosine": 0.995074,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000274
+      },
+      {
+        "tensor": "model.layers.11.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1903.84,
+        "sparsity": 0.0794,
+        "codec": "k64",
+        "delta_cosine": 0.98785,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000274
+      },
+      {
+        "tensor": "model.layers.11.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1880.77,
+        "sparsity": 0.0098,
+        "codec": "k256",
+        "delta_cosine": 0.994198,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001894
+      },
+      {
+        "tensor": "model.layers.11.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1880.77,
+        "sparsity": 0.0098,
+        "codec": "k64",
+        "delta_cosine": 0.989172,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001894
+      },
+      {
+        "tensor": "model.layers.11.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 97.73,
+        "sparsity": 0.039,
+        "codec": "k256",
+        "delta_cosine": 0.994134,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001063
+      },
+      {
+        "tensor": "model.layers.11.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 97.73,
+        "sparsity": 0.039,
+        "codec": "k64",
+        "delta_cosine": 0.987613,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001063
+      },
+      {
+        "tensor": "model.layers.11.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 65.82,
+        "sparsity": 0.0567,
+        "codec": "k256",
+        "delta_cosine": 0.995152,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000751
+      },
+      {
+        "tensor": "model.layers.11.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 65.82,
+        "sparsity": 0.0567,
+        "codec": "k64",
+        "delta_cosine": 0.98909,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000751
+      },
+      {
+        "tensor": "model.layers.11.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 237.62,
+        "sparsity": 0.0372,
+        "codec": "k256",
+        "delta_cosine": 0.993914,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001099
+      },
+      {
+        "tensor": "model.layers.11.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 237.62,
+        "sparsity": 0.0372,
+        "codec": "k64",
+        "delta_cosine": 0.988003,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001099
+      },
+      {
+        "tensor": "model.layers.11.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 30.96,
+        "sparsity": 0.0344,
+        "codec": "k256",
+        "delta_cosine": 0.996473,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00107
+      },
+      {
+        "tensor": "model.layers.11.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 30.96,
+        "sparsity": 0.0344,
+        "codec": "k64",
+        "delta_cosine": 0.99247,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00107
+      },
+      {
+        "tensor": "model.layers.12.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 4104.02,
+        "sparsity": 0.1421,
+        "codec": "k256",
+        "delta_cosine": 0.987195,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00052
+      },
+      {
+        "tensor": "model.layers.12.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 4104.02,
+        "sparsity": 0.1421,
+        "codec": "k64",
+        "delta_cosine": 0.972217,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00052
+      },
+      {
+        "tensor": "model.layers.12.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 872.37,
+        "sparsity": 0.0873,
+        "codec": "k256",
+        "delta_cosine": 0.994291,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000211
+      },
+      {
+        "tensor": "model.layers.12.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 872.37,
+        "sparsity": 0.0873,
+        "codec": "k64",
+        "delta_cosine": 0.988308,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000211
+      },
+      {
+        "tensor": "model.layers.12.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 427.41,
+        "sparsity": 0.0093,
+        "codec": "k256",
+        "delta_cosine": 0.992654,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001644
+      },
+      {
+        "tensor": "model.layers.12.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 427.41,
+        "sparsity": 0.0093,
+        "codec": "k64",
+        "delta_cosine": 0.989029,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001644
+      },
+      {
+        "tensor": "model.layers.12.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.18,
+        "sparsity": 0.0259,
+        "codec": "k256",
+        "delta_cosine": 0.998333,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001058
+      },
+      {
+        "tensor": "model.layers.12.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.18,
+        "sparsity": 0.0259,
+        "codec": "k64",
+        "delta_cosine": 0.9949,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001058
+      },
+      {
+        "tensor": "model.layers.12.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 59.5,
+        "sparsity": 0.0621,
+        "codec": "k256",
+        "delta_cosine": 0.995312,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000769
+      },
+      {
+        "tensor": "model.layers.12.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 59.5,
+        "sparsity": 0.0621,
+        "codec": "k64",
+        "delta_cosine": 0.987698,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000769
+      },
+      {
+        "tensor": "model.layers.12.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 71.62,
+        "sparsity": 0.0356,
+        "codec": "k256",
+        "delta_cosine": 0.995699,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001144
+      },
+      {
+        "tensor": "model.layers.12.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 71.62,
+        "sparsity": 0.0356,
+        "codec": "k64",
+        "delta_cosine": 0.990943,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001144
+      },
+      {
+        "tensor": "model.layers.12.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 16.66,
+        "sparsity": 0.0315,
+        "codec": "k256",
+        "delta_cosine": 0.997575,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001211
+      },
+      {
+        "tensor": "model.layers.12.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 16.66,
+        "sparsity": 0.0315,
+        "codec": "k64",
+        "delta_cosine": 0.993622,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001211
+      },
+      {
+        "tensor": "model.layers.13.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1430.75,
+        "sparsity": 0.1231,
+        "codec": "k256",
+        "delta_cosine": 0.987865,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000553
+      },
+      {
+        "tensor": "model.layers.13.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1430.75,
+        "sparsity": 0.1231,
+        "codec": "k64",
+        "delta_cosine": 0.975809,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000553
+      },
+      {
+        "tensor": "model.layers.13.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 824.15,
+        "sparsity": 0.0815,
+        "codec": "k256",
+        "delta_cosine": 0.993857,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000271
+      },
+      {
+        "tensor": "model.layers.13.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 824.15,
+        "sparsity": 0.0815,
+        "codec": "k64",
+        "delta_cosine": 0.988034,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000271
+      },
+      {
+        "tensor": "model.layers.13.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 490.42,
+        "sparsity": 0.009,
+        "codec": "k256",
+        "delta_cosine": 0.993609,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001916
+      },
+      {
+        "tensor": "model.layers.13.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 490.42,
+        "sparsity": 0.009,
+        "codec": "k64",
+        "delta_cosine": 0.988959,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001916
+      },
+      {
+        "tensor": "model.layers.13.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 24.16,
+        "sparsity": 0.0243,
+        "codec": "k256",
+        "delta_cosine": 0.997023,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001219
+      },
+      {
+        "tensor": "model.layers.13.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 24.16,
+        "sparsity": 0.0243,
+        "codec": "k64",
+        "delta_cosine": 0.992794,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001219
+      },
+      {
+        "tensor": "model.layers.13.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 82.62,
+        "sparsity": 0.0581,
+        "codec": "k256",
+        "delta_cosine": 0.996283,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000801
+      },
+      {
+        "tensor": "model.layers.13.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 82.62,
+        "sparsity": 0.0581,
+        "codec": "k64",
+        "delta_cosine": 0.992013,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000801
+      },
+      {
+        "tensor": "model.layers.13.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 47.51,
+        "sparsity": 0.0341,
+        "codec": "k256",
+        "delta_cosine": 0.995951,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001187
+      },
+      {
+        "tensor": "model.layers.13.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 47.51,
+        "sparsity": 0.0341,
+        "codec": "k64",
+        "delta_cosine": 0.989846,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001187
+      },
+      {
+        "tensor": "model.layers.13.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 73.15,
+        "sparsity": 0.0304,
+        "codec": "k256",
+        "delta_cosine": 0.995409,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001325
+      },
+      {
+        "tensor": "model.layers.13.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 73.15,
+        "sparsity": 0.0304,
+        "codec": "k64",
+        "delta_cosine": 0.989578,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001325
+      },
+      {
+        "tensor": "model.layers.14.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2185.82,
+        "sparsity": 0.1673,
+        "codec": "k256",
+        "delta_cosine": 0.987739,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000448
+      },
+      {
+        "tensor": "model.layers.14.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2185.82,
+        "sparsity": 0.1673,
+        "codec": "k64",
+        "delta_cosine": 0.972295,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000448
+      },
+      {
+        "tensor": "model.layers.14.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1371.43,
+        "sparsity": 0.0991,
+        "codec": "k256",
+        "delta_cosine": 0.993869,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000262
+      },
+      {
+        "tensor": "model.layers.14.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1371.43,
+        "sparsity": 0.0991,
+        "codec": "k64",
+        "delta_cosine": 0.987467,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000262
+      },
+      {
+        "tensor": "model.layers.14.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 398.56,
+        "sparsity": 0.0103,
+        "codec": "k256",
+        "delta_cosine": 0.994055,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.00158
+      },
+      {
+        "tensor": "model.layers.14.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 398.56,
+        "sparsity": 0.0103,
+        "codec": "k64",
+        "delta_cosine": 0.989867,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.00158
+      },
+      {
+        "tensor": "model.layers.14.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 22.76,
+        "sparsity": 0.0318,
+        "codec": "k256",
+        "delta_cosine": 0.997463,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001181
+      },
+      {
+        "tensor": "model.layers.14.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 22.76,
+        "sparsity": 0.0318,
+        "codec": "k64",
+        "delta_cosine": 0.992344,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001181
+      },
+      {
+        "tensor": "model.layers.14.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 46.02,
+        "sparsity": 0.0553,
+        "codec": "k256",
+        "delta_cosine": 0.995678,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000848
+      },
+      {
+        "tensor": "model.layers.14.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 46.02,
+        "sparsity": 0.0553,
+        "codec": "k64",
+        "delta_cosine": 0.990826,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000848
+      },
+      {
+        "tensor": "model.layers.14.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 356.24,
+        "sparsity": 0.0345,
+        "codec": "k256",
+        "delta_cosine": 0.994812,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001216
+      },
+      {
+        "tensor": "model.layers.14.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 356.24,
+        "sparsity": 0.0345,
+        "codec": "k64",
+        "delta_cosine": 0.987965,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001216
+      },
+      {
+        "tensor": "model.layers.14.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 100.44,
+        "sparsity": 0.0315,
+        "codec": "k256",
+        "delta_cosine": 0.994035,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001366
+      },
+      {
+        "tensor": "model.layers.14.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 100.44,
+        "sparsity": 0.0315,
+        "codec": "k64",
+        "delta_cosine": 0.987876,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001366
+      },
+      {
+        "tensor": "model.layers.15.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1698.64,
+        "sparsity": 0.1534,
+        "codec": "k256",
+        "delta_cosine": 0.988664,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000601
+      },
+      {
+        "tensor": "model.layers.15.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1698.64,
+        "sparsity": 0.1534,
+        "codec": "k64",
+        "delta_cosine": 0.973745,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000601
+      },
+      {
+        "tensor": "model.layers.15.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 336.72,
+        "sparsity": 0.0602,
+        "codec": "k256",
+        "delta_cosine": 0.99425,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000296
+      },
+      {
+        "tensor": "model.layers.15.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 336.72,
+        "sparsity": 0.0602,
+        "codec": "k64",
+        "delta_cosine": 0.989688,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000296
+      },
+      {
+        "tensor": "model.layers.15.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 2005.6,
+        "sparsity": 0.0091,
+        "codec": "k256",
+        "delta_cosine": 0.993517,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001719
+      },
+      {
+        "tensor": "model.layers.15.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 2005.6,
+        "sparsity": 0.0091,
+        "codec": "k64",
+        "delta_cosine": 0.986539,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001719
+      },
+      {
+        "tensor": "model.layers.15.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.54,
+        "sparsity": 0.0465,
+        "codec": "k256",
+        "delta_cosine": 0.998009,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001072
+      },
+      {
+        "tensor": "model.layers.15.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.54,
+        "sparsity": 0.0465,
+        "codec": "k64",
+        "delta_cosine": 0.994096,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001072
+      },
+      {
+        "tensor": "model.layers.15.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.53,
+        "sparsity": 0.0476,
+        "codec": "k256",
+        "delta_cosine": 0.996681,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000942
+      },
+      {
+        "tensor": "model.layers.15.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.53,
+        "sparsity": 0.0476,
+        "codec": "k64",
+        "delta_cosine": 0.991827,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000942
+      },
+      {
+        "tensor": "model.layers.15.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.51,
+        "sparsity": 0.0322,
+        "codec": "k256",
+        "delta_cosine": 0.996025,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001304
+      },
+      {
+        "tensor": "model.layers.15.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.51,
+        "sparsity": 0.0322,
+        "codec": "k64",
+        "delta_cosine": 0.991772,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001304
+      },
+      {
+        "tensor": "model.layers.15.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 102.98,
+        "sparsity": 0.0282,
+        "codec": "k256",
+        "delta_cosine": 0.994043,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001612
+      },
+      {
+        "tensor": "model.layers.15.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 102.98,
+        "sparsity": 0.0282,
+        "codec": "k64",
+        "delta_cosine": 0.987325,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001612
+      },
+      {
+        "tensor": "model.layers.16.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 599.02,
+        "sparsity": 0.1417,
+        "codec": "k256",
+        "delta_cosine": 0.986488,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00049
+      },
+      {
+        "tensor": "model.layers.16.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 599.02,
+        "sparsity": 0.1417,
+        "codec": "k64",
+        "delta_cosine": 0.9726,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00049
+      },
+      {
+        "tensor": "model.layers.16.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 331.62,
+        "sparsity": 0.0659,
+        "codec": "k256",
+        "delta_cosine": 0.994912,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000232
+      },
+      {
+        "tensor": "model.layers.16.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 331.62,
+        "sparsity": 0.0659,
+        "codec": "k64",
+        "delta_cosine": 0.990157,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000232
+      },
+      {
+        "tensor": "model.layers.16.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1499.66,
+        "sparsity": 0.0086,
+        "codec": "k256",
+        "delta_cosine": 0.992734,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001735
+      },
+      {
+        "tensor": "model.layers.16.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1499.66,
+        "sparsity": 0.0086,
+        "codec": "k64",
+        "delta_cosine": 0.988092,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001735
+      },
+      {
+        "tensor": "model.layers.16.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.65,
+        "sparsity": 0.0358,
+        "codec": "k256",
+        "delta_cosine": 0.998014,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000995
+      },
+      {
+        "tensor": "model.layers.16.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 14.65,
+        "sparsity": 0.0358,
+        "codec": "k64",
+        "delta_cosine": 0.99419,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000995
+      },
+      {
+        "tensor": "model.layers.16.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.92,
+        "sparsity": 0.0441,
+        "codec": "k256",
+        "delta_cosine": 0.9968,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001066
+      },
+      {
+        "tensor": "model.layers.16.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 33.92,
+        "sparsity": 0.0441,
+        "codec": "k64",
+        "delta_cosine": 0.992749,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001066
+      },
+      {
+        "tensor": "model.layers.16.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 381.88,
+        "sparsity": 0.0276,
+        "codec": "k256",
+        "delta_cosine": 0.996031,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001492
+      },
+      {
+        "tensor": "model.layers.16.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 381.88,
+        "sparsity": 0.0276,
+        "codec": "k64",
+        "delta_cosine": 0.991533,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001492
+      },
+      {
+        "tensor": "model.layers.16.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 120.35,
+        "sparsity": 0.0232,
+        "codec": "k256",
+        "delta_cosine": 0.993814,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001932
+      },
+      {
+        "tensor": "model.layers.16.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 120.35,
+        "sparsity": 0.0232,
+        "codec": "k64",
+        "delta_cosine": 0.987052,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001932
+      },
+      {
+        "tensor": "model.layers.17.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 997.45,
+        "sparsity": 0.16,
+        "codec": "k256",
+        "delta_cosine": 0.988375,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000489
+      },
+      {
+        "tensor": "model.layers.17.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 997.45,
+        "sparsity": 0.16,
+        "codec": "k64",
+        "delta_cosine": 0.973558,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000489
+      },
+      {
+        "tensor": "model.layers.17.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 285.58,
+        "sparsity": 0.0673,
+        "codec": "k256",
+        "delta_cosine": 0.995579,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000229
+      },
+      {
+        "tensor": "model.layers.17.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 285.58,
+        "sparsity": 0.0673,
+        "codec": "k64",
+        "delta_cosine": 0.990611,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000229
+      },
+      {
+        "tensor": "model.layers.17.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 798.07,
+        "sparsity": 0.0139,
+        "codec": "k256",
+        "delta_cosine": 0.99347,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001081
+      },
+      {
+        "tensor": "model.layers.17.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 798.07,
+        "sparsity": 0.0139,
+        "codec": "k64",
+        "delta_cosine": 0.989404,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001081
+      },
+      {
+        "tensor": "model.layers.17.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 16.42,
+        "sparsity": 0.0419,
+        "codec": "k256",
+        "delta_cosine": 0.998033,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000734
+      },
+      {
+        "tensor": "model.layers.17.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 16.42,
+        "sparsity": 0.0419,
+        "codec": "k64",
+        "delta_cosine": 0.994153,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000734
+      },
+      {
+        "tensor": "model.layers.17.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 75.55,
+        "sparsity": 0.0365,
+        "codec": "k256",
+        "delta_cosine": 0.997617,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001182
+      },
+      {
+        "tensor": "model.layers.17.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 75.55,
+        "sparsity": 0.0365,
+        "codec": "k64",
+        "delta_cosine": 0.994052,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001182
+      },
+      {
+        "tensor": "model.layers.17.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 73.55,
+        "sparsity": 0.0267,
+        "codec": "k256",
+        "delta_cosine": 0.995851,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001496
+      },
+      {
+        "tensor": "model.layers.17.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 73.55,
+        "sparsity": 0.0267,
+        "codec": "k64",
+        "delta_cosine": 0.989454,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001496
+      },
+      {
+        "tensor": "model.layers.17.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 42.7,
+        "sparsity": 0.022,
+        "codec": "k256",
+        "delta_cosine": 0.99639,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001819
+      },
+      {
+        "tensor": "model.layers.17.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 42.7,
+        "sparsity": 0.022,
+        "codec": "k64",
+        "delta_cosine": 0.991591,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001819
+      },
+      {
+        "tensor": "model.layers.18.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1406.08,
+        "sparsity": 0.1353,
+        "codec": "k256",
+        "delta_cosine": 0.986524,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000611
+      },
+      {
+        "tensor": "model.layers.18.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 1406.08,
+        "sparsity": 0.1353,
+        "codec": "k64",
+        "delta_cosine": 0.972201,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000611
+      },
+      {
+        "tensor": "model.layers.18.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 998.0,
+        "sparsity": 0.0581,
+        "codec": "k256",
+        "delta_cosine": 0.993715,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000407
+      },
+      {
+        "tensor": "model.layers.18.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 998.0,
+        "sparsity": 0.0581,
+        "codec": "k64",
+        "delta_cosine": 0.986779,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000407
+      },
+      {
+        "tensor": "model.layers.18.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1218.27,
+        "sparsity": 0.0142,
+        "codec": "k256",
+        "delta_cosine": 0.993653,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001231
+      },
+      {
+        "tensor": "model.layers.18.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1218.27,
+        "sparsity": 0.0142,
+        "codec": "k64",
+        "delta_cosine": 0.989577,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001231
+      },
+      {
+        "tensor": "model.layers.18.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 18.09,
+        "sparsity": 0.0395,
+        "codec": "k256",
+        "delta_cosine": 0.99802,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000801
+      },
+      {
+        "tensor": "model.layers.18.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 18.09,
+        "sparsity": 0.0395,
+        "codec": "k64",
+        "delta_cosine": 0.993891,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000801
+      },
+      {
+        "tensor": "model.layers.18.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 307.17,
+        "sparsity": 0.035,
+        "codec": "k256",
+        "delta_cosine": 0.998007,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001171
+      },
+      {
+        "tensor": "model.layers.18.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 307.17,
+        "sparsity": 0.035,
+        "codec": "k64",
+        "delta_cosine": 0.994756,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001171
+      },
+      {
+        "tensor": "model.layers.18.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 103.83,
+        "sparsity": 0.0273,
+        "codec": "k256",
+        "delta_cosine": 0.996247,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00143
+      },
+      {
+        "tensor": "model.layers.18.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 103.83,
+        "sparsity": 0.0273,
+        "codec": "k64",
+        "delta_cosine": 0.991557,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00143
+      },
+      {
+        "tensor": "model.layers.18.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 31.86,
+        "sparsity": 0.0224,
+        "codec": "k256",
+        "delta_cosine": 0.996172,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001823
+      },
+      {
+        "tensor": "model.layers.18.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 31.86,
+        "sparsity": 0.0224,
+        "codec": "k64",
+        "delta_cosine": 0.991274,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001823
+      },
+      {
+        "tensor": "model.layers.19.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2393.65,
+        "sparsity": 0.1405,
+        "codec": "k256",
+        "delta_cosine": 0.988365,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000644
+      },
+      {
+        "tensor": "model.layers.19.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 2393.65,
+        "sparsity": 0.1405,
+        "codec": "k64",
+        "delta_cosine": 0.973945,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000644
+      },
+      {
+        "tensor": "model.layers.19.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 543.77,
+        "sparsity": 0.0639,
+        "codec": "k256",
+        "delta_cosine": 0.99517,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.000337
+      },
+      {
+        "tensor": "model.layers.19.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 543.77,
+        "sparsity": 0.0639,
+        "codec": "k64",
+        "delta_cosine": 0.98916,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000337
+      },
+      {
+        "tensor": "model.layers.19.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1363.4,
+        "sparsity": 0.0158,
+        "codec": "k256",
+        "delta_cosine": 0.994688,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001241
+      },
+      {
+        "tensor": "model.layers.19.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1363.4,
+        "sparsity": 0.0158,
+        "codec": "k64",
+        "delta_cosine": 0.990084,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001241
+      },
+      {
+        "tensor": "model.layers.19.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 28.02,
+        "sparsity": 0.0455,
+        "codec": "k256",
+        "delta_cosine": 0.996857,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000715
+      },
+      {
+        "tensor": "model.layers.19.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 28.02,
+        "sparsity": 0.0455,
+        "codec": "k64",
+        "delta_cosine": 0.992298,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000715
+      },
+      {
+        "tensor": "model.layers.19.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 243.47,
+        "sparsity": 0.034,
+        "codec": "k256",
+        "delta_cosine": 0.996703,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001211
+      },
+      {
+        "tensor": "model.layers.19.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 243.47,
+        "sparsity": 0.034,
+        "codec": "k64",
+        "delta_cosine": 0.99162,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001211
+      },
+      {
+        "tensor": "model.layers.19.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 227.06,
+        "sparsity": 0.0282,
+        "codec": "k256",
+        "delta_cosine": 0.996209,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001471
+      },
+      {
+        "tensor": "model.layers.19.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 227.06,
+        "sparsity": 0.0282,
+        "codec": "k64",
+        "delta_cosine": 0.990975,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001471
+      },
+      {
+        "tensor": "model.layers.19.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 78.11,
+        "sparsity": 0.0229,
+        "codec": "k256",
+        "delta_cosine": 0.995046,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001863
+      },
+      {
+        "tensor": "model.layers.19.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 78.11,
+        "sparsity": 0.0229,
+        "codec": "k64",
+        "delta_cosine": 0.988848,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001863
+      },
+      {
+        "tensor": "model.layers.20.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 331.09,
+        "sparsity": 0.1551,
+        "codec": "k256",
+        "delta_cosine": 0.990367,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000356
+      },
+      {
+        "tensor": "model.layers.20.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 331.09,
+        "sparsity": 0.1551,
+        "codec": "k64",
+        "delta_cosine": 0.980021,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000356
+      },
+      {
+        "tensor": "model.layers.20.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 802.91,
+        "sparsity": 0.0646,
+        "codec": "k256",
+        "delta_cosine": 0.994712,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000222
+      },
+      {
+        "tensor": "model.layers.20.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 802.91,
+        "sparsity": 0.0646,
+        "codec": "k64",
+        "delta_cosine": 0.989549,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.000222
+      },
+      {
+        "tensor": "model.layers.20.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1518.96,
+        "sparsity": 0.0129,
+        "codec": "k256",
+        "delta_cosine": 0.996016,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001199
+      },
+      {
+        "tensor": "model.layers.20.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 1518.96,
+        "sparsity": 0.0129,
+        "codec": "k64",
+        "delta_cosine": 0.991065,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001199
+      },
+      {
+        "tensor": "model.layers.20.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.86,
+        "sparsity": 0.0419,
+        "codec": "k256",
+        "delta_cosine": 0.998179,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000727
+      },
+      {
+        "tensor": "model.layers.20.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 12.86,
+        "sparsity": 0.0419,
+        "codec": "k64",
+        "delta_cosine": 0.994924,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000727
+      },
+      {
+        "tensor": "model.layers.20.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 3873.96,
+        "sparsity": 0.0337,
+        "codec": "k256",
+        "delta_cosine": 0.996084,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001301
+      },
+      {
+        "tensor": "model.layers.20.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 3873.96,
+        "sparsity": 0.0337,
+        "codec": "k64",
+        "delta_cosine": 0.990506,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001301
+      },
+      {
+        "tensor": "model.layers.20.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 413135.78,
+        "sparsity": 0.0294,
+        "codec": "k256",
+        "delta_cosine": 0.996269,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.002139
+      },
+      {
+        "tensor": "model.layers.20.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 413135.78,
+        "sparsity": 0.0294,
+        "codec": "k64",
+        "delta_cosine": 0.991859,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.002139
+      },
+      {
+        "tensor": "model.layers.20.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 67.47,
+        "sparsity": 0.0233,
+        "codec": "k256",
+        "delta_cosine": 0.99494,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00199
+      },
+      {
+        "tensor": "model.layers.20.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 67.47,
+        "sparsity": 0.0233,
+        "codec": "k64",
+        "delta_cosine": 0.98883,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00199
+      },
+      {
+        "tensor": "model.layers.21.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 518.45,
+        "sparsity": 0.1103,
+        "codec": "k256",
+        "delta_cosine": 0.992517,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000509
+      },
+      {
+        "tensor": "model.layers.21.self_attn.q_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 518.45,
+        "sparsity": 0.1103,
+        "codec": "k64",
+        "delta_cosine": 0.982183,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.000509
+      },
+      {
+        "tensor": "model.layers.21.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 298.55,
+        "sparsity": 0.0456,
+        "codec": "k256",
+        "delta_cosine": 0.995535,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.00029
+      },
+      {
+        "tensor": "model.layers.21.self_attn.k_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 298.55,
+        "sparsity": 0.0456,
+        "codec": "k64",
+        "delta_cosine": 0.990626,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.00029
+      },
+      {
+        "tensor": "model.layers.21.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 22951.46,
+        "sparsity": 0.0121,
+        "codec": "k256",
+        "delta_cosine": 0.996956,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.97,
+        "delta_l2_norm": 0.001389
+      },
+      {
+        "tensor": "model.layers.21.self_attn.v_proj.weight",
+        "shape": [
+          256,
+          2048
+        ],
+        "kurtosis": 22951.46,
+        "sparsity": 0.0121,
+        "codec": "k64",
+        "delta_cosine": 0.991424,
+        "weight_cosine": 1.0,
+        "compression_ratio": 3.98,
+        "delta_l2_norm": 0.001389
+      },
+      {
+        "tensor": "model.layers.21.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 30.87,
+        "sparsity": 0.0312,
+        "codec": "k256",
+        "delta_cosine": 0.996914,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001
+      },
+      {
+        "tensor": "model.layers.21.self_attn.o_proj.weight",
+        "shape": [
+          2048,
+          2048
+        ],
+        "kurtosis": 30.87,
+        "sparsity": 0.0312,
+        "codec": "k64",
+        "delta_cosine": 0.992575,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001
+      },
+      {
+        "tensor": "model.layers.21.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 25188.7,
+        "sparsity": 0.0365,
+        "codec": "k256",
+        "delta_cosine": 0.992942,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001661
+      },
+      {
+        "tensor": "model.layers.21.mlp.gate_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 25188.7,
+        "sparsity": 0.0365,
+        "codec": "k64",
+        "delta_cosine": 0.98596,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.001661
+      },
+      {
+        "tensor": "model.layers.21.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 29871.62,
+        "sparsity": 0.0333,
+        "codec": "k256",
+        "delta_cosine": 0.986741,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.002529
+      },
+      {
+        "tensor": "model.layers.21.mlp.up_proj.weight",
+        "shape": [
+          5632,
+          2048
+        ],
+        "kurtosis": 29871.62,
+        "sparsity": 0.0333,
+        "codec": "k64",
+        "delta_cosine": 0.974407,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.002529
+      },
+      {
+        "tensor": "model.layers.21.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 65670.12,
+        "sparsity": 0.0186,
+        "codec": "k256",
+        "delta_cosine": 0.97873,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00945
+      },
+      {
+        "tensor": "model.layers.21.mlp.down_proj.weight",
+        "shape": [
+          2048,
+          5632
+        ],
+        "kurtosis": 65670.12,
+        "sparsity": 0.0186,
+        "codec": "k64",
+        "delta_cosine": 0.96813,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.00945
+      },
+      {
+        "tensor": "lm_head.weight",
+        "shape": [
+          32000,
+          2048
+        ],
+        "kurtosis": 48393.72,
+        "sparsity": 0.9194,
+        "codec": "k256",
+        "delta_cosine": 0.967776,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.005659
+      },
+      {
+        "tensor": "lm_head.weight",
+        "shape": [
+          32000,
+          2048
+        ],
+        "kurtosis": 48393.72,
+        "sparsity": 0.9194,
+        "codec": "k64",
+        "delta_cosine": 0.96219,
+        "weight_cosine": 1.0,
+        "compression_ratio": 4.0,
+        "delta_l2_norm": 0.005659
+      }
+    ],
+    "total_delta_mb": 4399.8,
+    "bandwidth_ratio_k256": 4.0,
+    "bandwidth_ratio_k64": 4.0,
+    "data_source": "PARTIAL \u2014 real TinyLlama weights + real WikiText-2 SGD step",
+    "flag": "Single SGD step, not full fine-tuning"
+  },
+  "cost": {
+    "wall_time_s": 1680.989,
+    "cpu_time_s": 1437.581,
+    "peak_memory_mb": 18129.4,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T22:12:54",
+    "timestamp_end": "2026-03-25T22:40:55"
+  }
+}

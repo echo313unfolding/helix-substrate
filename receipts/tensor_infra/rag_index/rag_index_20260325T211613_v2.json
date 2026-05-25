@@ -1,0 +1,26 @@
+{
+  "artifact_type": "Embedding",
+  "content_hash": "a1c971b615b2194085c8de89a2cd584a7a587538596d46976713dd87099f668c",
+  "cost": {
+    "cpu_time_s": 9.098,
+    "hostname": "Echo",
+    "peak_memory_mb": 1690.8,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:16:13",
+    "timestamp_start": "2026-03-25T21:15:54",
+    "wall_time_s": 18.85
+  },
+  "data_source": "REAL \u2014 WikiText-2 documents encoded by MiniLM",
+  "gate": "Domain Proof: RAG Index Compression",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/rag_index/rag_index_20260325T211613.json",
+  "results_summary": {
+    "data_source": "REAL \u2014 WikiText-2 documents encoded by MiniLM",
+    "embedding_dim": 384,
+    "n_documents": 500
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:15:54Z",
+  "tool": "bench_rag_index.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

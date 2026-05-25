@@ -1,0 +1,29 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "8a681ad9b92ad89e26a152876e5a98d2d25fbd9636f16161f9495202ccc6f0a3",
+  "cost": {
+    "cpu_time_s": 5247.629,
+    "hostname": "Echo",
+    "peak_memory_mb": 26812.7,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-26T00:26:11",
+    "timestamp_start": "2026-03-25T22:41:05",
+    "wall_time_s": 6305.226
+  },
+  "data_source": "PARTIAL \u2014 TinyLlama base + 3 SGD-step snapshots",
+  "gate": "Domain Proof: Continual Learning Snapshots",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/continual_snapshots/continual_snapshots_20260326T002611.json",
+  "results_summary": {
+    "data_source": "PARTIAL \u2014 TinyLlama base + 3 SGD-step snapshots",
+    "flag": "Single SGD steps, not full training epochs",
+    "n_snapshots": 4,
+    "total_delta_compressed_mb": 4401.7,
+    "total_full_compressed_mb": 4402.0,
+    "total_uncompressed_mb": 17599.2
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T22:41:05Z",
+  "tool": "bench_continual_snapshots.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

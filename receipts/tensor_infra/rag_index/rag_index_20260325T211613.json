@@ -1,0 +1,36 @@
+{
+  "experiment": "tensor_infra_domain_6",
+  "domain": "rag_index",
+  "results": {
+    "n_documents": 500,
+    "embedding_dim": 384,
+    "per_variant": [
+      {
+        "k": 256,
+        "full_cosine": 0.999921,
+        "top1_match_rate": 1.0,
+        "avg_top5_overlap": 4.92,
+        "compression_ratio": 3.93,
+        "original_mb": 0.77
+      },
+      {
+        "k": 64,
+        "full_cosine": 0.999383,
+        "top1_match_rate": 0.94,
+        "avg_top5_overlap": 4.82,
+        "compression_ratio": 3.95,
+        "original_mb": 0.77
+      }
+    ],
+    "data_source": "REAL \u2014 WikiText-2 documents encoded by MiniLM"
+  },
+  "cost": {
+    "wall_time_s": 18.85,
+    "cpu_time_s": 9.098,
+    "peak_memory_mb": 1690.8,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:15:54",
+    "timestamp_end": "2026-03-25T21:16:13"
+  }
+}

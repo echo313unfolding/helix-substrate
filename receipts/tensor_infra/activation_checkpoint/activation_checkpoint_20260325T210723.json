@@ -1,0 +1,553 @@
+{
+  "experiment": "tensor_infra_domain_3",
+  "domain": "activation_checkpoint",
+  "results": {
+    "n_tensors": 44,
+    "total_original_mb": 369.1,
+    "total_compressed_mb": 94.7,
+    "overall_ratio": 3.9,
+    "cosine_min": 0.995823,
+    "cosine_mean": 0.998684,
+    "verdict": "PASS",
+    "per_tensor": [
+      {
+        "tensor": "layer_00_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1352.56,
+        "cosine": 0.997632,
+        "mse": 3.88431e-05,
+        "ratio": 3.82,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_00_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 78.15,
+        "cosine": 0.998477,
+        "mse": 1.29844e-05,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_01_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1338.09,
+        "cosine": 0.99866,
+        "mse": 0.0001141236,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_01_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 4.46,
+        "cosine": 0.999024,
+        "mse": 1.58868e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_02_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 530.06,
+        "cosine": 0.996726,
+        "mse": 0.0003198218,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_02_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.21,
+        "cosine": 0.999708,
+        "mse": 7.6698e-06,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_03_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 62.38,
+        "cosine": 0.997169,
+        "mse": 0.0004687811,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_03_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.31,
+        "cosine": 0.999634,
+        "mse": 1.36441e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_04_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 32.68,
+        "cosine": 0.997785,
+        "mse": 0.0006454231,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_04_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.87,
+        "cosine": 0.99969,
+        "mse": 1.59416e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_05_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 37.09,
+        "cosine": 0.997837,
+        "mse": 0.000487611,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_05_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.43,
+        "cosine": 0.999542,
+        "mse": 2.93799e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_06_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 42.88,
+        "cosine": 0.997342,
+        "mse": 0.0007399895,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_06_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.17,
+        "cosine": 0.999378,
+        "mse": 4.57999e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_07_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 46.11,
+        "cosine": 0.997619,
+        "mse": 0.0006833504,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_07_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.85,
+        "cosine": 0.999218,
+        "mse": 6.8859e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_08_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 75.8,
+        "cosine": 0.995823,
+        "mse": 0.0020245501,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_08_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.72,
+        "cosine": 0.999498,
+        "mse": 5.24677e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_09_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 46.03,
+        "cosine": 0.99748,
+        "mse": 0.000776428,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_09_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.5,
+        "cosine": 0.999332,
+        "mse": 7.94189e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_10_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 36.58,
+        "cosine": 0.997856,
+        "mse": 0.0006623717,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_10_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.06,
+        "cosine": 0.999425,
+        "mse": 7.473e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_11_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 36.92,
+        "cosine": 0.997847,
+        "mse": 0.0009741861,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_11_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.39,
+        "cosine": 0.99935,
+        "mse": 9.33733e-05,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_12_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 45.59,
+        "cosine": 0.997711,
+        "mse": 0.0007954649,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_12_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 3.2,
+        "cosine": 0.999204,
+        "mse": 0.0001256165,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_13_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 40.6,
+        "cosine": 0.998028,
+        "mse": 0.0007877533,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_13_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 2.27,
+        "cosine": 0.999358,
+        "mse": 0.0001136734,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_14_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 31.12,
+        "cosine": 0.998286,
+        "mse": 0.0005995752,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_14_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.77,
+        "cosine": 0.999469,
+        "mse": 0.000102074,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_15_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 18.71,
+        "cosine": 0.998564,
+        "mse": 0.0006280365,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_15_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.48,
+        "cosine": 0.999515,
+        "mse": 0.0001085721,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_16_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 29.55,
+        "cosine": 0.998271,
+        "mse": 0.000760488,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_16_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 1.18,
+        "cosine": 0.999588,
+        "mse": 0.0001150087,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_17_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 27.59,
+        "cosine": 0.998359,
+        "mse": 0.0008338538,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_17_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.74,
+        "cosine": 0.999688,
+        "mse": 0.0001013717,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_18_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 23.78,
+        "cosine": 0.998434,
+        "mse": 0.0008061771,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_18_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.55,
+        "cosine": 0.999719,
+        "mse": 0.0001100692,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_19_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 19.72,
+        "cosine": 0.99857,
+        "mse": 0.000721912,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_19_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.45,
+        "cosine": 0.999729,
+        "mse": 0.0001243324,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_20_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 13.57,
+        "cosine": 0.998843,
+        "mse": 0.0005394346,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_20_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.48,
+        "cosine": 0.999754,
+        "mse": 0.000126716,
+        "ratio": 3.99,
+        "policy": "VQ"
+      },
+      {
+        "tensor": "layer_21_attn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 7.06,
+        "cosine": 0.999225,
+        "mse": 0.0003747582,
+        "ratio": 3.81,
+        "policy": "VQ+SVD"
+      },
+      {
+        "tensor": "layer_21_ffn_input",
+        "shape": [
+          1024,
+          2048
+        ],
+        "kurtosis": 0.93,
+        "cosine": 0.99973,
+        "mse": 0.000153487,
+        "ratio": 3.99,
+        "policy": "VQ"
+      }
+    ],
+    "data_source": "REAL \u2014 TinyLlama calibration activations from WikiText-2"
+  },
+  "cost": {
+    "wall_time_s": 238.924,
+    "cpu_time_s": 238.305,
+    "peak_memory_mb": 3196.1,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-03-25T21:03:24",
+    "timestamp_end": "2026-03-25T21:07:23"
+  }
+}

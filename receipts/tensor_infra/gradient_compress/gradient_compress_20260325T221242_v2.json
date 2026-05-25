@@ -1,0 +1,27 @@
+{
+  "artifact_type": "AITensor",
+  "content_hash": "fe65d4f98ab77d94f08eab0f8086ab5a33d9f49f56803f8e5c6fcc225b4b894d",
+  "cost": {
+    "cpu_time_s": 1612.579,
+    "hostname": "Echo",
+    "peak_memory_mb": 14264.6,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T22:12:42",
+    "timestamp_start": "2026-03-25T21:17:33",
+    "wall_time_s": 3309.522
+  },
+  "data_source": "REAL \u2014 TinyLlama backward on WikiText-2",
+  "gate": "Domain Proof: Gradient Compression",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/gradient_compress/gradient_compress_20260325T221242.json",
+  "results_summary": {
+    "data_source": "REAL \u2014 TinyLlama backward on WikiText-2",
+    "mean_ratio": 3.99,
+    "n_tensors": 156,
+    "total_original_mb": 4399.8
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:17:33Z",
+  "tool": "bench_gradient_compress.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

@@ -1,0 +1,189 @@
+{
+  "cost": {
+    "cpu_time_s": 0.009,
+    "hostname": "Echo",
+    "peak_memory_mb": 16.4,
+    "python_version": "3.10.12",
+    "wall_time_s": 0.009
+  },
+  "gate": "Receipt Schema Uplift",
+  "receipts": [
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "04ab3e970526b61b36df3c89fbdfb504722dd6fa679132dcd5c61cdc8845d59f",
+      "domain": "activation_checkpoint",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/activation_checkpoint/activation_checkpoint_20260325T210723.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/activation_checkpoint/activation_checkpoint_20260325T210723_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "bf73bc477a48325326dae9c6eec7c4885eed4eacd6dba59c63930713b777629f",
+      "domain": "activation_checkpoint",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/activation_checkpoint/activation_checkpoint_20260325T211321.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/activation_checkpoint/activation_checkpoint_20260325T211321_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "6286bef0a48b4b19e4ac849df8c0fbaf18cbe22927f732ae14feb3e7651db3b6",
+      "domain": "codec_weight_compress",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/codec_weight_compress/codec_weight_compress_20260325T212714.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/codec_weight_compress/codec_weight_compress_20260325T212714_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "8a681ad9b92ad89e26a152876e5a98d2d25fbd9636f16161f9495202ccc6f0a3",
+      "domain": "continual_snapshots",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/continual_snapshots/continual_snapshots_20260326T002611.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/continual_snapshots/continual_snapshots_20260326T002611_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "84319ebf029b0d5195a32aa15fa75d1c70de93a9b94140708d6bf2c7360fb1ec",
+      "domain": "embedding_table",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260325T210932.json",
+      "status": "FAIL",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260325T210932_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "967ab5b930643cd53afc6e667123b8893e1d14f4b03737420143e78138257f3f",
+      "domain": "embedding_table",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260325T211714.json",
+      "status": "FAIL",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260325T211714_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "6137d05d57ccea008562855d2ce962b702a3aa9c61d26729e2dc327dd2406a6e",
+      "domain": "embedding_table",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260525T180338.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260525T180338_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "f5f99eee03f50b550c2dfb4c77c4a4c82740260f2d0d11d7022d31b29e1863b4",
+      "domain": "embedding_table",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260525T180916.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/embedding_table/embedding_table_20260525T180916_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "1e90fcb759faf600393e95babb2d328544f64343bd70ff82e653b7e2475e923d",
+      "domain": "federated_deltas",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/federated_deltas/federated_deltas_20260325T224055.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/federated_deltas/federated_deltas_20260325T224055_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "fe65d4f98ab77d94f08eab0f8086ab5a33d9f49f56803f8e5c6fcc225b4b894d",
+      "domain": "gradient_compress",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/gradient_compress/gradient_compress_20260325T221242.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/gradient_compress/gradient_compress_20260325T221242_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "908334487f4e6be422bf626edbb4909f20086c1dedd81009acd2f5e10de6328e",
+      "domain": "lora_compress",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/lora_compress/lora_compress_20260325T222219.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/lora_compress/lora_compress_20260325T222219_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "f7afec5539764e1ddef6de472a20e3f6d46f8ebe08ef3ddc55fe2f4d35cd2ced",
+      "domain": "moe_tiered",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/moe_tiered/moe_tiered_20260325T214634.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/moe_tiered/moe_tiered_20260325T214634_v2.json"
+    },
+    {
+      "artifact_type": "Embedding",
+      "content_hash": "a1c971b615b2194085c8de89a2cd584a7a587538596d46976713dd87099f668c",
+      "domain": "rag_index",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/rag_index/rag_index_20260325T211613.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/rag_index/rag_index_20260325T211613_v2.json"
+    },
+    {
+      "artifact_type": "Scientific",
+      "content_hash": "17c91357eb10db00084931d7ce52178bb04ad129ce65fbbdf2221e5300cc3d2a",
+      "domain": "sensor_timeseries",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/sensor_timeseries/sensor_timeseries_20260325T211553.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/sensor_timeseries/sensor_timeseries_20260325T211553_v2.json"
+    },
+    {
+      "artifact_type": "MedicalImaging",
+      "content_hash": "bce56f9836c0e8b8eee562c78c61e26691112c794ef727791b04c96b2fd2f3ed",
+      "domain": "dicom_twofamily",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/dicom_twofamily/dicom_twofamily_20260321T094918.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/dicom_twofamily/dicom_twofamily_20260321T094918_v2.json"
+    },
+    {
+      "artifact_type": "AITensor",
+      "content_hash": "bb7ce8f7dda91cc9f76e96ca37ef1ac25acc8a0f0b46b568999540cb979a160f",
+      "domain": "non_llm_proof",
+      "original": "/home/voidstr3m33/helix-substrate/receipts/non_llm_proof/non_llm_proof_20260312T103756.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/helix-substrate/receipts/non_llm_proof/non_llm_proof_20260312T103756_v2.json"
+    },
+    {
+      "artifact_type": "Scientific",
+      "content_hash": "97e9cde0453899742e664004e42122af60bfa93a743e2f6dc9cc53e074fdc133",
+      "domain": "raw_distribution",
+      "original": "/home/voidstr3m33/receipts/hxq_raw_distribution_test_20260502T103120.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/receipts/hxq_raw_distribution_test_20260502T103120_v2.json"
+    },
+    {
+      "artifact_type": "Scientific",
+      "content_hash": "0707c92343d65dfe829a183ba1a120bf6d244969d05e3e65dfa8f649ae4cf4c9",
+      "domain": "climate_devnet",
+      "original": "/home/voidstr3m33/hxq-solana/receipts/devnet_non_ai_climate_2026-05-20T0223Z.json",
+      "status": "PASS",
+      "uplifted": "/home/voidstr3m33/hxq-solana/receipts/devnet_non_ai_climate_2026-05-20T0223Z_v2.json"
+    }
+  ],
+  "schema_version": "receipt_uplift:v1",
+  "status": "PARTIAL",
+  "summary": {
+    "artifact_types": [
+      "AITensor",
+      "Embedding",
+      "MedicalImaging",
+      "Scientific"
+    ],
+    "domains": [
+      "activation_checkpoint",
+      "climate_devnet",
+      "codec_weight_compress",
+      "continual_snapshots",
+      "dicom_twofamily",
+      "embedding_table",
+      "federated_deltas",
+      "gradient_compress",
+      "lora_compress",
+      "moe_tiered",
+      "non_llm_proof",
+      "rag_index",
+      "raw_distribution",
+      "sensor_timeseries"
+    ],
+    "fail": 2,
+    "pass": 16,
+    "schema_target": "domain_proof_receipt:v2",
+    "total": 18,
+    "undetermined": 0
+  },
+  "timestamp_utc": "2026-05-25T22:09:41Z",
+  "tool": "receipt_schema_uplift.py"
+}

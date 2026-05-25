@@ -1,0 +1,36 @@
+{
+  "artifact_type": "Scientific",
+  "content_hash": "17c91357eb10db00084931d7ce52178bb04ad129ce65fbbdf2221e5300cc3d2a",
+  "cost": {
+    "cpu_time_s": 13.316,
+    "hostname": "Echo",
+    "peak_memory_mb": 3693.9,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-03-25T21:15:53",
+    "timestamp_start": "2026-03-25T21:15:28",
+    "wall_time_s": 24.514
+  },
+  "data_source": "REAL \u2014 PBMC3K scRNA-seq + PDB protein coordinates",
+  "gate": "Domain Proof: Sensor/Bio Time-Series",
+  "original_receipt": "/home/voidstr3m33/helix-substrate/receipts/tensor_infra/sensor_timeseries/sensor_timeseries_20260325T211553.json",
+  "results_summary": {
+    "data_source": "REAL \u2014 PBMC3K scRNA-seq + PDB protein coordinates",
+    "protein": {
+      "compression_ratio": 3.81,
+      "cosine": 0.998967,
+      "n_proteins": 10,
+      "reshape_note": "Grouped 10 residues -> (N/10, 30) for VQ",
+      "rmsd_angstrom": 0.8172,
+      "total_atoms": 6440
+    },
+    "scrna_seq": {
+      "dataset": "PBMC3K",
+      "sparsity": 0.0
+    }
+  },
+  "schema_version": "domain_proof_receipt:v2",
+  "status": "PASS",
+  "timestamp_utc": "2026-03-25T21:15:28Z",
+  "tool": "bench_sensor_timeseries.py",
+  "uplift_note": "Uplifted from pre-Gate-era receipt to lifecycle-compatible schema."
+}

@@ -231,3 +231,6 @@ receipts/*
 !receipts/drift_gated_probe/
 !receipts/raw_distribution_probe/
 !receipts/nonuniform_ceiling_probe/
+!receipts/tensor_infra/
+!receipts/dicom_twofamily/
+!receipts/receipt_uplift/
