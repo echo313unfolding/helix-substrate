@@ -1,0 +1,112 @@
+{
+  "all_pass": true,
+  "condition_count": 9,
+  "conditions": {
+    "9a_encrypt_decrypt": {
+      "cipher": "AES-256-GCM",
+      "ciphertext_bytes": 95,
+      "codec": "gzip",
+      "device_bound": true,
+      "pass": true,
+      "plaintext_bytes": 61,
+      "roundtrip": true,
+      "two_factor": true
+    },
+    "9b_receipt_safety": {
+      "codebook_aad_matches": true,
+      "has_content_hash": true,
+      "has_hardware_fingerprint_hash": true,
+      "no_plaintext_hash": true,
+      "no_salt_in_receipt": true,
+      "no_wrapped_dek": true,
+      "pass": true,
+      "phi_violations": []
+    },
+    "9c_consent_scope": {
+      "grant_created": true,
+      "pass": true,
+      "wrong_consent_denied": true
+    },
+    "9d_revoke_consent": {
+      "pass": true,
+      "post_revocation_blocked": true,
+      "pre_revocation_decrypt": true,
+      "wrapped_dek_zeroed": true
+    },
+    "9e_audit_explain": {
+      "actions_logged": [
+        "encrypt",
+        "decrypt",
+        "grant",
+        "revoke"
+      ],
+      "explanation_contains_cipher": true,
+      "explanation_contains_id": true,
+      "log_entry_count": 4,
+      "pass": true
+    },
+    "9f_wrong_device": {
+      "pass": true,
+      "wrong_device_raises_InvalidTag": true
+    },
+    "9g_wrong_passphrase": {
+      "pass": true,
+      "wrong_passphrase_raises_InvalidTag": true
+    },
+    "9h_tampered_aad": {
+      "pass": true,
+      "tampered_aad_raises_InvalidTag": true
+    },
+    "9i_no_raw_serials": {
+      "no_key_material_leaked": true,
+      "pass": true,
+      "receipt_fields_present": [
+        "artifact_id",
+        "content_hash",
+        "codebook_hash_aad",
+        "hardware_fingerprint_hash",
+        "codec",
+        "cipher",
+        "ciphertext_bytes",
+        "nonce_hex",
+        "consent_id",
+        "encrypted_utc"
+      ],
+      "secrets_found": []
+    }
+  },
+  "cost": {
+    "cpu_time_s": 0.299,
+    "hostname": "Echo",
+    "peak_memory_mb": 41.9,
+    "python_version": "3.10.12",
+    "timestamp_end": "2026-05-25T20:34:10",
+    "timestamp_start": "2026-05-25T20:34:09",
+    "wall_time_s": 0.299
+  },
+  "gate": "Gate 9: Personal Encryption Agent \u2014 Device-Bound Key Proof",
+  "label": "User-controlled envelope encryption with three-property binding",
+  "not_claimed": [
+    "HIPAA compliance (requires administrative + physical + legal safeguards)",
+    "Biometric key (hardware fingerprint != biometric)",
+    "DNA-based encryption (brand is biological, math is standard crypto)",
+    "Unbreakable (standard crypto, standard limitations)"
+  ],
+  "pass_count": 9,
+  "status": "PASS",
+  "technical_safeguards_demonstrated": [
+    "Device-bound key derivation (passphrase + hardware fingerprint via HKDF-SHA256)",
+    "Envelope encryption (DEK wrapped by device master key, AES-256-GCM)",
+    "Artifact binding (codebook hash as AAD in AES-256-GCM)",
+    "Consent-gated key release with audit trail",
+    "Wrapped DEK destruction on consent revocation",
+    "Receipt contains fingerprint hash only (no raw serials, no key material)"
+  ],
+  "three_property_model": {
+    "something_it_is": "artifact codebook hash (AAD in AES-GCM)",
+    "something_you_have": "device hardware fingerprint (HKDF binding factor)",
+    "something_you_know": "passphrase (scrypt KDF)"
+  },
+  "timestamp_utc": "2026-05-26T00:34:10Z",
+  "tool": "gate9_personal_agent_probe.py"
+}
