@@ -348,6 +348,78 @@ class HydraRouter:
             return Head.AFFINE5, Head.AFFINE5.bpw
         return Head.AFFINE6, Head.AFFINE6.bpw
 
+    def route_with_residuals(
+        self,
+        profiles: list[TensorProfile],
+        residual_profiles_map: dict[str, "ResidualProfile"],
+        model_name: str = "unknown",
+    ) -> tuple[CompressionPlan, list]:
+        """Route with post-reconstruction residual verification.
+
+        First routes normally via probe-based policy, then checks each
+        tensor's residual profile. If residual analysis indicates the
+        chosen codec is suboptimal (high structure_score, concentrated
+        or low-rank damage), adjusts the plan with corrections or
+        fallbacks.
+
+        Args:
+            profiles: TensorProfiles with probe data
+            residual_profiles_map: {tensor_name: ResidualProfile}
+            model_name: model identifier
+
+        Returns:
+            (CompressionPlan, list[ResidualRouteDecision])
+        """
+        from helix_substrate.residual_router import (
+            decide_from_residual, ResidualRouteDecision, CorrectionType,
+        )
+
+        # First pass: normal Hydra routing
+        plan = self.route(profiles, model_name)
+
+        residual_decisions = []
+        adjusted_plans = []
+
+        for tp in plan.tensors:
+            rp = residual_profiles_map.get(tp.tensor_name)
+
+            if rp is None or tp.head == Head.EXACT:
+                # No residual data or exact tensor → keep as-is
+                adjusted_plans.append(tp)
+                continue
+
+            decision = decide_from_residual(
+                tp.tensor_name, tp.head.value, tp.head, rp,
+            )
+            residual_decisions.append(decision)
+
+            if decision.fallback_required and decision.fallback_head is not None:
+                # Residual says this codec is bad → upgrade to safer head
+                adjusted_plans.append(TensorPlan(
+                    tensor_name=tp.tensor_name,
+                    head=decision.fallback_head,
+                    reason=tp.reason + ["residual_fallback"] + decision.reason,
+                    bpw=decision.fallback_head.bpw,
+                    expected_cosine=tp.expected_cosine,
+                    fallback_head=Head.EXACT,
+                ))
+            elif decision.correction_type != CorrectionType.NONE:
+                # Residual suggests correction → annotate but keep head
+                adjusted_plans.append(TensorPlan(
+                    tensor_name=tp.tensor_name,
+                    head=tp.head,
+                    reason=tp.reason + [f"residual:{decision.correction_type.value}"],
+                    bpw=tp.bpw,
+                    expected_cosine=tp.expected_cosine,
+                    sidecar_budget=self.sidecar_density if "sidecar" in decision.correction_type.value else 0.0,
+                    fallback_head=tp.fallback_head,
+                ))
+            else:
+                adjusted_plans.append(tp)
+
+        plan.tensors = adjusted_plans
+        return plan, residual_decisions
+
     # ── Per-tensor policies ──
 
     def _route_quality_first(self, p: TensorProfile) -> TensorPlan:
