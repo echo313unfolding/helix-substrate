@@ -250,6 +250,104 @@ class HydraRouter:
 
         return plan
 
+    def route_with_ghost(
+        self,
+        profiles: list[TensorProfile],
+        ghost_preroute: "GhostPreRoute",
+        ghost_features_map: dict[str, dict],
+        arch: str,
+        model_name: str = "unknown",
+    ) -> tuple[CompressionPlan, "GhostPreRouteResult"]:
+        """Route with Ghost pre-screening.
+
+        For tensors where Ghost says SKIP_PROBE, uses the policy's default
+        safe head (affine5 for edge_balanced/size_target, affine6 for
+        quality_first) without requiring probe cosine data.
+
+        For tensors where Ghost says PROBE_REQUIRED, uses normal
+        probe-based routing (requires valid cosine fields in profile).
+
+        Args:
+            profiles: TensorProfiles (cosine fields may be unset for
+                      tensors Ghost will pre-route)
+            ghost_preroute: calibrated GhostPreRoute instance
+            ghost_features_map: {tensor_name: {te, tr, mo, ac}}
+            arch: architecture family for Ghost model selection
+            model_name: model identifier
+
+        Returns:
+            (CompressionPlan, GhostPreRouteResult)
+        """
+        from helix_substrate.ghost_bridge import (
+            GhostPreRouteResult, PreRouteAction,
+        )
+
+        plan = CompressionPlan(model=model_name, policy=self.policy)
+        plan._param_map = {p.tensor_name: p.n_params for p in profiles}
+
+        ghost_result = GhostPreRouteResult(n_total=len(profiles))
+        tensor_plans = []
+
+        for p in profiles:
+            # Always-exact tensors bypass Ghost
+            if _is_exact_tensor(p):
+                tensor_plans.append(TensorPlan(
+                    tensor_name=p.tensor_name, head=Head.EXACT,
+                    reason=["exact_tensor_type"], bpw=Head.EXACT.bpw,
+                    expected_cosine=1.0, fallback_head=Head.EXACT,
+                ))
+                continue
+
+            # Check Ghost pre-route
+            gf = ghost_features_map.get(p.tensor_name)
+            if gf is not None:
+                decision = ghost_preroute.decide(gf, arch)
+                ghost_result.decisions.append({
+                    "tensor_name": p.tensor_name,
+                    "decision": decision,
+                })
+
+                if decision.action == PreRouteAction.SKIP_PROBE:
+                    ghost_result.n_ghost_routed += 1
+                    # Ghost says safe → use policy's default safe head
+                    safe_head, safe_bpw = self._ghost_safe_head()
+                    tensor_plans.append(TensorPlan(
+                        tensor_name=p.tensor_name, head=safe_head,
+                        reason=["ghost_preroute", f"confidence={decision.confidence:.3f}"],
+                        bpw=safe_bpw,
+                        expected_cosine=0.999,  # Ghost-estimated (conservative)
+                        fallback_head=Head.AFFINE6,
+                    ))
+                    continue
+                else:
+                    ghost_result.n_probe_required += 1
+            else:
+                ghost_result.n_probe_required += 1
+
+            # Normal probe-based routing
+            if self.policy == "quality_first":
+                tensor_plans.append(self._route_quality_first(p))
+            elif self.policy == "edge_balanced":
+                tensor_plans.append(self._route_edge_balanced(p))
+            elif self.policy == "experimental_lowbit":
+                tensor_plans.append(self._route_experimental(p))
+            else:
+                # size_target handles all tensors at once; fall through
+                tensor_plans.append(self._route_edge_balanced(p))
+
+        plan.tensors = tensor_plans
+        return plan, ghost_result
+
+    def _ghost_safe_head(self) -> tuple[Head, float]:
+        """Default safe head for ghost-routed tensors under current policy."""
+        if self.policy == "quality_first":
+            return Head.AFFINE6, Head.AFFINE6.bpw
+        elif self.policy in ("edge_balanced", "size_target"):
+            return Head.AFFINE5, Head.AFFINE5.bpw
+        elif self.policy == "experimental_lowbit":
+            return Head.AFFINE5, Head.AFFINE5.bpw
+        return Head.AFFINE6, Head.AFFINE6.bpw
+
     # ── Per-tensor policies ──
 
     def _route_quality_first(self, p: TensorProfile) -> TensorPlan:
