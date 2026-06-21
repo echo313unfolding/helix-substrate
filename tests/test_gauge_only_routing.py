@@ -510,3 +510,65 @@ class TestJSONLAdapter:
         for r in records:
             text = json.dumps(r.to_dict())
             assert len(text) > 0
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Correction priority ordering: documented disagreement pattern
+# ═══════════════════════════════════════════════════════════════════════════
+
+class TestCorrectionPriorityOrdering:
+    """Documents the real-data disagreement: outlier fires before low-rank.
+
+    On real transformer embedding tensors, both outlier and low-rank signals
+    are present simultaneously:
+      - high kurtosis + high channel_concentration → outlier pattern
+      - low svd_rank_ratio → low-rank pattern
+
+    The gauge-only router checks outlier first (priority ordering), so it
+    selects CORRECTION_OUTLIER. The full router uses damage_type to
+    disambiguate and selects low_rank_sidecar.
+
+    This is a correction-type ambiguity, not a safety failure:
+      - 0 missed fallbacks
+      - 0 false fallbacks
+      - Both corrections are non-trivial actions (not accept)
+    """
+
+    def test_dual_signal_selects_outlier_first(self):
+        """When both outlier and low-rank signals fire, outlier wins by priority."""
+        g = GaugeVector(
+            kurtosis=10.0,
+            channel_concentration=5.0,
+            svd_rank_ratio=0.3,  # also low-rank
+            structure_score=0.55,
+            confidence=0.8,
+        )
+        d = gauge_route(g)
+        # Outlier check comes first in priority ordering
+        assert d.action == GaugeAction.CORRECTION_OUTLIER
+        assert "gauge_kurtosis_spike" in d.reason
+
+    def test_lowrank_only_selects_lowrank(self):
+        """When only low-rank signal fires (no outlier), CORRECTION_LOWRANK chosen."""
+        g = GaugeVector(
+            kurtosis=2.0,           # below outlier threshold
+            channel_concentration=1.5,  # below outlier threshold
+            svd_rank_ratio=0.3,     # low-rank signal
+            structure_score=0.55,
+            confidence=0.8,
+        )
+        d = gauge_route(g)
+        assert d.action == GaugeAction.CORRECTION_LOWRANK
+        assert "gauge_rank_deficit" in d.reason
+
+    def test_priority_is_not_safety_failure(self):
+        """Both outlier and lowrank are correction actions, not accept/fallback."""
+        g_dual = GaugeVector(
+            kurtosis=10.0, channel_concentration=5.0,
+            svd_rank_ratio=0.3, structure_score=0.55, confidence=0.8,
+        )
+        d = gauge_route(g_dual)
+        # Key safety properties: both are corrections, not accept/fallback mismatch
+        assert d.action != GaugeAction.ACCEPT
+        assert d.action != GaugeAction.FALLBACK
+        assert d.fallback_required is False

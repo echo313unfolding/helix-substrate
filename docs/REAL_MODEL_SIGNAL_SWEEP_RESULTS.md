@@ -110,6 +110,51 @@ encoded bytes: affine, vq, rvq). SVD and exact do not produce encoded bytes.
 | Python | 3.10.12 |
 | Host | Echo |
 
+## Gauge-Only Routing on Real Data
+
+Run: `python3 tools/sweep_gauge_only_routing.py --from-jsonl results/compression_signal_sweep.real.jsonl`
+
+| Metric | Value | Threshold | Result |
+|--------|-------|-----------|--------|
+| Agreement rate | 99.6% (1538/1544) | >= 85% | PASS |
+| Missed fallback rate | 0.0% | 0% | PASS |
+| False fallback rate | 0.0% | < 15% | PASS |
+| Verdict | gauge_only_sufficient | | |
+
+### Disagreements
+
+6 of 1544 comparisons disagree. All 6 are on **transformer embedding tensors**:
+
+| Gauge-only decision | Full router decision | Count |
+|--------------------|---------------------|-------|
+| outlier_sidecar | low_rank_sidecar | 6 |
+
+These tensors have both high kurtosis/concentration (outlier signal) and
+low effective rank (low-rank signal). The gauge-only router checks outlier
+pattern first (kurtosis > 6.0 AND concentration > 3.0), so it fires before
+the SVD rank check. The full router has access to the classified `damage_type`
+enum and picks `low_rank_sidecar` directly.
+
+This is a **correction-type priority ambiguity**, not a safety failure:
+- 0 missed fallbacks (gauge never says "accept" when full says "fallback")
+- 0 false fallbacks (gauge never says "fallback" when full says "accept")
+- Both `outlier_sidecar` and `low_rank_sidecar` are correction actions
+
+The gauge-only router correctly detects that something is wrong. It just
+picks a different correction. Both corrections would improve the result.
+
+### Per-family agreement
+
+| Family | Agreement | Rate |
+|--------|-----------|------|
+| transformer | 922/928 | 99.4% |
+| ssm | 204/204 | 100% |
+| hybrid | 280/280 | 100% |
+| cnn | 84/84 | 100% |
+| encoder_transformer | 40/40 | 100% |
+| moe | 4/4 | 100% |
+| embedding | 4/4 | 100% |
+
 ## What This Proves
 
 **Proven:** Residual geometry provides information beyond scalar reconstruction
@@ -117,10 +162,13 @@ quality on real model tensors. 62.3% of tensors had their codec choice changed
 by structure_score after passing the quality gate. Damage type distributions
 vary by model family.
 
+**Proven:** Gauge-only routing (no semantic metadata) achieves 99.6% agreement
+with the full router on real model tensors, with zero missed/false fallbacks.
+The routing layer operates on gauges, not words.
+
 **Not proven:**
 - This improves perplexity (no end-to-end eval)
 - This transfers cleanly across families (damage signatures are family-specific)
-- Gauge-only routing works on real data (not yet tested)
 - MoE behavior is covered (only 1 synthetic tensor)
 - The changed routing decisions are actually better (would require downstream eval)
 
