@@ -24,9 +24,12 @@ from tools.sweep_gauge_only_routing import (
     GaugeRouteDecision,
     gauge_route,
     run_comparison,
+    run_comparison_from_jsonl,
+    gauge_vector_from_sweep_record,
     analyze_comparison,
     ComparisonRecord,
     _gauge_action_to_correction,
+    _FORBIDDEN_FIELDS,
 )
 from tools.sweep_compression_routing_signal import SYNTHETIC_GENERATORS
 from helix_substrate.residual_contract import (
@@ -349,3 +352,161 @@ class TestEndToEnd:
         assert d1.action == d2.action
         assert d1.blinded_id == d2.blinded_id
         assert d1.receipt_hash == d2.receipt_hash
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# JSONL adapter: gauge-only routing from sweep receipts
+# ═══════════════════════════════════════════════════════════════════════════
+
+class TestJSONLAdapter:
+    """Tests for running gauge-only routing on real sweep JSONL receipts."""
+
+    SAMPLE_RECORD = {
+        "tensor_id": "model.layers.5.mlp.gate_proj.weight",
+        "model_family": "transformer",
+        "tensor_role": "mlp",
+        "synthetic": False,
+        "codec_name": "affine_g128",
+        "bpw": 6.25,
+        "cosine": 0.999824,
+        "rms_error": 0.01967,
+        "max_abs_error": 0.03458,
+        "residual_profile": {
+            "rms_error": 0.01967,
+            "cosine": 0.999824,
+            "max_abs_error": 0.03458,
+            "mean_abs_error": 0.01712,
+            "kurtosis": -1.183,
+            "sparsity": 0.078,
+            "acf_lag1": 0.272,
+            "acf_lag10": 0.048,
+            "spectral_ratio": 4.06,
+            "svd_rank_ratio": 1.0,
+            "top10_explained": 0.0,
+            "channel_concentration": 1.0,
+            "structure_score": 0.093,
+            "damage_type": "distributed",
+        },
+        "ghost_features": {
+            "te": 0.343,
+            "tr": 0.0,
+            "mo": 0.752,
+            "ac": 0.078,
+        },
+        "route_signal": {
+            "codec_optimal": True,
+            "try_correction": False,
+            "correction_hint": "none",
+            "damage_type": "distributed",
+            "structure_score": 0.093,
+            "confidence": 0.9,
+        },
+        "receipt_hash": "47e0197e734f012b",
+    }
+
+    def test_forbidden_metadata_stripped(self):
+        """GaugeVector from sweep record contains no forbidden fields."""
+        gauge = gauge_vector_from_sweep_record(self.SAMPLE_RECORD)
+        gauge_dict = gauge.to_dict()
+        for field in _FORBIDDEN_FIELDS:
+            assert field not in gauge_dict, f"Forbidden field {field} leaked into gauge"
+
+    def test_numeric_fields_preserved(self):
+        """GaugeVector preserves numeric residual/ghost values from record."""
+        gauge = gauge_vector_from_sweep_record(self.SAMPLE_RECORD)
+        assert gauge.rms_error == pytest.approx(0.01967)
+        assert gauge.cosine == pytest.approx(0.999824)
+        assert gauge.kurtosis == pytest.approx(-1.183)
+        assert gauge.structure_score == pytest.approx(0.093)
+        assert gauge.ghost_te == pytest.approx(0.343)
+        assert gauge.ghost_mo == pytest.approx(0.752)
+        assert gauge.confidence == pytest.approx(0.9)
+
+    def test_same_gauge_same_route_different_tensor_ids(self):
+        """Same numeric values produce same route regardless of tensor_id."""
+        record_a = dict(self.SAMPLE_RECORD, tensor_id="model.layers.0.attn.q_proj")
+        record_b = dict(self.SAMPLE_RECORD, tensor_id="model.layers.99.mlp.up_proj")
+        gauge_a = gauge_vector_from_sweep_record(record_a)
+        gauge_b = gauge_vector_from_sweep_record(record_b)
+        d_a = gauge_route(gauge_a)
+        d_b = gauge_route(gauge_b)
+        assert d_a.action == d_b.action
+        assert d_a.blinded_id == d_b.blinded_id
+        assert d_a.receipt_hash == d_b.receipt_hash
+
+    def test_missing_ghost_handled(self):
+        """Record with no ghost features builds valid gauge."""
+        record = dict(self.SAMPLE_RECORD, ghost_features=None)
+        gauge = gauge_vector_from_sweep_record(record)
+        assert gauge.ghost_te == 0.0
+        assert gauge.ghost_mo == 0.0
+        d = gauge_route(gauge)
+        assert d.action in GaugeAction
+
+    def test_deterministic_blinded_id(self):
+        """Same record always produces same blinded_id."""
+        ids = set()
+        for _ in range(5):
+            gauge = gauge_vector_from_sweep_record(self.SAMPLE_RECORD)
+            d = gauge_route(gauge)
+            ids.add(d.blinded_id)
+        assert len(ids) == 1
+
+    def test_different_families_same_numerics_same_route(self):
+        """Records from different model families with same numerics route identically."""
+        record_ssm = dict(self.SAMPLE_RECORD, model_family="ssm", tensor_role="state_proj")
+        record_tf = dict(self.SAMPLE_RECORD, model_family="transformer", tensor_role="mlp")
+        gauge_ssm = gauge_vector_from_sweep_record(record_ssm)
+        gauge_tf = gauge_vector_from_sweep_record(record_tf)
+        d_ssm = gauge_route(gauge_ssm)
+        d_tf = gauge_route(gauge_tf)
+        assert d_ssm.action == d_tf.action
+        assert d_ssm.blinded_id == d_tf.blinded_id
+
+    def test_high_structure_record_triggers_action(self):
+        """Record with high structure score triggers non-accept action."""
+        record = dict(self.SAMPLE_RECORD)
+        record["residual_profile"] = dict(
+            record["residual_profile"],
+            structure_score=0.65,
+            kurtosis=12.0,
+            channel_concentration=5.0,
+        )
+        record["route_signal"] = dict(record["route_signal"], confidence=0.8)
+        gauge = gauge_vector_from_sweep_record(record)
+        d = gauge_route(gauge)
+        assert d.action != GaugeAction.ACCEPT
+
+    def test_run_comparison_from_jsonl(self, tmp_path):
+        """run_comparison_from_jsonl processes a JSONL file."""
+        jsonl = tmp_path / "test_sweep.jsonl"
+        # Write a few records (including an exact that should be skipped)
+        exact_record = dict(self.SAMPLE_RECORD, codec_name="exact",
+                            cosine=1.0, rms_error=0.0)
+        exact_record["residual_profile"] = dict(
+            exact_record["residual_profile"], structure_score=0.0)
+        lines = [
+            json.dumps(self.SAMPLE_RECORD),
+            json.dumps(dict(self.SAMPLE_RECORD, codec_name="vq_k256")),
+            json.dumps(exact_record),
+        ]
+        jsonl.write_text("\n".join(lines))
+
+        output = tmp_path / "gauge_comparison.jsonl"
+        records, summary = run_comparison_from_jsonl(jsonl, output_path=output)
+
+        # Exact should be skipped, so only 2 records
+        assert len(records) == 2
+        assert "agreement_rate" in summary
+        assert output.exists()
+        summary_path = output.with_suffix(".summary.json")
+        assert summary_path.exists()
+
+    def test_jsonl_comparison_records_serializable(self, tmp_path):
+        """All comparison records from JSONL serialize to JSON."""
+        jsonl = tmp_path / "test_sweep.jsonl"
+        jsonl.write_text(json.dumps(self.SAMPLE_RECORD))
+        records, _ = run_comparison_from_jsonl(jsonl)
+        for r in records:
+            text = json.dumps(r.to_dict())
+            assert len(text) > 0

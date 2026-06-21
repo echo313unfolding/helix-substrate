@@ -464,6 +464,141 @@ def analyze_comparison(records: list[ComparisonRecord]) -> dict:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# JSONL adapter: consume real sweep receipts without forbidden metadata
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Fields that the gauge-only router is FORBIDDEN from using
+_FORBIDDEN_FIELDS = frozenset([
+    "tensor_id", "tensor_name", "model_name", "model_family",
+    "tensor_role", "layer_index", "architecture",
+])
+
+
+def gauge_vector_from_sweep_record(record: dict) -> GaugeVector:
+    """Build GaugeVector from a sweep JSONL record, stripping forbidden metadata.
+
+    The gauge-only router may use ONLY numeric residual/ghost fields.
+    tensor_id, model_family, tensor_role are stripped before routing.
+    """
+    rp = record.get("residual_profile", {})
+    ghost = record.get("ghost_features")
+    route = record.get("route_signal", {})
+
+    return GaugeVector(
+        rms_error=rp.get("rms_error", 0.0),
+        cosine=rp.get("cosine", 1.0),
+        kurtosis=rp.get("kurtosis", 0.0),
+        sparsity=rp.get("sparsity", 0.0),
+        acf_lag1=rp.get("acf_lag1", 0.0),
+        acf_lag10=rp.get("acf_lag10", 0.0),
+        spectral_ratio=rp.get("spectral_ratio", 1.0),
+        svd_rank_ratio=rp.get("svd_rank_ratio", 1.0),
+        top10_explained=rp.get("top10_explained", 0.0),
+        channel_concentration=rp.get("channel_concentration", 1.0),
+        structure_score=rp.get("structure_score", 0.0),
+        ghost_te=ghost.get("te", 0.0) if ghost else 0.0,
+        ghost_tr=ghost.get("tr", 0.0) if ghost else 0.0,
+        ghost_mo=ghost.get("mo", 0.0) if ghost else 0.0,
+        ghost_ac=ghost.get("ac", 0.0) if ghost else 0.0,
+        confidence=route.get("confidence", 0.0),
+    )
+
+
+def run_comparison_from_jsonl(
+    jsonl_path: Path,
+    output_path: Path = None,
+) -> tuple[list[ComparisonRecord], dict]:
+    """Run gauge-only vs full-router comparison on sweep JSONL receipts.
+
+    Loads records from a compression signal sweep JSONL file, strips
+    forbidden metadata, builds GaugeVectors from numeric fields only,
+    and compares gauge-only routing against the full router's decision.
+
+    Args:
+        jsonl_path: Path to compression_signal_sweep.*.jsonl
+        output_path: If set, write comparison JSONL + summary
+
+    Returns:
+        (records, summary)
+    """
+    with open(jsonl_path) as f:
+        sweep_records = [json.loads(line) for line in f if line.strip()]
+
+    records = []
+    t_start = time.time()
+
+    for sr in sweep_records:
+        # Skip exact codec (zero error, not useful for routing comparison)
+        if sr.get("codec_name") == "exact":
+            continue
+
+        # Build gauge vector from numeric fields ONLY (no forbidden metadata)
+        gauge = gauge_vector_from_sweep_record(sr)
+        gauge_decision = gauge_route(gauge)
+
+        # Build ResidualProfile for full router comparison
+        rp_dict = sr.get("residual_profile", {})
+        rp = ResidualProfile(
+            rms_error=rp_dict.get("rms_error", 0.0),
+            cosine=rp_dict.get("cosine", 1.0),
+            max_abs_error=rp_dict.get("max_abs_error", 0.0),
+            mean_abs_error=rp_dict.get("mean_abs_error", 0.0),
+            kurtosis=rp_dict.get("kurtosis", 0.0),
+            sparsity=rp_dict.get("sparsity", 0.0),
+            acf_lag1=rp_dict.get("acf_lag1", 0.0),
+            acf_lag10=rp_dict.get("acf_lag10", 0.0),
+            spectral_ratio=rp_dict.get("spectral_ratio", 1.0),
+            svd_rank_ratio=rp_dict.get("svd_rank_ratio", 1.0),
+            top10_explained=rp_dict.get("top10_explained", 0.0),
+            channel_concentration=rp_dict.get("channel_concentration", 1.0),
+            structure_score=rp_dict.get("structure_score", 0.0),
+            damage_type=DamageType(rp_dict.get("damage_type", "distributed")),
+        )
+        full_action = _full_router_action(rp)
+        full_decision = decide_from_residual("_", "_", Head.AFFINE5, rp)
+
+        gauge_act = _gauge_action_to_correction(gauge_decision.action)
+        agree = gauge_act == full_action
+
+        # Preserve family/role for analysis only (NOT used in routing)
+        records.append(ComparisonRecord(
+            blinded_id=gauge_decision.blinded_id,
+            model_family=sr.get("model_family", "unknown"),
+            tensor_role=sr.get("tensor_role", "unknown"),
+            codec_name=sr.get("codec_name", "unknown"),
+            gauge_action=gauge_act,
+            full_action=full_action,
+            agree=agree,
+            gauge_fallback=gauge_decision.fallback_required,
+            full_fallback=full_decision.fallback_required,
+            missed_fallback=(full_decision.fallback_required and
+                             not gauge_decision.fallback_required),
+            false_fallback=(gauge_decision.fallback_required and
+                            not full_decision.fallback_required),
+        ))
+
+    wall_time = time.time() - t_start
+
+    summary = analyze_comparison(records)
+    summary["cost"] = {
+        "wall_time_s": round(wall_time, 3),
+        "n_comparisons": len(records),
+        "source": str(jsonl_path),
+    }
+
+    if output_path:
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            for r in records:
+                f.write(json.dumps(r.to_dict()) + "\n")
+        summary_path = output_path.with_suffix(".summary.json")
+        summary_path.write_text(json.dumps(summary, indent=2))
+
+    return records, summary
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # CLI
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -471,19 +606,27 @@ def main():
     parser = argparse.ArgumentParser(description="Gauge-only routing ablation")
     parser.add_argument("--output", type=Path,
                         default=Path("receipts/gauge_only_routing.jsonl"))
+    parser.add_argument("--from-jsonl", type=Path, default=None,
+                        help="Run on sweep JSONL receipts instead of synthetic tensors")
     args = parser.parse_args()
 
-    # Build synthetic tensors
-    rng = np.random.RandomState(42)
-    tensors = []
-    for gen_name, gen_fn in SYNTHETIC_GENERATORS.items():
-        W, meta = gen_fn(rng)
-        tensors.append((f"synthetic/{gen_name}", W, meta))
+    if args.from_jsonl:
+        print(f"Loading sweep receipts from {args.from_jsonl}...")
+        records, summary = run_comparison_from_jsonl(
+            args.from_jsonl, output_path=args.output
+        )
+    else:
+        # Build synthetic tensors
+        rng = np.random.RandomState(42)
+        tensors = []
+        for gen_name, gen_fn in SYNTHETIC_GENERATORS.items():
+            W, meta = gen_fn(rng)
+            tensors.append((f"synthetic/{gen_name}", W, meta))
 
-    print(f"Comparing gauge-only vs full routing on {len(tensors)} tensors "
-          f"x {len(CODEC_REGISTRY) - 1} lossy codecs...")
+        print(f"Comparing gauge-only vs full routing on {len(tensors)} tensors "
+              f"x {len(CODEC_REGISTRY) - 1} lossy codecs...")
 
-    records, summary = run_comparison(tensors, output_path=args.output)
+        records, summary = run_comparison(tensors, output_path=args.output)
 
     print(f"\nResults:")
     print(f"  Agreement rate: {summary['agreement_rate']:.1%}")
@@ -491,7 +634,7 @@ def main():
     print(f"  False fallback rate: {summary['false_fallback_rate']:.1%}")
     print(f"  Verdict: {summary['verdict']}")
     print(f"\n  Per-family:")
-    for fam, info in summary["agreement_by_family"].items():
+    for fam, info in summary.get("agreement_by_family", {}).items():
         print(f"    {fam}: {info['rate']:.1%} ({info['agree']}/{info['total']})")
     print(f"\nReceipts: {args.output}")
 
