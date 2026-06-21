@@ -334,20 +334,33 @@ def load_tensors_from_safetensors(path: Path, max_tensors: int = 20,
     if not Path(path).exists():
         return results
 
-    with safe_open(str(path), framework="numpy") as f:
+    try:
+        f_ctx = safe_open(str(path), framework="numpy")
+    except Exception:
+        return results
+
+    with f_ctx as f:
         keys = list(f.keys())
         for key in keys:
             if len(results) >= max_tensors:
                 break
-            tensor = f.get_tensor(key)
+            try:
+                tensor = f.get_tensor(key)
+            except (TypeError, ValueError):
+                # bfloat16 or other unsupported dtypes in numpy
+                continue
             if tensor.size > max_elements or tensor.ndim < 1:
                 continue
             if tensor.size < 64:
                 continue
+            try:
+                tensor = tensor.astype(np.float32)
+            except (TypeError, ValueError):
+                continue
             role = _classify_tensor_role(key)
             if role == "norm":
                 continue  # Skip 1D norms, not interesting for compression
-            results.append((key, tensor.astype(np.float32), {
+            results.append((key, tensor, {
                 "family": model_family,
                 "role": role,
                 "synthetic": False,
