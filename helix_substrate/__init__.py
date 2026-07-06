@@ -11,7 +11,7 @@ Core components:
 
 __version__ = "0.3.3"
 
-from helix_substrate.cdna_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
+from helix_substrate.hxq_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
 from helix_substrate.se import compute_tensor_se, compute_routing_decision
 from helix_substrate.convert import convert_huggingface_model
 from helix_substrate.convert_gguf import convert_gguf_model
@@ -23,8 +23,8 @@ from helix_substrate.receipt import (
     load_execution_receipt,
 )
 from helix_substrate.tensor_policy import classify_tensor, TensorPolicy, TensorClass, MORPHO_FFT_POLICY
-from helix_substrate.cdnav3_writer import CDNAv3Writer
-from helix_substrate.cdnav3_reader import CDNAv3Reader
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+from helix_substrate.hxq_reader_v3 import CDNAv3Reader
 
 # Auto-register CDNA v3 / Helix quantizer with HuggingFace Transformers.
 # hf_quantizer is the canonical implementation — handles HelixLinear, shared modules,
