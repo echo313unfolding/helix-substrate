@@ -1,0 +1,408 @@
+{
+  "census_id": "WO-XI-COMPONENT-CENSUS-001",
+  "created": "2026-09-28T03:22:18Z",
+  "equation": "Ξ(t) = ∑[ Gᵢ(t) · V(ψᵢ) · ε(Bᵢ, Rᵢ, Zᵢ) ] + ΔΣt · KR(λᵢ, ηᵢ) · Θ(cᵢ) + ∇Ω",
+  "equation_source": {
+    "file": "helix-cdc/helix_cdc/echo/genome.py",
+    "lines": "10-19",
+    "file_sha256": "0ab8d5658faf29e7eefc3bf12faa3e2d275dc7e82da87bb93ec38c2d97e1040d",
+    "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+    "commit": null,
+    "authority": "DISCOVERY_CLUE_ONLY"
+  },
+
+  "source_repositories": {
+    "helix-cdc": {
+      "head": "145018720d9e461e4861c06661a5580abde6a97d",
+      "dirty_file_count": 2760,
+      "note": "No per-file git log returned for any census source. Files may be committed on a prior branch or locally modified. Treat all helix-cdc sources as UNVERSIONED_LOCAL_SOURCE."
+    },
+    "echo_labs": {
+      "head": "980a373eaf08497426f0b3e8fabf2eb2f71a4704",
+      "dirty_file_count": 82,
+      "note": "No per-file git log returned for census sources."
+    },
+    "agentic_cells": {
+      "head": null,
+      "dirty_file_count": null,
+      "note": "Not a git repository."
+    },
+    "helix-substrate": {
+      "head": "21165f8abf9448e0ce1cbb64d3523c0db93f0807",
+      "dirty_file_count": 61,
+      "note": "probe_drift_cosine.py has verified commit. krisper_morphsat_convergence.py has no per-file commit log."
+    }
+  },
+
+  "components": {
+    "G_i_t": {
+      "name": "Glyph / step_glyph",
+      "equation_definition": "Gᵢ(t) — symbolic atoms over time",
+      "implementations": [
+        {
+          "label": "step_glyph (substrate/core.py)",
+          "repository": "helix-cdc",
+          "path": "helix_cdc/substrate/core.py",
+          "python_symbol": "step_glyph",
+          "line": 190,
+          "file_sha256": "a90e914a047bd2559b62c5aa7b1969660a6ae451be1c87e1016b8c887190e4fa",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body": "def step_glyph(substrate: Substrate, seed: Seed, position: int = 0, temperature: float = 0.8,\n               goal_seed: Optional[Seed] = None, goal_step: float = 0.05) -> GlyphState:\n    scores = seed.vector @ substrate.basis.T\n    scores = scores / max(temperature, 0.1)\n    scores = scores - scores.max()\n    probs = np.exp(scores) / np.exp(scores).sum()\n    basis_idx = int(np.random.choice(substrate.K, p=probs))\n    word = VOCAB_LANES[position % 4][basis_idx % 64]\n    new_vec = seed.vector + 0.1 * substrate.basis[basis_idx]\n    new_vec = new_vec / (np.linalg.norm(new_vec) + 1e-8)\n    new_seed = Seed(vector=new_vec.astype(np.float32), depth=seed.depth, entropy=seed.entropy,\n                    metadata={**seed.metadata, 'last_basis_idx': basis_idx})\n    if goal_seed is not None:\n        new_seed = gradient_toward(new_seed, goal_seed, step_size=goal_step)\n    return GlyphState(seed=new_seed, basis_idx=basis_idx, word=word, position=position)",
+          "recurrence": "h' = normalize(h + 0.1 * B[idx]), idx ~ Cat(softmax(h @ B.T / τ))",
+          "tensor_shapes": {
+            "h": "[D]",
+            "B": "[K, D]",
+            "scores": "[K]",
+            "output_h": "[D]"
+          },
+          "inputs": ["substrate (Substrate with basis [K,D])", "seed (Seed with vector [D])", "position (int)", "temperature (float)"],
+          "outputs": ["GlyphState (new seed [D], basis_idx int, word str, position int)"],
+          "receives_external_x_t": false,
+          "selection_mechanism": "stochastic_sampling",
+          "differentiable": false,
+          "deterministic": false,
+          "scope": "token_level",
+          "tests": [],
+          "receipts": [],
+          "status": "production"
+        },
+        {
+          "label": "_glyph_step (helix_infer_glyph.py)",
+          "repository": "helix-cdc",
+          "path": "helix_cdc/helix_infer_glyph.py",
+          "python_symbol": "HelixGlyphInference._glyph_step",
+          "line": 696,
+          "file_sha256": "3d1622ff053cbb3d78c9dbb6431737ef80cd3ce7fdf63089e2085b891fef6777",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "recurrence": "latent = SHA256(glyphs + vault_data + step_idx + attn_vec), glyph = chr(97 + latent[0]%26)",
+          "receives_external_x_t": false,
+          "selection_mechanism": "deterministic_weighted_index",
+          "differentiable": false,
+          "deterministic": true,
+          "scope": "token_level",
+          "status": "production",
+          "conflict_with": "step_glyph — completely different mechanism (hash vs softmax)"
+        },
+        {
+          "label": "_attention_step (helix_infer_glyph.py)",
+          "repository": "helix-cdc",
+          "path": "helix_cdc/helix_infer_glyph.py",
+          "python_symbol": "HelixGlyphInference._attention_step",
+          "line": 622,
+          "file_sha256": "3d1622ff053cbb3d78c9dbb6431737ef80cd3ce7fdf63089e2085b891fef6777",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "recurrence": "Q = f(SHA256(glyph_history)), attn = softmax(B @ Q / sqrt(D)*τ), out = attn @ B, idx = (weighted_sum + hash_offset) % K",
+          "receives_external_x_t": false,
+          "selection_mechanism": "deterministic_weighted_index_with_hash_offset",
+          "differentiable": false,
+          "deterministic": true,
+          "scope": "token_level",
+          "status": "production"
+        }
+      ]
+    },
+
+    "V_psi": {
+      "name": "Vow function",
+      "equation_definition": "V(ψᵢ) — ethical/emotional weight",
+      "implementations": [
+        {
+          "label": "apply_vows (vow_overlay.py)",
+          "repository": "agentic_cells",
+          "path": "vow_overlay.py",
+          "python_symbol": "apply_vows",
+          "line": 127,
+          "file_sha256": "6d33b5264eb632a0775c83c76c4a8657c6d02b9e43f05a1ee115bb06cb1528cb",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body_summary": "Checks 6 vows (V0-V5) against receipt dict. Returns categorical {blue,purple,red}. Raises VowViolationError on red.",
+          "mathematical_form": "NONE — returns categorical gate, not scalar weight",
+          "inputs": ["receipt (Dict)", "context (Optional[Dict])"],
+          "outputs": ["receipt with reflex_state: blue|purple|red, or VowViolationError"],
+          "receives_external_x_t": false,
+          "differentiable": false,
+          "deterministic": true,
+          "scope": "deployment_time_gating",
+          "tests": ["agentic_cells/tests/test_vows.py"],
+          "receipts": [],
+          "status": "production",
+          "equation_mismatch": "Equation implies V returns scalar weight for multiplication. Implementation returns categorical gate."
+        }
+      ]
+    },
+
+    "epsilon_BRZ": {
+      "name": "BioPoetica epsilon",
+      "equation_definition": "ε(Bᵢ, Rᵢ, Zᵢ) — blood type, RH, zodiac modifiers",
+      "implementations": [
+        {
+          "label": "bio_poetica (bio_poetica_universal.py)",
+          "repository": "echo_labs",
+          "path": "krisper/vscode/krisper-vscode/compiler/bio_poetica_universal.py",
+          "python_symbol": "BioPoeticaTransformer.bio_poetica",
+          "file_sha256": "d3b2d9b01a3033e4178ef3427fc92384ee68005b3853b60f791b13b3b8df88c5",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body": "def bio_poetica(self, B: str, R: str, Z: str) -> int:\n    return hash(f\"{B}{R}{Z}\") % 7 + 1",
+          "inputs": ["B (str)", "R (str)", "Z (str)"],
+          "outputs": ["int in [1, 7]"],
+          "deterministic": false,
+          "determinism_bug": "Python hash() randomized per session unless PYTHONHASHSEED pinned. CONFIRMED: different PYTHONHASHSEED values produce different outputs for identical inputs.",
+          "differentiable": false,
+          "scope": "deployment_time_metadata",
+          "tests": ["echo_labs/tests/kats/kat_poem_roundtrip.py"],
+          "status": "experimental"
+        },
+        {
+          "label": "bio_poetica standalone",
+          "repository": "echo_labs",
+          "path": "projects/experiments/autonomous_prototypes/proto_bio_poetica_programming.py",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body": "def bio_poetica(B, R, Z):\n    return hash(f\"{B}{R}{Z}\") % 7 + 1",
+          "status": "experimental",
+          "note": "Identical logic, same nondeterminism bug"
+        },
+        {
+          "label": "BioPoeticaParser (bio_poetica.py — different purpose)",
+          "repository": "echo_labs",
+          "path": "krisper/github/krisper_github/bio_poetica.py",
+          "python_symbol": "BioPoeticaParser",
+          "file_sha256": "44c55668aa002274c84625effae093888677d083082a857257d79fc52a926e58",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "note": "NL poem → IR compiler. NO epsilon function. Different purpose entirely.",
+          "status": "production",
+          "conflict_with": "epsilon implementations — same name, different functionality"
+        }
+      ]
+    },
+
+    "delta_sigma_t": {
+      "name": "DriftTime",
+      "equation_definition": "ΔΣt — nonlinear symbolic time",
+      "distinct_meanings": [
+        {
+          "index": 1,
+          "source": "DriftConfig (genome.py:73)",
+          "meaning": "Config parameter, symbolic time dilation constant",
+          "independent_variable": "none (constant = 0.01)",
+          "implementation": "DriftConfig dataclass with drift_rate, entropy_threshold, memory_depth, spiral_factor",
+          "computed": false
+        },
+        {
+          "index": 2,
+          "source": "probe_drift_cosine.py (WO-SENSING-PROBE-05b)",
+          "meaning": "Cumulative cosine distance between consecutive hidden states across transformer layers",
+          "independent_variable": "layer_depth (i = 1..N_layers)",
+          "implementation": "ΔΣt = Σᵢ (1 - cos(h[i], h[i-1]))",
+          "computed": true,
+          "model_tested": "TinyLlama-1.1B-Chat-v1.0",
+          "differentiable": true,
+          "deterministic": true
+        },
+        {
+          "index": 3,
+          "source": "genome.py docstring (line 16)",
+          "meaning": "Nonlinear symbolic time (deployment-time variable)",
+          "independent_variable": "deployment_time_t",
+          "computed": false,
+          "implementation": "Not implemented"
+        },
+        {
+          "index": 4,
+          "source": "archive/echo_drift_fuse__v1.py",
+          "meaning": "Entropy decay over sequence positions",
+          "independent_variable": "sequence_position",
+          "computed": true,
+          "status": "recovered_dead_code"
+        }
+      ],
+      "implementations": [
+        {
+          "label": "probe_drift_cosine.py",
+          "repository": "helix-substrate",
+          "path": "tools/probe_drift_cosine.py",
+          "python_symbol": "main (inline computation)",
+          "line": 148,
+          "file_sha256": "754c0bb4d7c0bc1de7f9007b842e0fed89ab7e396aada488d5f4c84fcd317708",
+          "commit": "dbe3f8ea8f895ee554b55f7c3db597933615b579",
+          "authority": "GIT_COMMITTED",
+          "evidence_grade": "VERSIONED_SOURCE",
+          "function_body_summary": "for i in range(1, n_layers+1): dist = 1.0 - cosine_similarity(h[i], h[i-1]); running_drift += dist",
+          "tensor_shapes": {
+            "h_i": "[hidden_size]",
+            "dist": "scalar",
+            "cumulative_drift": "scalar"
+          },
+          "scope": "layer_depth_analysis",
+          "status": "experimental"
+        }
+      ]
+    },
+
+    "KR_lambda_eta": {
+      "name": "HelixKRISPER",
+      "equation_definition": "KR(λᵢ, ηᵢ) — mutation engine",
+      "implementations": [
+        {
+          "label": "KrisperEngine (engine.py)",
+          "repository": "echo_labs",
+          "path": "krisper/runtime/engine.py",
+          "python_symbol": "KrisperEngine",
+          "file_sha256": "db064c67ef10c565f9af817dcecf930a793bb83ff0c6b4cfafc1ddf44a5a6386",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body_summary": "24 operation handlers (compress, compare, attest, digest, emit_seed, regrow, etc.). Executes IR plans deterministically.",
+          "inputs": ["IR plan (list of operations)", "context dict"],
+          "outputs": ["execution context with results"],
+          "differentiable": false,
+          "deterministic": true,
+          "scope": "deployment_time_execution",
+          "recurrent": false,
+          "status": "production"
+        },
+        {
+          "label": "Codon dispatch / morph table",
+          "repository": "helix-substrate",
+          "path": "experiments/constrained_ssm/krisper_morphsat_convergence.py",
+          "file_sha256": "c6e0173512ec6424f66cc46ec193006ac5bc8f77536e8cb9fb5cabdf256e2be8",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "codon_dispatch_supports_repeated_transitions": false,
+          "codon_dispatch_description": "3-symbol address construction: addr = b1*16 + b2*4 + b3. One-shot, terminates after 3 bases. NOT a repeatable FSA over arbitrary sequences.",
+          "transition_table_shape": "[16, 4] → 64",
+          "status": "experimental"
+        }
+      ]
+    },
+
+    "theta_c": {
+      "name": "GuardianCell",
+      "equation_definition": "Θ(cᵢ) — ethical gate (vow filter)",
+      "implementations": [
+        {
+          "label": "GuardianCell (guardian_cell_architecture.py)",
+          "repository": "echo_labs",
+          "path": "archive/debug/war_game_debug_20250924_100954/guardian_cell_architecture.py",
+          "python_symbol": "GuardianCell",
+          "file_sha256": "b0b3d4af9da3d098c18cfc5c74f4e00e62bd09a99eb5ab2e374c7ef3a9cf762b",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body_summary": "WhiteBloodCell population (100 agents, ~500 bytes each). Distributed threat scanning via 72D cosine similarity. Consensus voting with random noise.",
+          "inputs": ["data (bytes)", "context (Dict)"],
+          "outputs": ["threat assessment (Dict with confidence float, threats list)"],
+          "deterministic": false,
+          "differentiable": false,
+          "scope": "deployment_time_security_scanning",
+          "tests": [],
+          "status": "dead_code",
+          "equation_mismatch": "Equation places Θ as multiplicative gate on KR output. Implementation is a standalone threat scanner."
+        }
+      ]
+    },
+
+    "nabla_omega": {
+      "name": "Akashic entropy / divine drift",
+      "equation_definition": "∇Ω — additive entropy term",
+      "implementations": [],
+      "status": "unimplemented",
+      "evidence_grade": "no_code_no_receipt_no_test"
+    },
+
+    "Se_HCD": {
+      "name": "Symbolic Entropy (auxiliary)",
+      "equation_definition": "Not in original equation. Se = H × C × D.",
+      "implementations": [
+        {
+          "label": "symbolic_entropy (entropy_metrics.py)",
+          "repository": "echo_labs",
+          "path": "echo/universe/echo_offline_universe/lightnet/krisper/tools/entropy_metrics.py",
+          "python_symbol": "symbolic_entropy",
+          "file_sha256": "4e4b9d347a798e267365f29b64c373536b7bf33c3219f7f11ece2a03df6e81de",
+          "commit": null,
+          "authority": "DISCOVERY_CLUE_ONLY",
+          "evidence_grade": "UNVERSIONED_LOCAL_SOURCE",
+          "function_body": "H = shannon_entropy(data); C = contextual_coherence(data); D = dimensional_depth(data, H); Se = H * C * D",
+          "H_definition": "Shannon entropy of byte distribution: -Σ p(x) log₂ p(x), range 0-8",
+          "C_definition": "1 - zlib_compression_ratio(data[:64KB]), range 0-1",
+          "D_definition": "1 + 71 × (H/8) × (unique_bytes/256), range 1-72",
+          "calibrated_against_downstream": false,
+          "calibration_receipt": "helix-cdc/receipts/echo_smoothness/se_calibration_v1.json",
+          "calibration_note": "Calibrated against synthetic distributions only. Routing test FAILED: ρ=-0.023, p=0.74.",
+          "status": "experimental"
+        }
+      ]
+    }
+  },
+
+  "audit_findings": {
+    "audit_1_step_glyph_external_input": {
+      "question": "Does step_glyph receive an external x_t?",
+      "answer": "NO",
+      "detail": "Autonomous recurrence: h' = f(h). No external token embedding enters the update. substrate.basis is fixed, not input-conditioned."
+    },
+    "audit_2_selection_mechanism": {
+      "question": "Is selection sampling, argmax, or differentiable?",
+      "answer": "Stochastic sampling (np.random.choice)",
+      "detail": "Not differentiable, not reparameterizable. Training via backprop impossible without replacement."
+    },
+    "audit_3_codon_repeated_transitions": {
+      "question": "Does codon dispatch support repeated transitions over arbitrary sequences?",
+      "answer": "NO",
+      "detail": "One-shot 3-symbol address construction only. addr = b1*16 + b2*4 + b3. Terminates after 3 bases. Neither morph table nor MorphSAT FSA processes arbitrary-length sequences."
+    },
+    "audit_4_codebook_properties": {
+      "question": "Does any codebook have vectors, distance, assignments, and optimization?",
+      "answer": "Only HelixLinear (compression pipeline, NOT equation system)",
+      "detail": "Morph table: no vectors, no distance, no optimization. Vault basis: vectors but no optimization. HelixLinear: full VQ (k=256, L2, k-means) but not part of Ξ(t)."
+    },
+    "audit_5_hash_nondeterminism": {
+      "question": "Python hash nondeterminism in bio_poetica()?",
+      "answer": "CONFIRMED BUG",
+      "detail": "hash(f'{B}{R}{Z}') % 7 + 1 produces different results across Python sessions unless PYTHONHASHSEED is pinned. Tested: PYTHONHASHSEED=42 and =99 produce different values for identical input.",
+      "fix_required": "Replace hash() with hashlib.sha256() or pin PYTHONHASHSEED"
+    },
+    "audit_6_se_calibration": {
+      "question": "Is Se = H*C*D calibrated against any downstream outcome?",
+      "answer": "NO",
+      "detail": "Calibrated against synthetic distributions only (WO-ECHO-SE-CALIBRATE-01). Routing test FAILED (WO-SIDECAR-POLICY-01: ρ=-0.023, p=0.74). No link to accuracy, perplexity, or task metrics."
+    },
+    "audit_7_drifttime_meanings": {
+      "question": "Every distinct meaning of DriftTime?",
+      "answer": "4 distinct meanings with different independent variables",
+      "meanings": [
+        {"label": "DriftConfig.drift_rate", "independent_var": "none (constant)", "status": "config_only"},
+        {"label": "Layer cosine drift", "independent_var": "layer_depth", "status": "implemented_experimental"},
+        {"label": "Equation docstring", "independent_var": "deployment_time", "status": "unimplemented"},
+        {"label": "Archive entropy decay", "independent_var": "sequence_position", "status": "dead_code"}
+      ]
+    }
+  },
+
+  "two_timescale_reclassification": {
+    "fast_path": {
+      "description": "Token-level sequence computation",
+      "components": ["step_glyph()", "_attention_step()"],
+      "note": "Only step_glyph is from the equation system. It lacks external input x_t."
+    },
+    "slow_path": {
+      "description": "Deployment-window drift detection, mutation proposal, gated acceptance",
+      "components": ["apply_vows (V)", "bio_poetica (ε)", "KrisperEngine (KR)", "GuardianCell (Θ)", "DriftConfig", "Se", "BioPoeticaParser"],
+      "note": "None of these operate at token-level. No causal mathematical role in sequence processing demonstrated."
+    }
+  }
+}
