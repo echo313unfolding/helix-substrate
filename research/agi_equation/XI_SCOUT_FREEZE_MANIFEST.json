@@ -1,0 +1,84 @@
+{
+  "manifest_id": "XI_SCOUT_FREEZE_MANIFEST_v1",
+  "created": "2026-09-28T04:10:00Z",
+  "branch": "research/xi-discrete-state-scout-001",
+  "execution_authorized": false,
+
+  "commit_a": {
+    "oid": "b7a55bab48752d6b3a60964bd189975e1f26a3e5",
+    "message_summary": "research: Ξ(t) equation component census and discrete state scout preregistration"
+  },
+
+  "artifacts": {
+    "census_md": {
+      "path": "research/agi_equation/AGI_EQUATION_COMPONENT_CENSUS.md",
+      "sha256": "e8cc8a68984edcde430b610e1814065519f48eb8c5d043cdb7ed85c61e2704e7"
+    },
+    "census_json": {
+      "path": "research/agi_equation/AGI_EQUATION_COMPONENT_CENSUS.json",
+      "sha256": "d19d1262f62fa401ea2da89a54c7f6024e81c89cb4d14f489b0c9222a6c22daf"
+    },
+    "preregistration": {
+      "path": "research/agi_equation/WO-XI-DISCRETE-STATE-SCOUT-001-PREREGISTRATION.md",
+      "sha256": "bd87431bd8d30d33c041084957bb6a56b1b236b1c76d391dee4853a6abd656e3"
+    }
+  },
+
+  "source_repositories_at_census_time": {
+    "helix-cdc": {
+      "head": "145018720d9e461e4861c06661a5580abde6a97d",
+      "dirty_file_count": 2760,
+      "per_file_commit_available": false,
+      "all_sources_classification": "UNVERSIONED_LOCAL_SOURCE"
+    },
+    "echo_labs": {
+      "head": "980a373eaf08497426f0b3e8fabf2eb2f71a4704",
+      "dirty_file_count": 82,
+      "per_file_commit_available": false,
+      "all_sources_classification": "UNVERSIONED_LOCAL_SOURCE"
+    },
+    "agentic_cells": {
+      "head": null,
+      "dirty_file_count": null,
+      "is_git_repo": false,
+      "all_sources_classification": "UNVERSIONED_LOCAL_SOURCE"
+    },
+    "helix-substrate": {
+      "head": "21165f8abf9448e0ce1cbb64d3523c0db93f0807",
+      "dirty_file_count": 61,
+      "versioned_sources": [
+        {
+          "path": "tools/probe_drift_cosine.py",
+          "commit": "dbe3f8ea8f895ee554b55f7c3db597933615b579",
+          "classification": "VERSIONED_SOURCE"
+        }
+      ],
+      "unversioned_sources": [
+        {
+          "path": "experiments/constrained_ssm/krisper_morphsat_convergence.py",
+          "classification": "UNVERSIONED_LOCAL_SOURCE"
+        }
+      ]
+    }
+  },
+
+  "unversioned_source_summary": {
+    "total_unversioned": 11,
+    "total_versioned": 1,
+    "authority_for_all_unversioned": "DISCOVERY_CLUE_ONLY",
+    "note": "File SHA-256 hashes confirm content identity but do NOT establish git provenance. A hash is not a commit."
+  },
+
+  "actual_creation_timestamps": {
+    "census_md_filesystem": "2026-09-28T03:22:18Z",
+    "census_json_filesystem": "2026-09-28T03:24:21Z",
+    "preregistration_filesystem": "2026-09-28T03:25:48Z",
+    "original_misplaced_commit": "2026-09-28T03:27:02Z",
+    "original_misplaced_commit_oid": "ef012fbe45b4a17dd225e99524ac842361340363",
+    "original_misplaced_repo": "echo-kernel-delegation",
+    "original_misplaced_branch": "feature/continuity-hook-v2-001",
+    "recovery_ref": "recovery/xi-census-ef012fb (in echo-kernel-delegation)"
+  },
+
+  "tag": "xi-discrete-state-scout-prereg-v1"
+}
