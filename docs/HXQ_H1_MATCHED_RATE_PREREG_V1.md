@@ -1,6 +1,6 @@
 # HXQ H1B — Decoded-Weight Multi-Format Codec Study: Preregistration v1 (CANDIDATE — not frozen)
 
-Companion: H1A (`docs/HXQ_H1A_Q5K_ENCODER_PREREG_V1.md`) separately tests the released Q5_K artifact's encoder against stock Q5_K at identical layout.
+Status note (2026-10-13): **DEFERRED.** The primary HXQ study is H1 (`docs/HXQ_H1_AF6_CONFIRMATORY_PREREG_V1.md`), which extends the published HXQ_AF6 GGUF results. H1A (`docs/HXQ_H1A_Q5K_ENCODER_PREREG_V1.md`) covers the Q5_K compatibility lane. This decoded-weight study of the older scalar, 2D and RVQ formats is kept for later.
 
 Status: **candidate for review.** Nothing in H1 has been executed. Earlier
 HXQ receipts are background only. The 14B result (README) stays
