@@ -1,8 +1,12 @@
 # HXQ H1A — Q5_K Encoder Reconciliation: Preregistration v1 (CANDIDATE — not frozen)
 
-Status: **candidate for review.** Nothing in H1A has been executed. The
-broader decoded-weight study (H1B, `docs/HXQ_H1_MATCHED_RATE_PREREG_V1.md`)
-is separate and unchanged in scope.
+Status: **candidate for review; SECONDARY / optional.**
+* The primary HXQ study is H1
+  (`docs/HXQ_H1_AF6_CONFIRMATORY_PREREG_V1.md`), which extends the
+  published HXQ_AF6 results.
+* H1A covers only the Q5_K stock-compatibility lane.
+* The decoded-weight study (H1B) is deferred.
+* Nothing in H1A has been executed.
 
 ## 0. Background and question
 
