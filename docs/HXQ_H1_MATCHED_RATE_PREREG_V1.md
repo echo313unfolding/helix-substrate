@@ -1,4 +1,6 @@
-# HXQ H1 — Matched-Rate Codec Fidelity: Preregistration v1 (CANDIDATE — not frozen)
+# HXQ H1B — Decoded-Weight Multi-Format Codec Study: Preregistration v1 (CANDIDATE — not frozen)
+
+Companion: H1A (`docs/HXQ_H1A_Q5K_ENCODER_PREREG_V1.md`) separately tests the released Q5_K artifact's encoder against stock Q5_K at identical layout.
 
 Status: **candidate for review.** Nothing in H1 has been executed. Earlier
 HXQ receipts are background only. The 14B result (README) stays
@@ -7,8 +9,8 @@ HXQ receipts are background only. The 14B result (README) stays
 ## 0. Question and ceiling
 
 **Question.** At equal whole-model effective bits per weight, does an HXQ
-format give better language-model fidelity than conventional uniform
-quantization?
+format give better language-model fidelity than the llama.cpp K-quant
+rate–distortion curve?
 
 **Out of scope for H1** (deferred to H2, a native-runtime study): speed,
 memory, time to first token, paging and bytes touched. They are measured
@@ -17,7 +19,7 @@ confounded.
 
 **Ceiling.** A positive result may support only: "On these models and this
 evaluation set, format X reached lower language-modelling loss than the
-uniform-quantization rate–distortion curve at the same effective bpw." It
+llama.cpp K-quant rate–distortion curve at the same effective bpw." It
 says nothing about kernels, speed or other tasks.
 
 ## 1. Phase 0 — format audit and effective bpw (before any evaluation)
@@ -49,7 +51,7 @@ from descriptions:
 | Family | Formats | Role |
 |---|---|---|
 | HXQ | scalar VQ-256 (+ sidecar as frozen in Phase 0); AF6; 2D VQ-4096; RVQ (**only** if Phase 0 shows it is operational end to end) | candidates |
-| Uniform, llama.cpp | Q5_K_M, Q6_K, Q8_0 | rate–distortion (R–D) baseline curve |
+| llama.cpp K-quants | Q5_K_M, Q6_K, Q8_0 | K-quant rate–distortion (R–D) baseline curve |
 | Uniform, simple | per-channel symmetric round-to-nearest INT8 | INT8 reference point |
 | Dense | the model's released dtype | loss reference (ΔNLL = 0) |
 
@@ -85,7 +87,7 @@ way:
 
 ## 4. Rate–distortion comparison and decision rule
 
-**Baseline curve.** For each model, the uniform R–D curve is the
+**Baseline curve.** For each model, the llama.cpp K-quant R–D curve is the
 piecewise-linear interpolation in effective bpw through the Q5_K_M, Q6_K and
 Q8_0 points (ΔNLL against bpw). INT8 is also reported as its own point.
 
