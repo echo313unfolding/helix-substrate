@@ -43,7 +43,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.rapl_meter import RaplMeter
 from helix_substrate.tensor_policy import (
     classify_tensor,
@@ -787,6 +787,19 @@ def compress_model(model_dir: Path, dry_run: bool = False, force: bool = False,
                 if stats_path.exists():
                     stats = json.loads(stats_path.read_text())
 
+            # Contribution-weighted sidecar post-processing
+            elif (dp_entry is not None
+                    and dp_entry.get("policy", {}).get("sidecar_mode") == "contribution"
+                    and "activations" in dp_entry):
+                _replace_sidecar_contribution(
+                    tensor_dir, tensor_np,
+                    np.array(dp_entry["activations"], dtype=np.float32),
+                    top_k=dp_entry.get("policy", {}).get("sidecar_top_k"),
+                )
+                stats_path = tensor_dir / "stats.json"
+                if stats_path.exists():
+                    stats = json.loads(stats_path.read_text())
+
             chosen_k = k_map_k or layer_k_override or k_override or 256
 
         # Save channel scale factors alongside the tensor artifacts
@@ -944,6 +957,55 @@ def _replace_sidecar_hessian(tensor_dir: Path, original: np.ndarray,
             s["num_outliers"] = len(positions)
             s["sidecar_bytes"] = int(sidecar_path.stat().st_size)
             s["sidecar_mode"] = "hessian"
+            # Recompute cosine_with_sidecar
+            patched = codebook[indices].copy()
+            patched[positions] = values
+            flat_orig = original.ravel().astype(np.float32)
+            patched = patched.astype(np.float32)
+            dot = np.dot(flat_orig, patched)
+            norm_a = np.linalg.norm(flat_orig)
+            norm_b = np.linalg.norm(patched)
+            cos = float(dot / max(norm_a * norm_b, 1e-12))
+            s["cosine_with_sidecar"] = round(cos, 6)
+            stats_path.write_text(json.dumps(s, indent=2))
+
+
+# ---------------------------------------------------------------------------
+# Contribution-weighted sidecar post-processing
+# ---------------------------------------------------------------------------
+
+def _replace_sidecar_contribution(tensor_dir: Path, original: np.ndarray,
+                                   activations: np.ndarray, top_k: int = None):
+    """Replace percentile sidecar with contribution-weighted sidecar.
+
+    WO-HXQ-CONTRIBUTION-MODEL-VALIDATION-004
+    """
+    from helix_substrate.generate_sidecars_v3 import find_outliers_contribution, write_sidecar_npz
+
+    codebook = np.load(tensor_dir / "codebook.npy")
+    meta_path = tensor_dir / "meta.json"
+    idx_dtype = np.uint8
+    if meta_path.exists():
+        meta = json.loads(meta_path.read_text())
+        if meta.get("index_dtype") == "uint16":
+            idx_dtype = np.uint16
+    indices = np.fromfile(tensor_dir / "indices.bin", dtype=idx_dtype)
+    quantized = codebook[indices].reshape(original.shape)
+
+    positions, values = find_outliers_contribution(
+        original, quantized, activations, top_k=top_k,
+    )
+
+    if len(positions) > 0:
+        sidecar_path = tensor_dir / "sidecar.npz"
+        write_sidecar_npz(positions, values, sidecar_path)
+
+        stats_path = tensor_dir / "stats.json"
+        if stats_path.exists():
+            s = json.loads(stats_path.read_text())
+            s["num_outliers"] = len(positions)
+            s["sidecar_bytes"] = int(sidecar_path.stat().st_size)
+            s["sidecar_mode"] = "contribution"
             # Recompute cosine_with_sidecar
             patched = codebook[indices].copy()
             patched[positions] = values

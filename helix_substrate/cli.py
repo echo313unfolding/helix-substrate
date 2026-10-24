@@ -155,7 +155,7 @@ def main():
         import tracemalloc
         from pathlib import Path
         import numpy as np
-        from helix_substrate.cdna_reader import CDNAv2Writer, CDNAv2Reader
+        from helix_substrate.hxq_reader import CDNAv2Writer, CDNAv2Reader
 
         M, K = args.rows, args.cols
         block_rows = args.block_rows

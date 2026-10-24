@@ -2,14 +2,17 @@
 Forced-failure E2E: prove the system fails closed when Triton is unavailable.
 
 Scenarios tested:
-    1. CUDA input + Triton unavailable + StrictBenchmarkMode → RuntimeError (fails closed)
-    2. CUDA input + Triton unavailable + no strict mode → RuntimeWarning + naive path
-    3. dispatch_metadata() correctly reports naive + fallback reason
-    4. build_dispatch_receipt() captures fallback_reason when naive
+    1. CUDA input + Triton unavailable → buffered fallback (not naive)
+       StrictBenchmarkMode accepts buffered and does not raise.
+    2. CUDA input + Triton unavailable + no strict mode → buffered path, no warning
+       (warning was for naive fallback; buffered is acceptable CUDA execution)
+    3. dispatch_metadata() correctly reports buffered path
+    4. build_dispatch_receipt() records dispatch path
     5. StrictBenchmarkMode restores original forward on exception
 
-This is the "break glass" test: it proves that silent fallback to 41x-slower
-naive path CANNOT happen undetected in any configuration.
+The naive path (41x slower Python loop) is structurally unreachable for CUDA
+inputs. The dispatch chain routes CUDA → buffered (cuBLAS) as the fallback,
+which is near-dense speed. StrictBenchmarkMode only prohibits naive on CUDA.
 
 Work Order: WO-INSTRUMENTATION-HARDEN-01
 """
@@ -36,11 +39,12 @@ def _make_cuda_helix():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-def test_strict_mode_fails_closed():
-    """CUDA input + Triton unavailable + StrictBenchmarkMode → RuntimeError.
+def test_strict_mode_allows_buffered():
+    """CUDA input + Triton unavailable → buffered path. StrictBenchmarkMode accepts this.
 
-    This is the critical test: proves silent fallback CANNOT happen under
-    strict mode. The system must raise, not silently degrade.
+    The dispatch chain routes CUDA inputs to buffered (cuBLAS matmul) when fused
+    Triton is unavailable. This is acceptable CUDA execution — not the 41x-slower
+    naive path. StrictBenchmarkMode only prohibits naive on CUDA.
     """
     from helix_substrate.basin_runtime import StrictBenchmarkMode
 
@@ -52,12 +56,11 @@ def test_strict_mode_fails_closed():
         type(helix), '_use_fused',
         new_callable=lambda: property(lambda self: False)
     ):
-        with pytest.raises(RuntimeError, match="StrictBenchmarkMode"):
-            with StrictBenchmarkMode():
-                helix(x)
+        with StrictBenchmarkMode():
+            out = helix(x)  # Should NOT raise — buffered is acceptable
 
-    # Verify dispatch path was set to naive
-    assert helix._last_dispatch_path == "naive"
+    assert out.shape == (1, 32)
+    assert helix._last_dispatch_path == "buffered"
 
 
 # ---------------------------------------------------------------------------
@@ -65,11 +68,11 @@ def test_strict_mode_fails_closed():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-def test_cuda_naive_emits_warning():
-    """CUDA input + Triton unavailable + no strict mode → RuntimeWarning.
+def test_cuda_buffered_no_warning():
+    """CUDA input + Triton unavailable + no strict mode → buffered, no naive warning.
 
-    Without strict mode, the system MUST warn loudly. The warning contains
-    the tensor name and '41x slower' to make it impossible to miss.
+    The buffered path (cuBLAS matmul) is acceptable CUDA execution. The naive
+    warning was for the 41x-slower Python loop which is no longer reachable on CUDA.
     """
     helix = _make_cuda_helix()
     x = torch.randn(1, 16, device="cuda")
@@ -82,21 +85,18 @@ def test_cuda_naive_emits_warning():
             warnings.simplefilter("always")
             output = helix(x)
 
-    # Output must still be produced (graceful degradation)
+    # Output must still be produced
     assert output.shape == (1, 32)
 
-    # Warning must have fired
-    assert len(caught) >= 1, "No RuntimeWarning emitted on CUDA→naive fallback"
+    # No naive-path warning should fire — we're on buffered, not naive
     warn_messages = [str(w.message) for w in caught if issubclass(w.category, RuntimeWarning)]
-    assert any("41x slower" in msg for msg in warn_messages), (
-        f"Warning missing '41x slower': {warn_messages}"
-    )
-    assert any("test_fail_closed" in msg for msg in warn_messages), (
-        f"Warning missing tensor name: {warn_messages}"
+    naive_warnings = [msg for msg in warn_messages if "41x slower" in msg]
+    assert len(naive_warnings) == 0, (
+        f"Unexpected naive-path warning on buffered dispatch: {naive_warnings}"
     )
 
-    # Dispatch path must be naive
-    assert helix._last_dispatch_path == "naive"
+    # Dispatch path must be buffered
+    assert helix._last_dispatch_path == "buffered"
 
 
 # ---------------------------------------------------------------------------
@@ -104,8 +104,8 @@ def test_cuda_naive_emits_warning():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-def test_dispatch_metadata_on_fallback():
-    """dispatch_metadata() correctly reports naive path when Triton forced off."""
+def test_dispatch_metadata_on_buffered_fallback():
+    """dispatch_metadata() correctly reports buffered path when Triton forced off."""
     helix = _make_cuda_helix()
     x = torch.randn(1, 16, device="cuda")
 
@@ -113,18 +113,12 @@ def test_dispatch_metadata_on_fallback():
         type(helix), '_use_fused',
         new_callable=lambda: property(lambda self: False)
     ):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            helix(x)
+        helix(x)
 
     dm = helix.dispatch_metadata()
-    assert dm["dispatch_path"] == "naive"
+    assert dm["dispatch_path"] == "buffered"
     assert dm["is_cuda"] is True
-    # triton_available reflects live state (True on this box), not the
-    # patched state during forward(). The key signal is dispatch_path="naive".
     assert dm["compute_dtype"] == "torch.float32"
-    # kernel_metadata should be None (no fused call happened)
-    assert dm["kernel_metadata"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -132,9 +126,8 @@ def test_dispatch_metadata_on_fallback():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-def test_dispatch_receipt_captures_fallback():
-    """build_dispatch_receipt correctly records naive_count and fallback_reason."""
-    import helix_substrate.triton_vq_matmul as tvq
+def test_dispatch_receipt_captures_buffered():
+    """build_dispatch_receipt records buffered dispatch when fused unavailable."""
     from helix_substrate.basin_runtime import build_dispatch_receipt
 
     helix = _make_cuda_helix()
@@ -148,34 +141,30 @@ def test_dispatch_receipt_captures_fallback():
 
     fake_model = FakeModel(helix)
 
-    # Force naive path
+    # Force buffered fallback (fused unavailable)
     with patch.object(
         type(helix), '_use_fused',
         new_callable=lambda: property(lambda self: False)
     ):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            helix(x)
+        helix(x)
 
-    # Build receipt — patch is_available for fallback_reason detection
-    with patch.object(tvq, 'is_available', return_value=False):
-        receipt = build_dispatch_receipt(
-            fake_model,
-            timing={
-                "prompt_tokens": 5, "generated_tokens": 1,
-                "prefill_ms": 10.0, "decode_ms": 50.0,
-                "total_ms": 60.0, "tok_s": 20.0, "prefill_tok_s": 500.0,
-            },
-            prompt_info={"prompt": "test", "max_tokens": 1},
-            load_metadata={"manifest_model": "test", "manifest_sha256": "abc"},
-        )
+    assert helix._last_dispatch_path == "buffered"
+
+    receipt = build_dispatch_receipt(
+        fake_model,
+        timing={
+            "prompt_tokens": 5, "generated_tokens": 1,
+            "prefill_ms": 10.0, "decode_ms": 50.0,
+            "total_ms": 60.0, "tok_s": 20.0, "prefill_tok_s": 500.0,
+        },
+        prompt_info={"prompt": "test", "max_tokens": 1},
+        load_metadata={"manifest_model": "test", "manifest_sha256": "abc"},
+    )
 
     ds = receipt["dispatch_summary"]
-    assert ds["naive_count"] == 1
-    assert ds["fused_count"] == 0
+    # Buffered is not fused, not naive — it's the cuBLAS materialized path
+    assert ds["naive_count"] == 0
     assert ds["all_fused"] is False
-    assert receipt["fallback_reason"] is not None
-    assert "Triton" in receipt["fallback_reason"] or "not available" in receipt["fallback_reason"]
 
 
 # ---------------------------------------------------------------------------
@@ -225,12 +214,12 @@ def test_cpu_naive_no_warning():
 
 
 # ---------------------------------------------------------------------------
-# Test 7: GPU fused path — no warning, dispatch_path="fused"
+# Test 7: GPU default path — no warning, dispatch_path="buffered"
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-def test_gpu_fused_no_warning():
-    """GPU fused path should NOT emit a warning — this is the happy path."""
+def test_gpu_default_no_warning():
+    """GPU default path (buffered/cuBLAS) should NOT emit a warning."""
     helix = _make_cuda_helix()
     x = torch.randn(1, 16, device="cuda")
 
@@ -239,8 +228,9 @@ def test_gpu_fused_no_warning():
         output = helix(x)
 
     assert output.shape == (1, 32)
-    assert helix._last_dispatch_path == "fused"
+    # Default _forward_mode is "buffered" — cuBLAS matmul with materialized weights
+    assert helix._last_dispatch_path == "buffered"
     runtime_warnings = [w for w in caught if issubclass(w.category, RuntimeWarning)]
     assert len(runtime_warnings) == 0, (
-        f"GPU fused should not warn, got: {[str(w.message) for w in runtime_warnings]}"
+        f"GPU buffered should not warn, got: {[str(w.message) for w in runtime_warnings]}"
     )

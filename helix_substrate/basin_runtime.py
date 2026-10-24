@@ -613,7 +613,7 @@ def StrictBenchmarkMode():
             raise RuntimeError(
                 f"StrictBenchmarkMode: HelixLinear '{self.tensor_name}' "
                 f"dispatched to naive path with CUDA input. "
-                f"Expected fused Triton kernel. "
+                f"Expected buffered or fused kernel. "
                 f"Triton available: {self._use_fused}"
             )
         return output

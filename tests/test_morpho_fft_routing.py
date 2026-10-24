@@ -21,7 +21,7 @@ from helix_substrate.tensor_policy import (
     MORPHO_FFT_POLICY,
     MORPHO_FIT_POLICY,
 )
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.morpho_codec import (
     morpho_decode,
     morpho_encode,

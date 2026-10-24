@@ -349,7 +349,7 @@ def main():
     print("[4/6] Compressing blocks → HelixLinear...", flush=True)
     from safetensors import safe_open
     from scipy.stats import kurtosis as scipy_kurtosis
-    from helix_substrate.cdnav3_writer import CDNAv3Writer
+    from helix_substrate.hxq_writer_v3 import CDNAv3Writer
     from helix_substrate.helix_linear import (
         HelixLinear, load_helix_linear_from_cdnav3,
         swap_to_helix, swap_summary,

@@ -13,7 +13,7 @@ def test_stream_matmul_small():
 
     This tests the core claim: compute Y = X @ W without loading full W.
     """
-    from helix_substrate.cdna_reader import CDNAv2Writer
+    from helix_substrate.hxq_reader import CDNAv2Writer
     from helix_substrate.stream_matmul import stream_xw_from_cdna
 
     rng = np.random.RandomState(42)
@@ -68,7 +68,7 @@ def test_stream_matmul_small():
 
 def test_stream_matmul_transpose():
     """Verify Y = X @ W^T mode works for GQA-style projections."""
-    from helix_substrate.cdna_reader import CDNAv2Writer
+    from helix_substrate.hxq_reader import CDNAv2Writer
     from helix_substrate.stream_matmul import stream_xw_from_cdna
 
     rng = np.random.RandomState(123)
@@ -106,7 +106,7 @@ def test_stream_matmul_transpose():
 
 def test_cdna_v2_block_streaming():
     """Verify CDNAv2 block streaming works correctly."""
-    from helix_substrate.cdna_reader import CDNAv2Writer, CDNAv2Reader
+    from helix_substrate.hxq_reader import CDNAv2Writer, CDNAv2Reader
 
     rng = np.random.RandomState(777)
 
@@ -159,7 +159,7 @@ def test_full_pipeline_encode_stream_decode():
     4. Stream compute Y = X @ W without loading full W
     5. Verify result against original
     """
-    from helix_substrate.cdna_reader import CDNAv2Writer
+    from helix_substrate.hxq_reader import CDNAv2Writer
     from helix_substrate.stream_matmul import stream_xw_from_cdna
 
     rng = np.random.RandomState(999)

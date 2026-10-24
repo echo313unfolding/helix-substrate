@@ -181,6 +181,36 @@ def _get_helix_linear_cls():
     return HelixLinear
 
 
+class HelixCompressedParameter(nn.Module):
+    """Shell for loading HXQ-compressed standalone nn.Parameter tensors.
+
+    Lifecycle:
+      1. Replaces nn.Parameter in _process_model_before_weight_loading
+      2. Receives codebook/indices/sidecar from safetensors via create_quantized_param
+      3. Reconstructs dense parameter and restores nn.Parameter in after_weight_loading
+
+    Authoritative representation contract:
+      When a logical tensor name appears in compressed_modules, the HXQ
+      representation (codebook + indices + sidecar) is authoritative.
+      A raw tensor with the same logical name is a legacy fallback copy
+      and must NOT be used.
+    """
+
+    def __init__(self, original_shape, original_dtype, requires_grad, n_clusters=256):
+        super().__init__()
+        self.original_shape = original_shape
+        self.original_dtype = original_dtype
+        self.original_requires_grad = requires_grad
+        # Primary buffers — overwritten by safetensors load
+        self.register_buffer("codebook", torch.zeros(n_clusters, dtype=torch.float32))
+        self.register_buffer("indices", torch.zeros(*original_shape, dtype=torch.uint8))
+        # Optional sidecar — empty tensors; populated if sidecar exists in checkpoint
+        self.register_buffer("sidecar_positions", torch.zeros(0, dtype=torch.int64))
+        self.register_buffer("sidecar_values", torch.zeros(0, dtype=torch.float32))
+        # Track whether primary buffers were loaded (fail-closed check)
+        self._primary_buffers_loaded: set = set()
+
+
 def _replace_with_helix_linear(
     model: nn.Module,
     compressed_modules: set,
@@ -218,10 +248,13 @@ def _replace_with_helix_linear(
     compressed_embeddings = set()
     k_map = module_k_map or {}
     vd_map = module_vector_dim_map or {}
+    seen_as_module = set()
+    compressed_parameters = set()
 
     for name, module in list(model.named_modules()):
         if name not in compressed_modules:
             continue
+        seen_as_module.add(name)
 
         # Skip if this exact Python object was already replaced (shared modules)
         if id(module) in replaced_ids:
@@ -274,7 +307,91 @@ def _replace_with_helix_linear(
         setattr(parent, parts[-1], helix_shell)
         replaced += 1
 
-    return replaced, compressed_embeddings
+    # --- Pass 2: Standalone nn.Parameter entries ---
+    # Entries in compressed_modules not matched by named_modules() may be
+    # standalone parameters on parent modules (e.g., Mamba A_log).
+
+    # Build param identity map by walking _parameters dicts directly.
+    # named_parameters() deduplicates shared objects, which would hide
+    # tied parameters. Walking _parameters preserves all references.
+    param_id_to_paths: dict = {}
+
+    def _walk_params(mod: nn.Module, prefix: str = "") -> None:
+        for pname, param in mod._parameters.items():
+            if param is None:
+                continue
+            full = f"{prefix}.{pname}" if prefix else pname
+            pid = id(param)
+            if pid not in param_id_to_paths:
+                param_id_to_paths[pid] = []
+            param_id_to_paths[pid].append(full)
+        for cname, child in mod._modules.items():
+            if child is None:
+                continue
+            full = f"{prefix}.{cname}" if prefix else cname
+            _walk_params(child, full)
+
+    _walk_params(model)
+
+    for name in sorted(compressed_modules - seen_as_module):
+        parts = name.rsplit(".", 1)
+        if len(parts) == 2:
+            parent_path, param_name = parts
+        else:
+            parent_path, param_name = "", name
+
+        try:
+            parent = model.get_submodule(parent_path) if parent_path else model
+        except (AttributeError, ValueError):
+            raise ValueError(
+                f"Cannot resolve compressed_modules entry '{name}': "
+                f"parent path '{parent_path}' not found in model."
+            )
+
+        target = getattr(parent, param_name, None)
+        if target is None:
+            raise ValueError(
+                f"Cannot resolve compressed_modules entry '{name}': "
+                f"'{param_name}' not found on module "
+                f"'{parent_path or '(root)'}'."
+            )
+
+        if not isinstance(target, (nn.Parameter, torch.Tensor)):
+            raise ValueError(
+                f"Compressed module '{name}' resolves to "
+                f"{type(target).__name__}, not nn.Linear, nn.Embedding, "
+                f"or nn.Parameter. No HXQ consumer exists for this type."
+            )
+
+        # Tied parameter safety: reject if same object referenced
+        # from multiple paths
+        pid = id(target)
+        tied_paths = param_id_to_paths.get(pid, [])
+        if len(tied_paths) > 1:
+            others = [p for p in tied_paths if p != name]
+            raise RuntimeError(
+                f"Tied parameter detected: '{name}' shares underlying "
+                f"storage with {others}. Cannot safely replace a tied "
+                f"parameter without breaking parameter aliasing."
+            )
+
+        k = k_map.get(name, n_clusters_default)
+        shell = HelixCompressedParameter(
+            original_shape=tuple(target.shape),
+            original_dtype=target.dtype,
+            requires_grad=(
+                target.requires_grad
+                if isinstance(target, nn.Parameter) else False
+            ),
+            n_clusters=k,
+        )
+
+        delattr(parent, param_name)
+        parent.add_module(param_name, shell)
+        compressed_parameters.add(name)
+        replaced += 1
+
+    return replaced, compressed_embeddings, compressed_parameters
 
 
 # ---------------------------------------------------------------------------
@@ -328,20 +445,18 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
         """Same as update_dtype — alias for transformers >= 4.49.0 compat."""
         return self.update_dtype(torch_dtype)
 
-    def check_quantized_param(
+    def param_needs_quantization(
         self,
         model: nn.Module,
-        param_value: torch.Tensor,
         param_name: str,
-        state_dict: Dict[str, Any],
         **kwargs,
     ) -> bool:
-        """Return True for HelixLinear buffer parameters.
+        """Return True for HelixLinear/HelixCompressedParameter buffer parameters.
 
         When requires_parameters_quantization is True, transformers calls this
         for each parameter. Returning True routes the parameter through
         create_quantized_param instead of set_module_tensor_to_device,
-        bypassing shape-mismatch errors for HelixLinear's variable-shape buffers.
+        bypassing shape-mismatch errors for variable-shape buffers.
         """
         HelixLinear = _get_helix_linear_cls()
         _helix_suffixes = (
@@ -354,11 +469,21 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
             if len(parts) == 2:
                 try:
                     mod = model.get_submodule(parts[0])
-                    if isinstance(mod, HelixLinear):
+                    if isinstance(mod, (HelixLinear, HelixCompressedParameter)):
                         return True
                 except (AttributeError, ValueError):
                     pass
         return False
+
+    def check_quantized_param(self, *args, **kwargs) -> bool:
+        """Backward-compat shim for transformers < 4.57."""
+        # Extract param_name from positional args (old signature was
+        # check_quantized_param(model, param_value, param_name, state_dict))
+        model = args[0] if args else kwargs.get("model")
+        param_name = args[2] if len(args) > 2 else kwargs.get("param_name")
+        if model is None or param_name is None:
+            return False
+        return self.param_needs_quantization(model, param_name)
 
     def create_quantized_param(
         self,
@@ -384,6 +509,10 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
         if hasattr(mod, buf_name):
             delattr(mod, buf_name)
         mod.register_buffer(buf_name, new_val)
+        # Track primary buffer loading for HelixCompressedParameter fail-closed check
+        if (isinstance(mod, HelixCompressedParameter)
+                and buf_name in ("codebook", "indices")):
+            mod._primary_buffers_loaded.add(buf_name)
 
     def _process_model_before_weight_loading(
         self, model: nn.Module, **kwargs
@@ -426,16 +555,21 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
                 f"aliased paths from tied weights"
             )
 
-        n, self._compressed_embeddings = _replace_with_helix_linear(
-            model, compressed,
-            module_k_map=k_map,
-            n_clusters_default=self.quantization_config.n_clusters,
-            vector_dim_default=getattr(self.quantization_config, "vector_dim", 1),
-            module_vector_dim_map=vd_map,
-            index_packing=getattr(self.quantization_config, "index_packing", None),
+        n, self._compressed_embeddings, self._compressed_parameters = (
+            _replace_with_helix_linear(
+                model, compressed,
+                module_k_map=k_map,
+                n_clusters_default=self.quantization_config.n_clusters,
+                vector_dim_default=getattr(self.quantization_config, "vector_dim", 1),
+                module_vector_dim_map=vd_map,
+                index_packing=getattr(self.quantization_config, "index_packing", None),
+            )
         )
-        logger.info(f"CDNA v3: replaced {n} nn.Linear → HelixLinear"
-                     f" ({len(self._compressed_embeddings)} embeddings)")
+        logger.info(
+            f"CDNA v3: replaced {n} modules"
+            f" ({len(self._compressed_embeddings)} embeddings,"
+            f" {len(self._compressed_parameters)} parameters)"
+        )
 
         # Detect aliased module paths (e.g., Zamba2's shared_transformer).
         # When the same module object appears under multiple named paths,
@@ -562,6 +696,73 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
         if embed_count:
             logger.info(f"CDNA v3: reconstructed {embed_count} compressed embedding(s)")
 
+        # Reconstruct compressed standalone parameters.
+        # HelixCompressedParameter shells were created in before_weight_loading
+        # and populated from safetensors. Now: decode HXQ → restore nn.Parameter.
+        param_count = 0
+        for name, module in list(model.named_modules()):
+            if not isinstance(module, HelixCompressedParameter):
+                continue
+
+            # Fail-closed: verify primary buffers were actually loaded
+            if "codebook" not in module._primary_buffers_loaded:
+                raise ValueError(
+                    f"Codebook for compressed parameter '{name}' was not loaded "
+                    f"from checkpoint. Ensure '{name}.codebook' exists in the "
+                    f"safetensors file."
+                )
+            if "indices" not in module._primary_buffers_loaded:
+                raise ValueError(
+                    f"Indices for compressed parameter '{name}' were not loaded "
+                    f"from checkpoint. Ensure '{name}.indices' exists in the "
+                    f"safetensors file."
+                )
+
+            codebook = module.codebook
+            indices = module.indices
+
+            # Fail-closed: shape validation
+            if tuple(indices.shape) != tuple(module.original_shape):
+                raise ValueError(
+                    f"Shape mismatch for compressed parameter '{name}': "
+                    f"indices shape {tuple(indices.shape)} != "
+                    f"original shape {tuple(module.original_shape)}"
+                )
+
+            with torch.no_grad():
+                # VQ decode
+                dense = codebook[indices.long().view(-1)].clone()
+
+                # Apply sidecar corrections (exact existing semantics)
+                sidecar_pos = module.sidecar_positions
+                sidecar_vals = module.sidecar_values
+                if (sidecar_pos is not None and sidecar_vals is not None
+                        and sidecar_pos.numel() > 0):
+                    dense[sidecar_pos.long()] = sidecar_vals
+
+                dense = dense.view(module.original_shape).to(module.original_dtype)
+
+            # Restore as nn.Parameter on parent module
+            parts = name.rsplit(".", 1)
+            if len(parts) == 2:
+                parent_path, p_name = parts
+                parent = model.get_submodule(parent_path)
+            else:
+                parent = model
+                p_name = name
+
+            del parent._modules[p_name]
+            parent.register_parameter(
+                p_name,
+                nn.Parameter(dense, requires_grad=module.original_requires_grad),
+            )
+            param_count += 1
+
+        if param_count:
+            logger.info(
+                f"CDNA v3: reconstructed {param_count} compressed parameter(s)"
+            )
+
     def _is_under_alias(self, key: str) -> bool:
         """Check if a state_dict key belongs to an aliased (non-canonical) module path.
 
@@ -577,9 +778,10 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
     def update_missing_keys(
         self, model: nn.Module, missing_keys: list, prefix: str
     ) -> list:
-        """Remove HelixLinear buffer keys and aliased module keys from missing_keys."""
+        """Remove HelixLinear/HelixCompressedParameter buffer keys and aliased module keys."""
         _helix_suffixes = {
             ".codebook_f16",
+            ".sidecar_positions", ".sidecar_values",
             "._sidecar_vq_vals",
             "._sidecar_rows",
             "._sidecar_cols",
@@ -605,9 +807,10 @@ class HelixHfQuantizer(HfQuantizer if HAS_HF_QUANTIZER_API else object):
     def update_expected_keys(
         self, model: nn.Module, expected_keys: list, loaded_keys: list
     ) -> list:
-        """Filter expected keys for aliased paths and HelixLinear optional buffers."""
+        """Filter expected keys for aliased paths and HelixLinear/HelixCompressedParameter optional buffers."""
         _helix_suffixes = {
             ".codebook_f16",
+            ".sidecar_positions", ".sidecar_values",
             "._sidecar_vq_vals",
             "._sidecar_rows",
             "._sidecar_cols",

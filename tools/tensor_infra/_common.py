@@ -11,8 +11,8 @@ MODEL_DIR = Path.home() / "models" / "tinyllama_fp32"
 import sys
 sys.path.insert(0, str(HELIX_ROOT))
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer
-from helix_substrate.cdnav3_reader import CDNAv3Reader
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+from helix_substrate.hxq_reader_v3 import CDNAv3Reader
 from helix_substrate.tensor_policy import TensorPolicy, TensorClass
 
 # ── Cost Tracking (WO-RECEIPT-COST-01) ──

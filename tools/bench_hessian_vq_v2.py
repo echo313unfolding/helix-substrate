@@ -53,7 +53,7 @@ from scipy.stats import kurtosis as scipy_kurtosis, spearmanr
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer, _cosine
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer, _cosine
 from helix_substrate.helix_linear import (
     load_helix_linear_from_cdnav3,
     swap_to_helix,

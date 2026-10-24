@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from helix_substrate.morpho_codec import grow_weights, morpho_encode, morpho_decode
-from helix_substrate.cdnav3_writer import CDNAv3Writer
-from helix_substrate.cdnav3_reader import CDNAv3Reader
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+from helix_substrate.hxq_reader_v3 import CDNAv3Reader
 from helix_substrate.tensor_policy import TensorClass, TensorPolicy
 
 
@@ -243,8 +243,8 @@ class TestFitToTarget:
         target = np.ones((1, 64), dtype=np.float32) * 1.5 + rng.randn(1, 64).astype(np.float32) * 0.1
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            from helix_substrate.cdnav3_writer import CDNAv3Writer
-            from helix_substrate.cdnav3_reader import CDNAv3Reader
+            from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+            from helix_substrate.hxq_reader_v3 import CDNAv3Reader
             from helix_substrate.tensor_policy import TensorPolicy, TensorClass
 
             policy = TensorPolicy(

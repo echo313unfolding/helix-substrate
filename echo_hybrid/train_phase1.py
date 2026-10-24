@@ -75,7 +75,7 @@ def compress_linear(
         W_q = codebook[indices]
     else:
         # Grouped path: d-dimensional vectors
-        from helix_substrate.cdna_encoder import _vector_kmeans
+        from helix_substrate.hxq_encoder import _vector_kmeans
         vectors = W.reshape(-1, vector_dim)  # [out * in/d, d]
         n_fit = min(len(vectors), 200000)
         if len(vectors) > n_fit:

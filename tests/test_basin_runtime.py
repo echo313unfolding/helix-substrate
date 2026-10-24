@@ -141,8 +141,14 @@ class TestStrictBenchmarkMode:
         assert helix._last_dispatch_path == "naive"  # Expected for CPU
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
-    def test_gpu_naive_raises(self):
-        """CUDA input dispatched to naive (Triton unavailable) -> raises RuntimeError."""
+    def test_gpu_buffered_fallback_allowed(self):
+        """CUDA input with Triton unavailable falls to buffered, not naive.
+
+        The dispatch chain was updated so CUDA inputs always get buffered
+        as the fallback path (near-dense cuBLAS speed). The naive path
+        (41x slower Python loop) is unreachable for CUDA. StrictBenchmarkMode
+        only prohibits naive, so buffered is acceptable.
+        """
         from helix_substrate.helix_linear import HelixLinear
 
         codebook = torch.randn(256, device="cuda")
@@ -152,11 +158,12 @@ class TestStrictBenchmarkMode:
 
         x = torch.randn(1, 16, device="cuda")
 
-        # Mock _use_fused to return False, forcing naive path on CUDA
+        # Mock _use_fused to return False — CUDA still gets buffered, not naive
         with patch.object(type(helix), '_use_fused', new_callable=lambda: property(lambda self: False)):
-            with pytest.raises(RuntimeError, match="StrictBenchmarkMode"):
-                with StrictBenchmarkMode():
-                    helix(x)
+            with StrictBenchmarkMode():
+                out = helix(x)  # Should NOT raise
+        assert out.shape == (1, 32)
+        assert helix._last_dispatch_path == "buffered"
 
     def test_forward_restored_after_exit(self):
         """Original forward is restored after context manager exits."""

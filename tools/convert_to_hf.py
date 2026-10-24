@@ -149,16 +149,46 @@ def convert_cdnav3_to_hf(model_dir: Path, output_dir: Path):
         orig_state = None  # loaded on-demand below
 
     if orig_keys:
-        # Keys covered by compressed modules (codebook/indices replace .weight)
-        compressed_weight_keys = {m["module"] + ".weight" for m in compressed_modules}
+        # --- Generic coverage: map each compressed module to its source key ---
+        # A compressed module M maps to:
+        #   M + ".weight"  if that exists in orig_keys (nn.Linear/nn.Conv1d weight)
+        #   M              if that exists in orig_keys (standalone nn.Parameter)
+        #   HARD FAIL      if neither exists
+        #   HARD FAIL      if BOTH exist (ambiguous)
+        compressed_source_keys = set()
+        for m in compressed_modules:
+            module_path = m["module"]
+            has_weight = (module_path + ".weight") in orig_keys
+            has_bare = module_path in orig_keys
+
+            if has_weight and has_bare:
+                raise ValueError(
+                    f"Ambiguous source mapping for compressed module '{module_path}': "
+                    f"both '{module_path}' and '{module_path}.weight' exist in the "
+                    f"source model. Cannot determine which is the compression source."
+                )
+            elif has_weight:
+                compressed_source_keys.add(module_path + ".weight")
+            elif has_bare:
+                compressed_source_keys.add(module_path)
+            else:
+                raise ValueError(
+                    f"Unresolved source mapping for compressed module '{module_path}': "
+                    f"neither '{module_path}' nor '{module_path}.weight' exists in "
+                    f"the source model."
+                )
+
         output_keys = set(tensors.keys())
-        covered = set()
+        covered = set(output_keys)
+        # Output keys like {module}.codebook cover the source key for that module
         for k in output_keys:
-            covered.add(k)
             for suffix in (".codebook", ".indices", ".sidecar_positions", ".sidecar_values"):
                 if k.endswith(suffix):
-                    covered.add(k.rsplit(".", 1)[0] + ".weight")
-        covered.update(compressed_weight_keys)
+                    module_path = k.rsplit(".", 1)[0]
+                    # Cover whichever source form exists
+                    covered.add(module_path + ".weight")
+                    covered.add(module_path)
+        covered.update(compressed_source_keys)
 
         missing = orig_keys - covered
         if missing:

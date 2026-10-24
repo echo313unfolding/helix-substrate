@@ -488,7 +488,7 @@ def experiment_transfer(records: list[CodebookRecord]) -> dict:
             print(f"    Foreign codebook: {cb_name} k={len(cb)}")
 
             # Self-codebook: compress this weight with its OWN best codebook
-            from helix_substrate.cdna_encoder import _simple_kmeans
+            from helix_substrate.hxq_encoder import _simple_kmeans
             own_cb, own_indices = _simple_kmeans(
                 w.ravel(), n_clusters=256, max_iters=20
             )

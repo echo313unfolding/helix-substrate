@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-from helix_substrate.cdna_reader import CDNAv2Writer, CDNAv2Reader
+from helix_substrate.hxq_reader import CDNAv2Writer, CDNAv2Reader
 
 
 def measure_standard_matmul(

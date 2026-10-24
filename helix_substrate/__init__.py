@@ -1,17 +1,16 @@
 """
-helix-substrate: Nature-inspired model compression and streaming decode.
+helix-substrate: Calibration-free weight compression (HXQ-VQ).
 
 Core components:
-    - CDNA format: k-means quantized model weight compression
-    - Streaming decode: block-by-block Y = X @ W without loading full weights
-    - Se routing: structural entropy for tensor-level compute routing
-      (legacy H×U×D formula; revised four-component model in se_final_form.md)
+    - HXQ-VQ codec: scalar k-means VQ (k=256) with sparse outlier sidecar
+    - CDNAv3Writer/Reader: per-tensor directory format
+    - HelixLinear: drop-in nn.Linear replacement (codebook[indices] matmul)
     - Receipts: tamper-evident verification of all operations
 """
 
-__version__ = "0.3.3"
+__version__ = "0.4.0"
 
-from helix_substrate.cdna_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
+from helix_substrate.hxq_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
 from helix_substrate.se import compute_tensor_se, compute_routing_decision
 from helix_substrate.convert import convert_huggingface_model
 from helix_substrate.convert_gguf import convert_gguf_model
@@ -23,8 +22,8 @@ from helix_substrate.receipt import (
     load_execution_receipt,
 )
 from helix_substrate.tensor_policy import classify_tensor, TensorPolicy, TensorClass, MORPHO_FFT_POLICY
-from helix_substrate.cdnav3_writer import CDNAv3Writer
-from helix_substrate.cdnav3_reader import CDNAv3Reader
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+from helix_substrate.hxq_reader_v3 import CDNAv3Reader
 
 # Auto-register CDNA v3 / Helix quantizer with HuggingFace Transformers.
 # hf_quantizer is the canonical implementation — handles HelixLinear, shared modules,

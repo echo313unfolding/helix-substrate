@@ -29,8 +29,8 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from helix_substrate.cdnav3_reader import CDNAv3Reader
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_reader_v3 import CDNAv3Reader
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.tensor_policy import classify_tensor, get_policy, TensorClass
 
 RECEIPT_DIR = Path(__file__).resolve().parent.parent / "receipts" / "vq2d_ppl"
