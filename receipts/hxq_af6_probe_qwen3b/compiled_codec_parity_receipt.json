@@ -1,0 +1,131 @@
+{
+  "gate": "GAP-HXQ-009-QWEN-AF6-COMPILED-CODEC-PARITY",
+  "work_order": "GAP-HXQ-009",
+  "status": "NO_ROUTE_DIVERSITY",
+  "method": "C harness linked against production libggml-base.so; exercises actual quantize_row_hxq_affine_6_ref + dequantize_row_hxq_affine_6",
+  "NOT_a_python_reimplementation": true,
+  "production_source": {
+    "repo": "/home/voidstr3m33/llama-cpp-stage1/worktree_production",
+    "branch": "af6-mmq-production",
+    "commit": "f3d6e00d3df043be7ae13fc91b820e2755c8979b",
+    "libggml_base_sha256": "000e5910c2ec5e9a0ffd5e4bd7ce41431bf429f4692edb707c61fc8224e277b7",
+    "libggml_cuda_sha256": "4531d23f61b8c2359840af1cb566e66bd44261e759991270c9135182524d108b"
+  },
+  "dense_source": {
+    "model": "Qwen2.5-Coder-3B-Instruct (dense BF16)",
+    "path": "/home/voidstr3m33/models/qwen2.5-coder-3b-instruct-dense"
+  },
+  "probe_receipt_sha256": "d0d60e26825721324d7727764bb471df10bb1f18cd8839040f5c6d19ba7f9c4c",
+  "threshold": 0.999,
+  "scope": "7 tensors with probe affine6_cosine < 0.9995 (near-threshold population)",
+  "n_tensors_checked": 7,
+  "all_above_threshold": true,
+  "worst_cosine": 0.999096316,
+  "worst_tensor": "model.layers.1.mlp.down_proj.weight",
+  "margin_above_threshold": 9.6316e-05,
+  "results": [
+    {
+      "cosine": 0.999096316,
+      "max_abs_error": 0.005310058594,
+      "mean_abs_error": 0.0003171479301,
+      "nmse": 0.001809952154,
+      "n_elements": 22544384,
+      "above_0999": true,
+      "tensor": "model.layers.1.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ]
+    },
+    {
+      "cosine": 0.999169753,
+      "max_abs_error": 0.007019042969,
+      "mean_abs_error": 0.0003956770853,
+      "nmse": 0.001662633088,
+      "n_elements": 22544384,
+      "above_0999": true,
+      "tensor": "model.layers.2.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ]
+    },
+    {
+      "cosine": 0.999424458,
+      "max_abs_error": 0.003782272339,
+      "mean_abs_error": 0.0008306855882,
+      "nmse": 0.001152160194,
+      "n_elements": 524288,
+      "above_0999": true,
+      "tensor": "model.layers.32.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ]
+    },
+    {
+      "cosine": 0.999441828,
+      "max_abs_error": 0.005950927734,
+      "mean_abs_error": 0.0004658626209,
+      "nmse": 0.001117331599,
+      "n_elements": 22544384,
+      "above_0999": true,
+      "tensor": "model.layers.3.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ]
+    },
+    {
+      "cosine": 0.999466923,
+      "max_abs_error": 0.003845214844,
+      "mean_abs_error": 0.0007416953386,
+      "nmse": 0.00106713153,
+      "n_elements": 524288,
+      "above_0999": true,
+      "tensor": "model.layers.30.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ]
+    },
+    {
+      "cosine": 0.999492672,
+      "max_abs_error": 0.003818511963,
+      "mean_abs_error": 0.0007083164451,
+      "nmse": 0.0010155152,
+      "n_elements": 524288,
+      "above_0999": true,
+      "tensor": "model.layers.31.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ]
+    },
+    {
+      "cosine": 0.99949833,
+      "max_abs_error": 0.005950927734,
+      "mean_abs_error": 0.0004664913696,
+      "nmse": 0.001004120857,
+      "n_elements": 22544384,
+      "above_0999": true,
+      "tensor": "model.layers.4.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ]
+    }
+  ],
+  "decision": "NO_ROUTE_DIVERSITY",
+  "decision_detail": "All 7 near-threshold tensors have compiled-codec cosine >= 0.999. Worst: 0.999096316 (model.layers.1.mlp.down_proj.weight), margin 9.63e-05. quality_first candidate is semantically uniform AF6. Do NOT create or benchmark a duplicate mixed GGUF.",
+  "classification": {
+    "GAP-HXQ-009-QWEN-AF6": "RESOLVED - NO_ROUTE_DIVERSITY",
+    "meaning": "The Hydra->AF6 actuator bridge works, but under the frozen quality_first policy Qwen2.5-Coder-3B provides no meaningful EXACT/AF6 routing opportunity because every eligible tensor satisfies the AF6 fidelity gate.",
+    "implication": "AF6 is already uniformly good enough at six bits that Hydra has nothing useful to correct on this model. Routing becomes relevant when the representation is aggressive enough that tensors genuinely separate into safe and unsafe populations."
+  },
+  "cost": {
+    "hostname": "Echo",
+    "python_version": "3.10.12",
+    "timestamp": "2026-10-27T17:06:16"
+  }
+}

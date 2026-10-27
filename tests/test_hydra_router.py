@@ -368,6 +368,74 @@ def test_mixed_model_routing():
     assert "affine5" in dist, "Easy MLP should be affine5"
 
 
+# ── from_json round-trip ──
+
+def test_from_json_round_trip():
+    """CompressionPlan survives to_json → from_json cycle."""
+    profiles = [
+        _make_profile(name="model.layers.0.self_attn.q_proj.weight",
+                      tensor_type="q_proj", layer=0, kurtosis=60.0),
+        _make_profile(name="model.layers.5.mlp.gate_proj.weight",
+                      tensor_type="gate_proj", layer=5),
+        _make_profile(name="model.norm.weight", tensor_type="norm",
+                      shape=(2048, 1), layer=0),
+    ]
+    router = HydraRouter(policy="edge_balanced")
+    original = router.route(profiles, model_name="test-round-trip")
+
+    json_str = original.to_json()
+    restored = CompressionPlan.from_json(json_str)
+
+    assert restored.model == original.model
+    assert restored.policy == original.policy
+    assert len(restored.tensors) == len(original.tensors)
+    for orig, rest in zip(original.tensors, restored.tensors):
+        assert rest.tensor_name == orig.tensor_name
+        assert rest.head == orig.head
+        assert rest.bpw == orig.bpw
+        assert rest.expected_cosine == orig.expected_cosine
+        assert rest.fallback_head == orig.fallback_head
+        assert rest.reason == orig.reason
+
+
+def test_from_json_file(tmp_path):
+    """CompressionPlan.from_json() reads from a file path."""
+    profiles = [_make_profile()]
+    router = HydraRouter(policy="quality_first")
+    plan = router.route(profiles, model_name="file-test")
+
+    json_path = tmp_path / "plan.json"
+    plan.to_json(json_path)
+
+    restored = CompressionPlan.from_json(json_path)
+    assert restored.model == "file-test"
+    assert len(restored.tensors) == len(plan.tensors)
+    assert restored.tensors[0].head == plan.tensors[0].head
+
+
+def test_from_json_dict():
+    """CompressionPlan.from_json() accepts a dict directly."""
+    data = {
+        "model": "dict-test",
+        "policy": "edge_balanced",
+        "plan": [
+            {
+                "tensor_name": "model.layers.0.mlp.gate_proj.weight",
+                "head": "affine6",
+                "reason": ["test"],
+                "bpw": 6.25,
+                "expected_cosine": 0.999,
+                "sidecar_budget": 0.0,
+                "fallback_head": "exact",
+            }
+        ],
+    }
+    plan = CompressionPlan.from_json(data)
+    assert plan.model == "dict-test"
+    assert plan.tensors[0].head == Head.AFFINE6
+    assert plan.tensors[0].fallback_head == Head.EXACT
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0

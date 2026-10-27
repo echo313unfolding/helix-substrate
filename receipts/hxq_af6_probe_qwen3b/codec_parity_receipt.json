@@ -1,0 +1,170 @@
+{
+  "gate": "GAP-HXQ-009-QWEN-AF6-CODEC-PARITY",
+  "work_order": "GAP-HXQ-009",
+  "scope": "7 tensors with probe affine6_cosine < 0.9995",
+  "probe_receipt_sha256": "d0d60e26825721324d7727764bb471df10bb1f18cd8839040f5c6d19ba7f9c4c",
+  "model_dir": "/home/voidstr3m33/models/qwen2.5-coder-3b-instruct-dense",
+  "codec_differences": [
+    "Python probe: FP32 scale/offset throughout",
+    "C codec: FP16 round-trip on scale and offset before dequantize",
+    "C codec: index rounding via (uint8_t)(v + 0.5f) vs np.round"
+  ],
+  "threshold": 0.999,
+  "n_tensors_checked": 7,
+  "results": [
+    {
+      "tensor": "model.layers.1.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ],
+      "n_params": 22544384,
+      "probe_cosine": 0.999097,
+      "codec_cosine": 0.9990963,
+      "probe_vs_codec_cosine": 0.999994335,
+      "probe_max_abs_error": 0.0053885,
+      "codec_max_abs_error": 0.0053101,
+      "probe_mean_abs_error": 0.000317,
+      "codec_mean_abs_error": 0.0003171,
+      "probe_nmse": 0.001808634,
+      "codec_nmse": 0.001809936,
+      "ab_max_abs_diff": 0.0078125,
+      "ab_mean_abs_diff": 7.8e-06,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.2.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ],
+      "n_params": 22544384,
+      "probe_cosine": 0.9991702,
+      "codec_cosine": 0.9991698,
+      "probe_vs_codec_cosine": 0.999994849,
+      "probe_max_abs_error": 0.006992,
+      "codec_max_abs_error": 0.007019,
+      "probe_mean_abs_error": 0.0003955,
+      "codec_mean_abs_error": 0.0003957,
+      "probe_nmse": 0.001661729,
+      "codec_nmse": 0.001662622,
+      "ab_max_abs_diff": 0.0092943,
+      "ab_mean_abs_diff": 9.3e-06,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.32.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "n_params": 524288,
+      "probe_cosine": 0.9994248,
+      "codec_cosine": 0.9994245,
+      "probe_vs_codec_cosine": 0.99999319,
+      "probe_max_abs_error": 0.0037627,
+      "codec_max_abs_error": 0.0037823,
+      "probe_mean_abs_error": 0.0008303,
+      "codec_mean_abs_error": 0.0008307,
+      "probe_nmse": 0.001151497,
+      "codec_nmse": 0.00115214,
+      "ab_max_abs_diff": 0.0066014,
+      "ab_mean_abs_diff": 2.21e-05,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.3.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ],
+      "n_params": 22544384,
+      "probe_cosine": 0.9994422,
+      "codec_cosine": 0.9994418,
+      "probe_vs_codec_cosine": 0.999994897,
+      "probe_max_abs_error": 0.0058942,
+      "codec_max_abs_error": 0.0059509,
+      "probe_mean_abs_error": 0.0004656,
+      "codec_mean_abs_error": 0.0004659,
+      "probe_nmse": 0.001116667,
+      "codec_nmse": 0.001117313,
+      "ab_max_abs_diff": 0.0063281,
+      "ab_mean_abs_diff": 1.17e-05,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.30.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "n_params": 524288,
+      "probe_cosine": 0.9994673,
+      "codec_cosine": 0.9994669,
+      "probe_vs_codec_cosine": 0.999994385,
+      "probe_max_abs_error": 0.0039276,
+      "codec_max_abs_error": 0.0038452,
+      "probe_mean_abs_error": 0.0007412,
+      "codec_mean_abs_error": 0.0007417,
+      "probe_nmse": 0.0010664,
+      "codec_nmse": 0.001067096,
+      "ab_max_abs_diff": 0.0061171,
+      "ab_mean_abs_diff": 2.04e-05,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.31.self_attn.v_proj.weight",
+      "shape": [
+        256,
+        2048
+      ],
+      "n_params": 524288,
+      "probe_cosine": 0.999493,
+      "codec_cosine": 0.9994927,
+      "probe_vs_codec_cosine": 0.99999408,
+      "probe_max_abs_error": 0.003791,
+      "codec_max_abs_error": 0.0038185,
+      "probe_mean_abs_error": 0.0007079,
+      "codec_mean_abs_error": 0.0007083,
+      "probe_nmse": 0.00101491,
+      "codec_nmse": 0.001015511,
+      "ab_max_abs_diff": 0.0060863,
+      "ab_mean_abs_diff": 1.96e-05,
+      "codec_above_0999": true
+    },
+    {
+      "tensor": "model.layers.4.mlp.down_proj.weight",
+      "shape": [
+        2048,
+        11008
+      ],
+      "n_params": 22544384,
+      "probe_cosine": 0.9994986,
+      "codec_cosine": 0.9994983,
+      "probe_vs_codec_cosine": 0.999994777,
+      "probe_max_abs_error": 0.0058942,
+      "codec_max_abs_error": 0.0059509,
+      "probe_mean_abs_error": 0.0004662,
+      "codec_mean_abs_error": 0.0004665,
+      "probe_nmse": 0.001003503,
+      "codec_nmse": 0.001004105,
+      "ab_max_abs_diff": 0.0098351,
+      "ab_mean_abs_diff": 1.2e-05,
+      "codec_above_0999": true
+    }
+  ],
+  "worst_codec_cosine": 0.9990963,
+  "worst_tensor": "model.layers.1.mlp.down_proj.weight",
+  "decision": "NO_ROUTE_DIVERSITY",
+  "decision_detail": "All 7 near-threshold tensors have codec cosine >= 0.999. Worst: 0.9990963 (model.layers.1.mlp.down_proj.weight). quality_first candidate is semantically uniform AF6.",
+  "cost": {
+    "wall_time_s": 77.497,
+    "cpu_time_s": 92.498,
+    "peak_memory_mb": 1422.5,
+    "python_version": "3.10.12",
+    "hostname": "Echo",
+    "timestamp_start": "2026-10-27T16:22:24",
+    "timestamp_end": "2026-10-27T16:23:42",
+    "numpy_version": "2.2.6"
+  }
+}

@@ -144,6 +144,39 @@ class CompressionPlan:
             "head_distribution": head_counts,
         }
 
+    @classmethod
+    def from_json(cls, path_or_str) -> "CompressionPlan":
+        """Load CompressionPlan from JSON file, string, or dict."""
+        if isinstance(path_or_str, dict):
+            data = path_or_str
+        elif isinstance(path_or_str, Path):
+            data = json.loads(path_or_str.read_text())
+        elif isinstance(path_or_str, str):
+            # If it looks like JSON (starts with '{'), parse directly.
+            # Otherwise treat as a file path.
+            stripped = path_or_str.lstrip()
+            if stripped.startswith("{"):
+                data = json.loads(path_or_str)
+            else:
+                data = json.loads(Path(path_or_str).read_text())
+        else:
+            raise TypeError(f"Expected str, Path, or dict, got {type(path_or_str)}")
+        plan = cls(model=data.get("model", "unknown"), policy=data.get("policy", "unknown"))
+        plan.tensors = [
+            TensorPlan(
+                tensor_name=t["tensor_name"],
+                head=Head(t["head"]),
+                reason=t["reason"],
+                bpw=t["bpw"],
+                expected_cosine=t["expected_cosine"],
+                sidecar_budget=t.get("sidecar_budget", 0.0),
+                fallback_head=Head(t.get("fallback_head", "exact")),
+            )
+            for t in data["plan"]
+        ]
+        plan._param_map = {}
+        return plan
+
     def to_json(self, path: Optional[Path] = None) -> str:
         data = {
             "model": self.model,
