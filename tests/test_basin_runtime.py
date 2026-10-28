@@ -833,19 +833,50 @@ class TestManifestSchemaCompatibility:
             assert cap["valid"] is False
             assert any("n_tensors or n_tensors_compressed" in i for i in cap["issues"])
 
-    def test_old_field_preferred_over_new(self):
-        """When both old and new fields exist, old field is used (or-short-circuit)."""
+    def test_conflicting_block_fields_detected(self):
+        """Both n_blocks and n_layers present with different values -> issue."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cdna_dir = _make_manifest_dir(tmpdir, {
                 "model": "Test",
                 "n_blocks": 22,
                 "n_layers": 36,
                 "n_tensors": 154,
+                "compression_ratio": 3.99,
+            })
+            cap = check_cdnav3_capability(cdna_dir)
+            assert cap["valid"] is False
+            assert any("conflicting layer counts" in i for i in cap["issues"]), \
+                f"Expected conflict issue, got: {cap['issues']}"
+
+    def test_conflicting_tensor_fields_detected(self):
+        """Both n_tensors and n_tensors_compressed present with different values -> issue."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "Test",
+                "n_blocks": 22,
+                "n_tensors": 154,
                 "n_tensors_compressed": 324,
                 "compression_ratio": 3.99,
             })
             cap = check_cdnav3_capability(cdna_dir)
-            # or-short-circuit: n_blocks takes priority
+            assert cap["valid"] is False
+            assert any("conflicting tensor counts" in i for i in cap["issues"]), \
+                f"Expected conflict issue, got: {cap['issues']}"
+
+    def test_matching_old_and_new_fields_accepted(self):
+        """Both old and new fields present with same values -> no conflict."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "Test",
+                "n_blocks": 22,
+                "n_layers": 22,
+                "n_tensors": 154,
+                "n_tensors_compressed": 154,
+                "compression_ratio": 3.99,
+            })
+            cap = check_cdnav3_capability(cdna_dir)
+            conflict_issues = [i for i in cap["issues"] if "conflicting" in i]
+            assert conflict_issues == [], f"Unexpected conflict: {conflict_issues}"
             assert cap["n_blocks"] == 22
             assert cap["n_tensors"] == 154
 

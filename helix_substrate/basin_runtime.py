@@ -123,13 +123,38 @@ def check_cdnav3_capability(cdna_dir) -> dict:
     if "compression_ratio" not in manifest:
         issues.append("manifest.json missing required field: compression_ratio")
 
-    n_blocks = manifest.get("n_blocks") or manifest.get("n_layers")
-    if n_blocks is None:
+    # Resolve n_blocks / n_layers with conflict detection.
+    # These fields are NOT automatically interchangeable: n_layers counts all
+    # layers (attention + mamba + MoE), n_blocks may count only attention blocks.
+    _has_n_blocks = "n_blocks" in manifest
+    _has_n_layers = "n_layers" in manifest
+    if _has_n_blocks and _has_n_layers and manifest["n_blocks"] != manifest["n_layers"]:
+        issues.append(
+            f"manifest.json has conflicting layer counts: "
+            f"n_blocks={manifest['n_blocks']}, n_layers={manifest['n_layers']}"
+        )
+    if _has_n_blocks:
+        n_blocks = manifest["n_blocks"]
+    elif _has_n_layers:
+        n_blocks = manifest["n_layers"]
+    else:
+        n_blocks = None
         issues.append("manifest.json missing required field: n_blocks or n_layers")
 
-    # n_tensors counts .cdnav3 directories; maps to n_tensors_compressed in new schema
-    n_tensors = manifest.get("n_tensors") or manifest.get("n_tensors_compressed")
-    if n_tensors is None:
+    # Resolve n_tensors / n_tensors_compressed with conflict detection.
+    _has_n_tensors = "n_tensors" in manifest
+    _has_n_compressed = "n_tensors_compressed" in manifest
+    if _has_n_tensors and _has_n_compressed and manifest["n_tensors"] != manifest["n_tensors_compressed"]:
+        issues.append(
+            f"manifest.json has conflicting tensor counts: "
+            f"n_tensors={manifest['n_tensors']}, n_tensors_compressed={manifest['n_tensors_compressed']}"
+        )
+    if _has_n_tensors:
+        n_tensors = manifest["n_tensors"]
+    elif _has_n_compressed:
+        n_tensors = manifest["n_tensors_compressed"]
+    else:
+        n_tensors = None
         issues.append("manifest.json missing required field: n_tensors or n_tensors_compressed")
 
     manifest_ok = not issues  # track whether manifest parsed cleanly
