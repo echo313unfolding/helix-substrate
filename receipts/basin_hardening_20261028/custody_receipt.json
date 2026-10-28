@@ -1,0 +1,87 @@
+{
+  "gate": "BASIN_HARDENING_EVIDENCE_CUSTODY",
+  "date": "2026-10-28",
+  "purpose": "Bind the exact harness, source code, and receipts that produced the October 28 Basin hardening result into a single auditable bundle under version control.",
+
+  "harness": {
+    "file": "basin_hardening_harness.py",
+    "sha256": "e2785971d89f9e35e4f97f563e4b3ca2e7945a4c528def172a27fdfc11cb1c44",
+    "source": "helix-cdc/tools/basin_hardening.py (untracked in helix-cdc git)",
+    "note": "This is the exact script that was executed. It is not tracked in helix-cdc due to 887 unrelated staged files on feat/cdr-opcodes. Preserved here as a frozen copy."
+  },
+
+  "hardening_receipt": {
+    "file": "hardening_summary_20261028.json",
+    "sha256": "ed5642fa34cf022ff118d9ff00f7ebf9810a30ba976bbba19b45029559d2344e",
+    "source": "helix-cdc/receipts/hardening/2026-10-28/hardening_summary.json",
+    "result": "6 passed, 1 skipped (strict mode), 0 failed"
+  },
+
+  "march_baseline_preserved": {
+    "path": "helix-cdc/receipts/hardening/2026-03-13/hardening_summary.json",
+    "sha256": "bb159a72f2aed927da7271651f5f28908a3b2aafc878120dcfe7d5f76301c109",
+    "note": "Not copied here. Verified untouched at original location."
+  },
+
+  "source_commits": {
+    "repo": "helix-substrate",
+    "branch": "repair/clean-checkout-v1",
+    "commits": [
+      {
+        "hash": "1536519",
+        "full_hash": "15365193cf4d621e034bbc75d6c8cdacc614b31c",
+        "message": "Manifest contract check: detect conflicting n_blocks/n_layers values"
+      },
+      {
+        "hash": "eb0e42e",
+        "message": "Basin dispatch repair: manifest compat, buffered_cuda path, S6/S7 validation"
+      }
+    ],
+    "not_pushed": true,
+    "note": "Both commits are local only. Not on any remote."
+  },
+
+  "source_file_hashes_at_head": {
+    "helix_substrate/basin_runtime.py": "1a8ec688e72d36809ca776a80c09ece415cddd5bce9a70d0f0c4ad6e6b2655b7",
+    "tests/test_basin_runtime.py": "906f49f608d47883a6d745c4e5602004f66c161269b79e1c1cddbbf69f2e7411"
+  },
+
+  "runtime_configuration": {
+    "BASIN_BACKEND": "helix_fused",
+    "HELIX_MODEL_DIR": "/home/voidstr3m33/models/falcon-h1-0.5b-base",
+    "HELIX_MODEL_ID": "falcon_h1",
+    "HELIX_STRICT_BENCHMARK": "not set (default: 0)",
+    "server": "uvicorn api.basin_server:app --port 8099 --host 127.0.0.1",
+    "cwd": "/home/voidstr3m33/helix-cdc"
+  },
+
+  "model_served": {
+    "model": "falcon-h1-0.5b-base",
+    "manifest_sha256": "a0692d8c31f4a21c609f830b858ce3e04683b8850ea3c0980c86006338770688",
+    "helix_modules": 324,
+    "dispatch_path": "buffered_cuda"
+  },
+
+  "models_capability_checked": [
+    {"id": "falcon_h1", "tensors": 324, "manifest_sha256_prefix": "a0692d8c31f4"},
+    {"id": "jamba_tiny", "tensors": 302, "manifest_sha256_prefix": "f291af721efc"},
+    {"id": "qwen3b", "tensors": 252, "manifest_sha256_prefix": "d4d0770415d2"},
+    {"id": "granite_micro", "tensors": 168, "manifest_sha256_prefix": "f8356209368e"},
+    {"id": "zamba2", "tensors": 147, "manifest_sha256_prefix": "10100cbb69b5"}
+  ],
+
+  "what_this_does_not_establish": [
+    "Multi-model serving (only Falcon-H1 served HTTP requests)",
+    "Fused Triton execution (all requests dispatched buffered_cuda)",
+    "Strict-mode enforcement (skipped)",
+    "Performance comparison against March baseline (different model, different dispatch path)",
+    "Practical advantage over established inference stacks"
+  ],
+
+  "helix_cdc_state": {
+    "branch": "feat/cdr-opcodes",
+    "head": "145018720d9e461e4861c06661a5580abde6a97d",
+    "staged_files": 887,
+    "note": "basin_hardening.py is untracked. Receipt directory may also be untracked. This bundle exists because committing into that staging area would contaminate unrelated work."
+  }
+}

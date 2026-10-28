@@ -1,0 +1,26 @@
+{
+  "schema": "basin_hardening_summary:v1",
+  "startup_decision": "helix_fused",
+  "strict_mode": false,
+  "request_count": 6,
+  "success_count": 6,
+  "fused_count": 0,
+  "naive_count": 0,
+  "mean_decode_tok_s": 5.4,
+  "mean_prefill_tok_s": 10.1,
+  "latency_spread": {
+    "min_decode_tok_s": 5.4,
+    "max_decode_tok_s": 5.5
+  },
+  "failure_reasons": [],
+  "models_tested": [
+    "falcon_h1"
+  ],
+  "timestamp": "2026-10-28T10:07:32.706741+00:00",
+  "hostname": "Echo",
+  "cost": {
+    "wall_time_s": 49.523,
+    "peak_memory_mb": 478.0,
+    "python_version": "3.10.12"
+  }
+}
