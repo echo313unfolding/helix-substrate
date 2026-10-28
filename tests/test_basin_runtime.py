@@ -17,6 +17,7 @@ import torch
 
 from helix_substrate.basin_runtime import (
     check_cdnav3_capability,
+    build_dispatch_receipt,
     StrictBenchmarkMode,
     validate_receipt,
     validate_startup_receipt,
@@ -24,6 +25,7 @@ from helix_substrate.basin_runtime import (
     build_startup_receipt,
     build_hardening_summary,
     RUNTIME_PATH_FUSED,
+    RUNTIME_PATH_BUFFERED,
     RUNTIME_PATH_NAIVE,
     RUNTIME_PATH_MIXED,
     RUNTIME_PATH_UNSUPPORTED,
@@ -206,9 +208,11 @@ def _make_valid_receipt(**overrides):
         "dispatch_summary": {
             "total_helix_modules": 154,
             "fused_count": 154,
+            "buffered_count": 0,
             "naive_count": 0,
             "unknown_count": 0,
             "all_fused": True,
+            "all_accelerated": True,
             "runtime_path": RUNTIME_PATH_FUSED,
         },
         "kernel_metadata": {"kernel_version": "v3_tiled_fp16dot"},
@@ -241,9 +245,11 @@ def _make_naive_receipt():
         dispatch_summary={
             "total_helix_modules": 154,
             "fused_count": 0,
+            "buffered_count": 0,
             "naive_count": 154,
             "unknown_count": 0,
             "all_fused": False,
+            "all_accelerated": False,
             "runtime_path": RUNTIME_PATH_NAIVE,
         },
         kernel_metadata=None,
@@ -415,16 +421,18 @@ class TestValidateReceiptSemantic:
 
     def test_all_canonical_paths_accepted(self):
         """Every canonical runtime_path is accepted by the validator."""
-        for rp in (RUNTIME_PATH_FUSED, RUNTIME_PATH_NAIVE, RUNTIME_PATH_MIXED,
-                   RUNTIME_PATH_UNSUPPORTED, RUNTIME_PATH_STARTUP_FAIL,
-                   RUNTIME_PATH_RECEIPT_FAIL):
+        for rp in (RUNTIME_PATH_FUSED, RUNTIME_PATH_BUFFERED, RUNTIME_PATH_NAIVE,
+                   RUNTIME_PATH_MIXED, RUNTIME_PATH_UNSUPPORTED,
+                   RUNTIME_PATH_STARTUP_FAIL, RUNTIME_PATH_RECEIPT_FAIL):
             r = _make_valid_receipt()
             r["dispatch_summary"]["runtime_path"] = rp
             # Suppress semantic cross-check failures for non-fused paths
             if rp != RUNTIME_PATH_FUSED:
                 r["kernel_metadata"] = None
                 r["dispatch_summary"]["all_fused"] = False
+                r["dispatch_summary"]["all_accelerated"] = False
                 r["dispatch_summary"]["fused_count"] = 0
+                r["dispatch_summary"]["buffered_count"] = 0
                 r["dispatch_summary"]["naive_count"] = 0
                 r["dispatch_summary"]["total_helix_modules"] = 0
             issues = validate_receipt(r)
@@ -744,3 +752,388 @@ class TestNegativePaths:
             cap = check_cdnav3_capability(cdna_dir)
             assert cap["valid"] is False
             assert any("meta.json missing" in i for i in cap["issues"])
+
+
+# ---------------------------------------------------------------------------
+# Regression: Manifest schema compatibility (WO-BASIN-RECEIPT-SEMANTICS-01)
+# ---------------------------------------------------------------------------
+
+def _make_manifest_dir(tmpdir, manifest_data, n_tensor_dirs=0):
+    """Create a temp CDNA dir with manifest and optional tensor stubs."""
+    cdna_dir = Path(tmpdir)
+    (cdna_dir / "manifest.json").write_text(json.dumps(manifest_data))
+    for i in range(n_tensor_dirs):
+        td = cdna_dir / f"tensor_{i}.cdnav3"
+        td.mkdir()
+        (td / "meta.json").write_text(json.dumps({"format_version": "cdna_v3"}))
+    return cdna_dir
+
+
+class TestManifestSchemaCompatibility:
+    """Regression: check_cdnav3_capability accepts both old and new manifest schemas."""
+
+    def test_legacy_manifest_n_blocks_n_tensors(self):
+        """Old-schema manifest (n_blocks, n_tensors) -> model_name, n_blocks, n_tensors populated."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "TinyLlama-1.1B",
+                "n_blocks": 22,
+                "n_tensors": 3,
+                "compression_ratio": 3.99,
+            }, n_tensor_dirs=3)
+
+            cap = check_cdnav3_capability(cdna_dir)
+            data_issues = [i for i in cap["issues"]
+                           if "CUDA" not in i and "Triton" not in i
+                           and "accelerator" not in i.lower()]
+            assert data_issues == [], f"Unexpected data issues: {data_issues}"
+            assert cap["model_name"] == "TinyLlama-1.1B"
+            assert cap["n_blocks"] == 22
+            assert cap["n_tensors"] == 3
+
+    def test_current_manifest_n_layers_n_tensors_compressed(self):
+        """New-schema manifest (n_layers, n_tensors_compressed) -> accepted."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "falcon-h1-0.5b-base",
+                "n_layers": 36,
+                "n_tensors_compressed": 2,
+                "compression_ratio": 3.99,
+            }, n_tensor_dirs=2)
+
+            cap = check_cdnav3_capability(cdna_dir)
+            data_issues = [i for i in cap["issues"]
+                           if "CUDA" not in i and "Triton" not in i
+                           and "accelerator" not in i.lower()]
+            assert data_issues == [], f"Unexpected data issues: {data_issues}"
+            assert cap["model_name"] == "falcon-h1-0.5b-base"
+            assert cap["n_blocks"] == 36  # mapped from n_layers
+            assert cap["n_tensors"] == 2  # mapped from n_tensors_compressed
+
+    def test_missing_both_block_fields(self):
+        """Manifest with neither n_blocks nor n_layers -> issue reported."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "Test",
+                "compression_ratio": 2.0,
+            })
+            cap = check_cdnav3_capability(cdna_dir)
+            assert cap["valid"] is False
+            assert any("n_blocks or n_layers" in i for i in cap["issues"])
+
+    def test_missing_both_tensor_count_fields(self):
+        """Manifest with neither n_tensors nor n_tensors_compressed -> issue reported."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "Test",
+                "n_blocks": 2,
+                "compression_ratio": 2.0,
+            })
+            cap = check_cdnav3_capability(cdna_dir)
+            assert cap["valid"] is False
+            assert any("n_tensors or n_tensors_compressed" in i for i in cap["issues"])
+
+    def test_old_field_preferred_over_new(self):
+        """When both old and new fields exist, old field is used (or-short-circuit)."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cdna_dir = _make_manifest_dir(tmpdir, {
+                "model": "Test",
+                "n_blocks": 22,
+                "n_layers": 36,
+                "n_tensors": 154,
+                "n_tensors_compressed": 324,
+                "compression_ratio": 3.99,
+            })
+            cap = check_cdnav3_capability(cdna_dir)
+            # or-short-circuit: n_blocks takes priority
+            assert cap["n_blocks"] == 22
+            assert cap["n_tensors"] == 154
+
+    def test_real_falcon_manifest(self):
+        """Real Falcon-H1-0.5B manifest on disk uses new schema -> accepted."""
+        falcon_cdna = Path.home() / "models" / "falcon-h1-0.5b-base" / "cdnav3"
+        if not falcon_cdna.exists():
+            pytest.skip("Falcon CDNA v3 not present")
+
+        cap = check_cdnav3_capability(falcon_cdna)
+        data_issues = [i for i in cap["issues"]
+                       if "CUDA" not in i and "Triton" not in i
+                       and "accelerator" not in i.lower()]
+        assert data_issues == [], f"Unexpected data issues: {data_issues}"
+        assert cap["model_name"] == "falcon-h1-0.5b-base"
+        assert cap["n_blocks"] == 36
+        assert cap["n_tensors"] == 324
+        assert cap["compression_ratio"] == 3.99
+
+
+# ---------------------------------------------------------------------------
+# Regression: build_dispatch_receipt path classification
+# ---------------------------------------------------------------------------
+
+def _make_mock_model(dispatch_paths):
+    """Create a model with HelixLinear modules set to specific dispatch paths.
+
+    Args:
+        dispatch_paths: list of strings, each is "fused", "buffered", "naive", or None
+    """
+    from helix_substrate.helix_linear import HelixLinear
+
+    model = torch.nn.Module()
+    for i, path in enumerate(dispatch_paths):
+        codebook = torch.randn(256)
+        indices = torch.randint(0, 256, (4, 4), dtype=torch.uint8)
+        hl = HelixLinear(4, 4, codebook, indices)
+        hl._last_dispatch_path = path
+        model.add_module(f"helix_{i}", hl)
+    return model
+
+
+def _stub_timing():
+    return {
+        "prompt_tokens": 3,
+        "generated_tokens": 10,
+        "prefill_ms": 50.0,
+        "decode_ms": 200.0,
+        "total_ms": 250.0,
+        "tok_s": 10.0,
+        "prefill_tok_s": 5.0,
+        "decode_loop": "custom_greedy",
+    }
+
+
+def _stub_load_metadata():
+    return {
+        "manifest_model": "test-model",
+        "manifest_sha256": "abc123",
+        "helix_modules": 4,
+        "compression_ratio": 3.99,
+        "vram_mb": 100,
+        "load_time_s": 1.0,
+    }
+
+
+class TestBuildDispatchReceiptClassification:
+    """Regression: runtime_path classification in build_dispatch_receipt."""
+
+    def test_all_fused(self):
+        model = _make_mock_model(["fused", "fused", "fused"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_FUSED
+        assert ds["fused_count"] == 3
+        assert ds["buffered_count"] == 0
+        assert ds["all_fused"] is True
+        assert ds["all_accelerated"] is True
+
+    def test_all_buffered(self):
+        model = _make_mock_model(["buffered", "buffered", "buffered"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_BUFFERED
+        assert ds["buffered_count"] == 3
+        assert ds["fused_count"] == 0
+        assert ds["all_fused"] is False
+        assert ds["all_accelerated"] is True
+
+    def test_mixed_fused_buffered(self):
+        model = _make_mock_model(["fused", "buffered", "fused"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_MIXED
+        assert ds["fused_count"] == 2
+        assert ds["buffered_count"] == 1
+        assert ds["naive_count"] == 0
+        assert ds["all_fused"] is False
+        assert ds["all_accelerated"] is True
+
+    def test_all_naive(self):
+        model = _make_mock_model(["naive", "naive"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_NAIVE
+        assert ds["naive_count"] == 2
+        assert ds["all_fused"] is False
+        assert ds["all_accelerated"] is False
+
+    def test_mixed_accelerated_naive(self):
+        model = _make_mock_model(["fused", "naive", "buffered"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_MIXED
+        assert ds["fused_count"] == 1
+        assert ds["buffered_count"] == 1
+        assert ds["naive_count"] == 1
+        assert ds["all_accelerated"] is False
+
+    def test_zero_helix_modules(self):
+        model = torch.nn.Module()  # no HelixLinear modules
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_UNSUPPORTED
+        assert ds["total_helix_modules"] == 0
+
+    def test_all_unknown_dispatch(self):
+        model = _make_mock_model([None, None])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_UNSUPPORTED
+        assert ds["unknown_count"] == 2
+        assert ds["all_fused"] is False
+        assert ds["all_accelerated"] is False
+
+    def test_buffered_not_collapsed_to_fused(self):
+        """Regression: all-buffered must NOT report fused_triton_v3."""
+        model = _make_mock_model(["buffered"] * 10)
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_BUFFERED
+        assert ds["runtime_path"] != RUNTIME_PATH_FUSED
+
+    def test_mixed_not_collapsed_to_buffered(self):
+        """Regression: fused+buffered mix must NOT report buffered_cuda."""
+        model = _make_mock_model(["fused", "buffered"])
+        receipt = build_dispatch_receipt(model, _stub_timing(), {"prompt": "hi"}, _stub_load_metadata())
+        ds = receipt["dispatch_summary"]
+        assert ds["runtime_path"] == RUNTIME_PATH_MIXED
+        assert ds["runtime_path"] != RUNTIME_PATH_BUFFERED
+
+
+# ---------------------------------------------------------------------------
+# Regression: validate_receipt S6 (all_accelerated consistency)
+# ---------------------------------------------------------------------------
+
+def _make_buffered_receipt(**overrides):
+    """Build a valid all-buffered receipt."""
+    r = _make_valid_receipt()
+    r["dispatch_summary"] = {
+        "total_helix_modules": 324,
+        "fused_count": 0,
+        "buffered_count": 324,
+        "naive_count": 0,
+        "unknown_count": 0,
+        "all_fused": False,
+        "all_accelerated": True,
+        "runtime_path": RUNTIME_PATH_BUFFERED,
+    }
+    r["kernel_metadata"] = None
+    for k, v in overrides.items():
+        if isinstance(v, dict) and k in r and isinstance(r[k], dict):
+            r[k].update(v)
+        else:
+            r[k] = v
+    return r
+
+
+class TestValidateReceiptS6AllAccelerated:
+    """Regression: S6 all_accelerated consistency checks."""
+
+    def test_s6_all_accelerated_true_naive_nonzero(self):
+        """all_accelerated=True but naive_count>0 -> semantic error."""
+        r = _make_buffered_receipt()
+        r["dispatch_summary"]["all_accelerated"] = True
+        r["dispatch_summary"]["naive_count"] = 5
+        r["dispatch_summary"]["runtime_path"] = RUNTIME_PATH_MIXED
+        r["fallback_reason"] = "5/324 modules fell to naive path"
+        issues = validate_receipt(r)
+        assert any("all_accelerated=True but naive_count=5" in i for i in issues)
+
+    def test_s6_all_accelerated_true_counts_mismatch(self):
+        """all_accelerated=True but fused+buffered != total -> semantic error."""
+        r = _make_buffered_receipt()
+        r["dispatch_summary"]["all_accelerated"] = True
+        r["dispatch_summary"]["buffered_count"] = 300  # 300 != 324
+        r["dispatch_summary"]["unknown_count"] = 24
+        r["dispatch_summary"]["runtime_path"] = RUNTIME_PATH_MIXED
+        issues = validate_receipt(r)
+        assert any("fused(0)+buffered(300)=300" in i and "!= total(324)" in i
+                    for i in issues)
+
+    def test_s6_all_accelerated_false_but_all_are_accelerated(self):
+        """all_accelerated=False but fused+buffered == total -> semantic error."""
+        r = _make_buffered_receipt()
+        r["dispatch_summary"]["all_accelerated"] = False
+        issues = validate_receipt(r)
+        assert any("all_accelerated=False" in i and "== total(324)" in i
+                    for i in issues)
+
+    def test_s6_all_accelerated_true_correct(self):
+        """all_accelerated=True with matching counts -> no S6 issues."""
+        r = _make_buffered_receipt()
+        issues = validate_receipt(r)
+        s6_issues = [i for i in issues if "all_accelerated" in i]
+        assert s6_issues == [], f"Unexpected S6 issues: {s6_issues}"
+
+    def test_s6_absent_field_no_issues(self):
+        """all_accelerated absent -> S6 checks skipped."""
+        r = _make_buffered_receipt()
+        del r["dispatch_summary"]["all_accelerated"]
+        issues = validate_receipt(r)
+        s6_issues = [i for i in issues if "all_accelerated" in i]
+        assert s6_issues == [], f"Unexpected S6 issues when field absent: {s6_issues}"
+
+
+# ---------------------------------------------------------------------------
+# Regression: validate_receipt S7 (runtime_path vs count consistency)
+# ---------------------------------------------------------------------------
+
+class TestValidateReceiptS7RuntimePathConsistency:
+    """Regression: S7 runtime_path must be consistent with actual counts."""
+
+    def test_s7_fused_path_wrong_count(self):
+        """runtime_path=fused but fused_count != total -> semantic error."""
+        r = _make_valid_receipt()
+        r["dispatch_summary"]["fused_count"] = 100
+        r["dispatch_summary"]["buffered_count"] = 54
+        # runtime_path still says fused but fused != total
+        issues = validate_receipt(r)
+        assert any("runtime_path=" in i and "fused_count=100" in i
+                    for i in issues)
+
+    def test_s7_buffered_path_wrong_count(self):
+        """runtime_path=buffered but buffered_count != total -> semantic error."""
+        r = _make_buffered_receipt()
+        r["dispatch_summary"]["buffered_count"] = 300
+        r["dispatch_summary"]["unknown_count"] = 24
+        # runtime_path still says buffered but buffered != total
+        issues = validate_receipt(r)
+        assert any("runtime_path=" in i and "buffered_count=300" in i
+                    for i in issues)
+
+    def test_s7_naive_path_wrong_count(self):
+        """runtime_path=naive but naive_count != total -> semantic error."""
+        r = _make_naive_receipt()
+        r["dispatch_summary"]["naive_count"] = 100
+        r["dispatch_summary"]["fused_count"] = 54
+        # runtime_path still says naive
+        issues = validate_receipt(r)
+        assert any("runtime_path=" in i and "naive_count=100" in i
+                    for i in issues)
+
+    def test_s7_fused_path_correct(self):
+        """runtime_path=fused with matching fused_count -> no S7 issues."""
+        r = _make_valid_receipt()
+        issues = validate_receipt(r)
+        s7_issues = [i for i in issues if "runtime_path=" in i and "!= total" in i]
+        assert s7_issues == [], f"Unexpected S7 issues: {s7_issues}"
+
+    def test_s7_buffered_path_correct(self):
+        """runtime_path=buffered with matching buffered_count -> no S7 issues."""
+        r = _make_buffered_receipt()
+        issues = validate_receipt(r)
+        s7_issues = [i for i in issues if "runtime_path=" in i and "!= total" in i]
+        assert s7_issues == [], f"Unexpected S7 issues: {s7_issues}"
+
+    def test_s7_mixed_path_no_count_check(self):
+        """runtime_path=mixed -> no S7 single-count check (mixed is inherently multi)."""
+        r = _make_valid_receipt()
+        r["dispatch_summary"]["runtime_path"] = RUNTIME_PATH_MIXED
+        r["dispatch_summary"]["all_fused"] = False
+        r["dispatch_summary"]["all_accelerated"] = False
+        r["dispatch_summary"]["fused_count"] = 100
+        r["dispatch_summary"]["buffered_count"] = 50
+        r["dispatch_summary"]["naive_count"] = 4
+        r["dispatch_summary"]["total_helix_modules"] = 154
+        r["fallback_reason"] = "4/154 modules fell to naive path"
+        issues = validate_receipt(r)
+        s7_issues = [i for i in issues if "runtime_path=" in i and "!= total" in i]
+        assert s7_issues == [], f"Mixed path should not trigger S7: {s7_issues}"

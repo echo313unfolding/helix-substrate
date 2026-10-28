@@ -53,14 +53,15 @@ from .device_utils import (
 # 1a. Capability check
 # ---------------------------------------------------------------------------
 
-_REQUIRED_MANIFEST_FIELDS = ("model", "n_blocks", "n_tensors", "compression_ratio")
-
-
 def check_cdnav3_capability(cdna_dir) -> dict:
     """
     Validate a CDNA v3 directory for HelixLinear readiness.
 
     Never raises — returns issues as strings so the caller decides.
+
+    Accepts both original manifest schema (n_blocks, n_tensors) and
+    current schema (n_layers, n_tensors_compressed).  Runtime checks
+    (CUDA, Triton) always execute regardless of manifest issues.
 
     Returns:
         {
@@ -115,29 +116,40 @@ def check_cdnav3_capability(cdna_dir) -> dict:
     # SHA256 the manifest for receipt provenance
     result["manifest_sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
 
-    # Check required fields
-    for field in _REQUIRED_MANIFEST_FIELDS:
-        if field not in manifest:
-            issues.append(f"manifest.json missing required field: {field}")
+    # Check required fields — accept both old and new schema names.
+    # Old: n_blocks, n_tensors.  New: n_layers, n_tensors_compressed.
+    if "model" not in manifest:
+        issues.append("manifest.json missing required field: model")
+    if "compression_ratio" not in manifest:
+        issues.append("manifest.json missing required field: compression_ratio")
 
-    if issues:
-        return result
+    n_blocks = manifest.get("n_blocks") or manifest.get("n_layers")
+    if n_blocks is None:
+        issues.append("manifest.json missing required field: n_blocks or n_layers")
 
-    result["model_name"] = manifest["model"]
-    result["n_tensors"] = manifest["n_tensors"]
-    result["n_blocks"] = manifest["n_blocks"]
-    result["compression_ratio"] = manifest["compression_ratio"]
+    # n_tensors counts .cdnav3 directories; maps to n_tensors_compressed in new schema
+    n_tensors = manifest.get("n_tensors") or manifest.get("n_tensors_compressed")
+    if n_tensors is None:
+        issues.append("manifest.json missing required field: n_tensors or n_tensors_compressed")
 
-    # Count .cdnav3 subdirs
+    manifest_ok = not issues  # track whether manifest parsed cleanly
+
+    if manifest_ok:
+        result["model_name"] = manifest["model"]
+        result["n_tensors"] = n_tensors
+        result["n_blocks"] = n_blocks
+        result["compression_ratio"] = manifest["compression_ratio"]
+
+    # Count .cdnav3 subdirs (always, even if manifest had issues)
     tensor_dirs = sorted(cdna_dir.glob("*.cdnav3"))
     tensor_dirs = [d for d in tensor_dirs if d.is_dir()]
     result["tensor_dirs_found"] = len(tensor_dirs)
 
-    expected = manifest["n_tensors"]
-    if len(tensor_dirs) != expected:
-        issues.append(
-            f"Expected {expected} tensor dirs, found {len(tensor_dirs)}"
-        )
+    if manifest_ok and n_tensors is not None:
+        if len(tensor_dirs) != n_tensors:
+            issues.append(
+                f"Expected {n_tensors} tensor dirs, found {len(tensor_dirs)}"
+            )
 
     # Spot-check first tensor's meta.json
     if tensor_dirs:
@@ -474,6 +486,7 @@ def build_dispatch_receipt(
     # Collect dispatch metadata from all HelixLinear modules
     total_helix = 0
     fused_count = 0
+    buffered_count = 0
     naive_count = 0
     unknown_count = 0
 
@@ -483,26 +496,34 @@ def build_dispatch_receipt(
             path = module._last_dispatch_path
             if path == "fused":
                 fused_count += 1
+            elif path == "buffered":
+                buffered_count += 1
             elif path == "naive":
                 naive_count += 1
             else:
                 unknown_count += 1
+
+    accelerated_count = fused_count + buffered_count
 
     # Determine runtime_path (WO-BASIN-RECEIPT-SEMANTICS-01: canonical labels)
     if total_helix == 0:
         runtime_path = "unsupported_manifest"
     elif fused_count == total_helix:
         runtime_path = "fused_triton_v3"
+    elif buffered_count == total_helix:
+        runtime_path = "buffered_cuda"
+    elif fused_count > 0 and buffered_count > 0 and naive_count == 0:
+        runtime_path = "mixed_dispatch"
     elif naive_count == total_helix:
         runtime_path = "naive_tiled"
-    elif fused_count > 0 and naive_count > 0:
+    elif naive_count > 0 and accelerated_count > 0:
         runtime_path = "mixed_dispatch"
     else:
         runtime_path = "unsupported_manifest"
 
     # Fallback reason
     fallback_reason = None
-    if naive_count > 0 and fused_count == 0:
+    if naive_count > 0 and accelerated_count == 0:
         if not torch.cuda.is_available() and not (
             hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
         ):
@@ -568,9 +589,11 @@ def build_dispatch_receipt(
         "dispatch_summary": {
             "total_helix_modules": total_helix,
             "fused_count": fused_count,
+            "buffered_count": buffered_count,
             "naive_count": naive_count,
             "unknown_count": unknown_count,
             "all_fused": fused_count == total_helix and total_helix > 0,
+            "all_accelerated": accelerated_count == total_helix and total_helix > 0,
             "runtime_path": runtime_path,
         },
         "kernel_metadata": kernel_metadata,
@@ -631,6 +654,7 @@ def StrictBenchmarkMode():
 
 # Canonical runtime_path taxonomy (WO-BASIN-RECEIPT-SEMANTICS-01)
 RUNTIME_PATH_FUSED = "fused_triton_v3"
+RUNTIME_PATH_BUFFERED = "buffered_cuda"
 RUNTIME_PATH_NAIVE = "naive_tiled"
 RUNTIME_PATH_MIXED = "mixed_dispatch"
 RUNTIME_PATH_UNSUPPORTED = "unsupported_manifest"
@@ -639,6 +663,7 @@ RUNTIME_PATH_RECEIPT_FAIL = "receipt_validation_failure"
 
 _VALID_RUNTIME_PATHS = (
     RUNTIME_PATH_FUSED,
+    RUNTIME_PATH_BUFFERED,
     RUNTIME_PATH_NAIVE,
     RUNTIME_PATH_MIXED,
     RUNTIME_PATH_UNSUPPORTED,
@@ -738,9 +763,13 @@ def validate_receipt(receipt: dict) -> list:
     # --- Semantic invariant checks (WO-BASIN-RECEIPT-SEMANTICS-01 task 2) ---
 
     rp = ds.get("runtime_path")
+    total = ds.get("total_helix_modules", 0)
     fused_count = ds.get("fused_count", 0)
+    buffered_count = ds.get("buffered_count", 0)
     naive_count = ds.get("naive_count", 0)
+    unknown_count = ds.get("unknown_count", 0)
     all_fused = ds.get("all_fused")
+    all_accelerated = ds.get("all_accelerated")
     km = receipt.get("kernel_metadata")
     fr = receipt.get("fallback_reason")
 
@@ -774,14 +803,48 @@ def validate_receipt(receipt: dict) -> list:
         issues.append("semantic: all_fused=True but fused_count=0")
 
     if all_fused is False and fused_count > 0 and naive_count == 0:
-        # all modules were fused but all_fused was set to False
-        total = ds.get("total_helix_modules", 0)
-        unknown = ds.get("unknown_count", 0)
-        if fused_count == total and unknown == 0:
+        if fused_count == total and unknown_count == 0 and buffered_count == 0:
             issues.append(
                 f"semantic: all_fused=False but fused_count={fused_count} "
                 f"== total_helix_modules={total} with naive_count=0"
             )
+
+    # S6: all_accelerated consistency (when field is present)
+    if all_accelerated is not None:
+        accel = fused_count + buffered_count
+        if all_accelerated is True and naive_count != 0:
+            issues.append(
+                f"semantic: all_accelerated=True but naive_count={naive_count}"
+            )
+        if all_accelerated is True and accel != total:
+            issues.append(
+                f"semantic: all_accelerated=True but "
+                f"fused({fused_count})+buffered({buffered_count})={accel} "
+                f"!= total({total})"
+            )
+        if all_accelerated is False and accel == total and total > 0 and unknown_count == 0:
+            issues.append(
+                f"semantic: all_accelerated=False but "
+                f"fused({fused_count})+buffered({buffered_count})={accel} "
+                f"== total({total})"
+            )
+
+    # S7: runtime_path must be consistent with counts
+    if rp == RUNTIME_PATH_FUSED and fused_count != total:
+        issues.append(
+            f"semantic: runtime_path={rp!r} but fused_count={fused_count} "
+            f"!= total={total}"
+        )
+    if rp == RUNTIME_PATH_BUFFERED and buffered_count != total:
+        issues.append(
+            f"semantic: runtime_path={rp!r} but buffered_count={buffered_count} "
+            f"!= total={total}"
+        )
+    if rp == RUNTIME_PATH_NAIVE and naive_count != total:
+        issues.append(
+            f"semantic: runtime_path={rp!r} but naive_count={naive_count} "
+            f"!= total={total}"
+        )
 
     return issues
 
