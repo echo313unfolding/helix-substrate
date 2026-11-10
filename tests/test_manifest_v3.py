@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.build_manifest_v3 import build_manifest, validate_manifest
 
 

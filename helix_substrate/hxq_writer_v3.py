@@ -348,7 +348,7 @@ class CDNAv3Writer:
         Returns:
             (codebook [k, d], indices [rows * cols // d])
         """
-        from helix_substrate.cdna_encoder import _vector_kmeans
+        from helix_substrate.hxq_encoder import _vector_kmeans
 
         rows, cols = tensor.shape
         # Group adjacent elements along in_features (row-wise, memory-contiguous)
@@ -423,7 +423,7 @@ class CDNAv3Writer:
         self, flat: np.ndarray, n_clusters: int
     ) -> np.ndarray:
         """Build codebook using k-means on subsampled data."""
-        from helix_substrate.cdna_encoder import _simple_kmeans
+        from helix_substrate.hxq_encoder import _simple_kmeans
 
         # Subsample to avoid OOM in k-means
         if len(flat) > _KMEANS_MAX_SAMPLES:

@@ -77,7 +77,7 @@ def run_proof(quick: bool = False):
         print("ERROR: gguf package required. Install with: pip install gguf")
         sys.exit(1)
 
-    from helix_substrate.cdna_reader import CDNAv2Writer, CDNAv2Reader
+    from helix_substrate.hxq_reader import CDNAv2Writer, CDNAv2Reader
     from helix_substrate.convert_gguf import quantize_tensor
 
     print("=" * 60)

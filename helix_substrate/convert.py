@@ -83,7 +83,7 @@ def convert_huggingface_model(
             "Or: pip install huggingface_hub safetensors"
         )
 
-    from helix_substrate.cdna_reader import CDNAv2Writer
+    from helix_substrate.hxq_reader import CDNAv2Writer
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)

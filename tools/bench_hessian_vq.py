@@ -40,7 +40,7 @@ from scipy.stats import kurtosis as scipy_kurtosis
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer, _cosine
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer, _cosine
 from helix_substrate.helix_linear import (
     load_helix_linear_from_cdnav3,
     swap_to_helix,
@@ -154,7 +154,7 @@ def hessian_vq_encode(
 
     # Build codebook from weight distribution (same as standard VQ)
     flat = W.ravel()
-    from helix_substrate.cdna_encoder import _simple_kmeans
+    from helix_substrate.hxq_encoder import _simple_kmeans
     n_sample = min(len(flat), 500_000)
     rng = np.random.RandomState(42)
     sample = flat[rng.choice(len(flat), n_sample, replace=False)]

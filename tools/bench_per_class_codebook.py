@@ -37,7 +37,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from helix_substrate.tensor_policy import classify_tensor, TensorClass
-from helix_substrate.cdna_encoder import _simple_kmeans
+from helix_substrate.hxq_encoder import _simple_kmeans
 
 
 # ============================================================================
