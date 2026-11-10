@@ -23,7 +23,7 @@ import torch
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from helix_substrate.helix_linear import HelixLinear, load_helix_linear_from_cdnav3
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.tensor_policy import TensorPolicy, TensorClass
 
 

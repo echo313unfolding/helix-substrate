@@ -43,7 +43,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 from helix_substrate.rapl_meter import RaplMeter
 from helix_substrate.tensor_policy import (
     classify_tensor,

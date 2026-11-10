@@ -89,7 +89,7 @@ def load_receipts(receipts_dir):
 
 def compress_model_linears(model):
     """Compress all nn.Linear in the sentence-transformer's auto_model."""
-    from helix_substrate.cdnav3_writer import CDNAv3Writer
+    from helix_substrate.hxq_writer_v3 import CDNAv3Writer
     from helix_substrate.tensor_policy import TensorPolicy, TensorClass
     from helix_substrate.helix_linear import load_helix_linear_from_cdnav3
 

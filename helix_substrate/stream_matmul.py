@@ -38,7 +38,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 
-from helix_substrate.cdna_reader import CDNAv2Reader, load_cdna_auto
+from helix_substrate.hxq_reader import CDNAv2Reader, load_cdna_auto
 from helix_substrate.sidecar import read_outlier_sidecar
 
 # --- C++ kernel feature flags (optional, pure Python fallback available) ---

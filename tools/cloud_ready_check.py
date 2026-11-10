@@ -155,8 +155,8 @@ def phase1_imports():
         ("helix_substrate.helix_linear",
          ["HelixLinear", "load_cdna_factors", "swap_to_helix", "swap_summary",
           "load_helix_linear_from_cdnav3"]),
-        ("helix_substrate.cdnav3_writer", ["CDNAv3Writer"]),
-        ("helix_substrate.cdnav3_reader", ["CDNAv3Reader"]),
+        ("helix_substrate.hxq_writer_v3", ["CDNAv3Writer"]),
+        ("helix_substrate.hxq_reader_v3", ["CDNAv3Reader"]),
         ("helix_substrate.tensor_policy",
          ["classify_tensor", "TensorPolicy", "TensorClass", "get_policy",
           "get_default_policy"]),
@@ -389,8 +389,8 @@ def phase4_compression_roundtrip():
     print("\n── Phase 4: Compression roundtrip ──", flush=True)
 
     import numpy as np
-    from helix_substrate.cdnav3_writer import CDNAv3Writer
-    from helix_substrate.cdnav3_reader import CDNAv3Reader
+    from helix_substrate.hxq_writer_v3 import CDNAv3Writer
+    from helix_substrate.hxq_reader_v3 import CDNAv3Reader
     from helix_substrate.tensor_policy import TensorPolicy, TensorClass
 
     with tempfile.TemporaryDirectory() as tmpdir:

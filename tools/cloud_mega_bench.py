@@ -55,7 +55,7 @@ from helix_substrate.tensor_policy import (
     get_default_policy,
     get_policy,
 )
-from helix_substrate.cdnav3_writer import CDNAv3Writer
+from helix_substrate.hxq_writer_v3 import CDNAv3Writer
 
 
 # ── Utilities ──

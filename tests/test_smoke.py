@@ -9,7 +9,7 @@ import pytest
 
 def test_cdna_v1_roundtrip():
     """Encode a tensor to CDNA v1, decode it, verify reconstruction."""
-    from helix_substrate.cdna_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
+    from helix_substrate.hxq_encoder import encode_tensor_to_cdna, decode_cdna_to_tensor
 
     W = np.random.RandomState(42).randn(128, 256).astype(np.float32)
 

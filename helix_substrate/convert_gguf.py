@@ -82,7 +82,7 @@ def convert_gguf_model(
             "Or: pip install helix-substrate[gguf]"
         )
 
-    from helix_substrate.cdna_reader import CDNAv2Writer
+    from helix_substrate.hxq_reader import CDNAv2Writer
 
     gguf_path = Path(gguf_path)
     output_dir = Path(output_dir)
