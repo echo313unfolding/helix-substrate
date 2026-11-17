@@ -115,3 +115,59 @@ Possible 'near-return with learning' event: `return_dist(t) < ε` and `edge_delt
 ## 10. Scope of this handoff
 
 This document is a **research synthesis of the present discussion plus recovered historical snippets**, not a verbatim transcript of every message. It preserves the central observations, equations, file leads, uncertainty, and the requested agent handoff. No benchmark was run for this document, and earlier conversational claims of a completed graph experiment should not be treated as verified receipts without an executable artifact and logs.
+
+## 11. Addendum — self-organization, the "unheard drumbeat," and emergence of strange loops (2026-11-17)
+
+### User's core intuition
+
+The user proposes that the existence of consistent physical rules may indicate a deeper organizing principle — metaphorically, a **"drumbeat we cannot hear"** — and asks whether the interaction of enough self-organizing systems could produce the kind of recursive mirror described by Hofstadter. The analogy to radio waves emphasizes epistemic humility: historically, some real physical phenomena became measurable only after instrumentation improved.
+
+This is a **question and research intuition**, not evidence of an undiscovered field, frequency, intentional designer, or universal clock. The absence of a known deeper explanation does not itself establish a hidden mechanism.
+
+### Necessary distinctions
+
+1. **Physical laws and their origin:** Why laws or constants have the form they do is not settled by an account of self-organization.
+2. **Physical self-organization:** Local interactions can yield stable collective patterns without an intelligent external controller (e.g., phase transitions, pattern formation). Such organization does not by itself imply agency or awareness.
+3. **Coupled feedback:** Multiple self-organizing systems can alter each other's states and create higher-order dynamics. More subsystems alone do **not** guarantee a self-referential loop.
+4. **Self-modeling:** A subsystem or whole system constructs a predictive representation of its own state, behavior, or causal influence.
+5. **Strange-loop candidate:** That self-representation participates causally in the process that generates or updates it, potentially across representational levels. Even this does not demonstrate subjective consciousness.
+
+A minimal causal sketch:
+
+```text
+local interactions → emergent structure → coupled feedback
+                                      ↓
+                          predictive self-representation
+                                      ↓
+                         changed attention/actions/state
+                                      └── feedback into self-representation
+```
+
+This is an explanatory research model, not an established necessary evolutionary sequence.
+
+### Nuclear-physics and Yang–Mills clarification
+
+- Protons and neutrons contain quarks held together by the strong interaction; a residual strong interaction contributes to nuclear binding. Electrons bind to atomic nuclei primarily electromagnetically.
+- Yang–Mills theory is the gauge-theoretic framework used in describing fundamental interactions. The mathematical **existence and mass-gap** problem concerns a rigorously defined quantum Yang–Mills theory with a positive excitation gap; it is **not identical** to explaining a specific proton–neutron or electron–proton bond.
+- The Planck scale is associated with quantum-gravity questions, many orders of magnitude smaller than nuclear length scales. No established result connects Planck-scale dynamics directly to self-reference or consciousness.
+- **Source verification gate:** A prior conversational answer asserted a specific November 2026 OpenAI-related Yang–Mills partial-result announcement. That claim has **not been independently source-verified in this handoff** and must not be treated as an established theorem or prize resolution without checking original publication, proof, reviewer statements, and scope. Do not infer the mass-gap problem is solved.
+
+### Testable central question
+
+**Can coupled, locally self-organizing subsystems spontaneously develop an internal representation of their own collective state that causally improves adaptation, memory, or prediction?**
+
+Operational definitions and controls:
+- Pre-register what qualifies as `self_model` (e.g., decodable, intervention-sensitive information about the system's own state, beyond direct sensory echoes).
+- Compare coupled agents with and without explicit self-modeling capacity; hold compute, data, communication bandwidth, and training budget fixed.
+- Use interventions: corrupt, remove, delay, or swap the candidate self-model while preserving other state; quantify effects on subsequent policy, memory updates, prediction accuracy, and recovery.
+- Compare against non-self-referential feedback, externally provided controller, simple recurrent network, and shuffled or decoupled communications.
+- Track whether a higher-level model recursively predicts its own modeling process, not merely external variables.
+- Avoid claiming consciousness from improved performance or loop closure. Report failure cases, negative results, and alternate explanations.
+
+### Relevance to DriftTime
+
+Investigate whether `ΔΣt` can quantify the **history-dependent reorganization** associated with self-model feedback, as distinct from elapsed time, hidden-state path length, and mere recurrence. Compare proposed metrics with standard information-theoretic, dynamical-systems, and causal-intervention baselines before introducing a new construct.
+
+### Agent next action
+
+**Read-only mathematical and literature audit only.** Map each analogy to explicit assumptions, observables, falsifiable predictions, and competing explanations. No new runtime code, mutations, branch merge, or unapproved experiment execution. Preserve the draft PR for user review.
